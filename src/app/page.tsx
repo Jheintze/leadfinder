@@ -5,8 +5,7 @@ import { FormEvent, useState } from "react";
 type Lead = {
   id: string;
   businessName: string;
-  website: string;
-  email: string;
+  website: string | null;
   location: string;
   status: "Ready" | "Needs review";
 };
@@ -136,7 +135,7 @@ function Field({ label, htmlFor, children }: { label: string; htmlFor: string; c
 }
 
 function ResultsTable({ leads }: { leads: Lead[] }) {
-  return <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"><div className="overflow-x-auto"><table className="w-full min-w-[720px] text-left text-sm"><thead className="border-b border-slate-200 bg-slate-50 text-xs font-medium uppercase tracking-wide text-slate-500"><tr><th className="px-5 py-3.5">Business</th><th className="px-5 py-3.5">Website</th><th className="px-5 py-3.5">Email</th><th className="px-5 py-3.5">Location</th><th className="px-5 py-3.5">Status</th></tr></thead><tbody className="divide-y divide-slate-100">{leads.map((lead) => <tr key={lead.id} className="hover:bg-slate-50/70"><td className="px-5 py-4 font-medium text-slate-800">{lead.businessName}</td><td className="px-5 py-4"><a className="text-blue-600 hover:text-blue-700 hover:underline" href={lead.website} target="_blank" rel="noreferrer">{lead.website.replace("https://", "")}</a></td><td className="px-5 py-4 text-slate-600">{lead.email}</td><td className="px-5 py-4 text-slate-600">{lead.location}</td><td className="px-5 py-4"><span className={lead.status === "Ready" ? "status-ready" : "status-review"}>{lead.status}</span></td></tr>)}</tbody></table></div></div>;
+  return <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"><div className="overflow-x-auto"><table className="w-full min-w-[760px] text-left text-sm"><thead className="border-b border-slate-200 bg-slate-50 text-xs font-medium uppercase tracking-wide text-slate-500"><tr><th className="px-5 py-3.5">Business</th><th className="px-5 py-3.5">Website</th><th className="px-5 py-3.5">Location</th><th className="px-5 py-3.5">Place ID</th><th className="px-5 py-3.5">Status</th></tr></thead><tbody className="divide-y divide-slate-100">{leads.map((lead) => <tr key={lead.id} className="hover:bg-slate-50/70"><td className="px-5 py-4 font-medium text-slate-800">{lead.businessName}</td><td className="px-5 py-4">{lead.website ? <a className="text-blue-600 hover:text-blue-700 hover:underline" href={lead.website} target="_blank" rel="noreferrer">{lead.website.replace(/^https?:\/\//, "")}</a> : <span className="text-slate-400">Not available</span>}</td><td className="px-5 py-4 text-slate-600">{lead.location}</td><td className="max-w-44 truncate px-5 py-4 font-mono text-xs text-slate-500" title={lead.id}>{lead.id}</td><td className="px-5 py-4"><span className={lead.status === "Ready" ? "status-ready" : "status-review"}>{lead.status}</span></td></tr>)}</tbody></table></div></div>;
 }
 
 function LoadingState({ count }: { count: number }) { return <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"><div className="mb-5 flex items-center gap-3 text-sm text-slate-600"><Spinner /><span>Looking for {count} businesses that match your search…</span></div>{Array.from({ length: 4 }).map((_, index) => <div key={index} className="mb-4 h-5 animate-pulse rounded bg-slate-100 last:mb-0" style={{ width: `${92 - index * 11}%` }} />)}</div>; }

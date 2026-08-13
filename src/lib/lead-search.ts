@@ -1,35 +1,87 @@
 export type LeadStatus = "Ready" | "Needs review";
 
 export type Lead = {
+  /** Google Place ID: use this as the stable external identifier. */
   id: string;
   businessName: string;
-  website: string;
-  email: string;
+  website: string | null;
   location: string;
   status: LeadStatus;
 };
 
 export type LeadSearchInput = { city: string; businessType: string; limit: number };
 
-const businesses = [
-  ["Juniper Table", "hello@junipertable.example"], ["Mosaic Kitchen", "team@mosaickitchen.example"],
-  ["Olive & Ember", "contact@oliveember.example"], ["North Star Dining", "hello@northstardining.example"],
-  ["The Daily Grain", "info@dailygrain.example"], ["Cedar House", "reservations@cedarhouse.example"],
-  ["Market & Vine", "team@marketandvine.example"], ["Golden Hour Cafe", "hello@goldenhourcafe.example"],
-  ["Riverside Social", "contact@riversidesocial.example"], ["Common Ground", "info@commonground.example"],
-] as const;
+type GooglePlace = {
+  id?: string;
+  displayName?: { text?: string };
+  formattedAddress?: string;
+  websiteUri?: string;
+};
 
-function slugify(value: string) { return value.toLowerCase().replace(/[^a-z0-9]+/g, "").replace(/(^-|-$)/g, ""); }
+type GooglePlacesResponse = {
+  places?: GooglePlace[];
+  nextPageToken?: string;
+  error?: { message?: string };
+};
 
-/** Replace this adapter with a provider integration later; consumers retain this contract. */
-export async function searchLeads({ city, businessType, limit }: LeadSearchInput): Promise<Lead[]> {
-  await new Promise((resolve) => setTimeout(resolve, 550));
-  const normalizedCity = city.trim();
-  const type = businessType.trim() || "Restaurant";
-  return Array.from({ length: limit }, (_, index) => {
-    const [name, email] = businesses[index % businesses.length];
-    const iteration = index >= businesses.length ? ` ${Math.floor(index / businesses.length) + 1}` : "";
-    const businessName = `${name}${iteration}`;
-    return { id: `${slugify(normalizedCity)}-${slugify(type)}-${index + 1}`, businessName, website: `https://${slugify(businessName)}.example`, email, location: normalizedCity, status: index % 4 === 3 ? "Needs review" : "Ready" };
+const GOOGLE_PLACES_ENDPOINT = "https://places.googleapis.com/v1/places:searchText";
+const FIELD_MASK = "places.id,places.displayName,places.formattedAddress,places.websiteUri,nextPageToken";
+
+async function searchGooglePlaces(
+  apiKey: string,
+  textQuery: string,
+  pageSize: number,
+  pageToken?: string,
+): Promise<GooglePlacesResponse> {
+  const response = await fetch(GOOGLE_PLACES_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": apiKey,
+      "X-Goog-FieldMask": FIELD_MASK,
+    },
+    body: JSON.stringify({ textQuery, pageSize, ...(pageToken ? { pageToken } : {}) }),
+    cache: "no-store",
   });
+
+  const data = (await response.json()) as GooglePlacesResponse;
+  if (!response.ok) {
+    throw new Error(data.error?.message || "Google Places search failed.");
+  }
+
+  return data;
+}
+
+/**
+ * Google Places Text Search adapter. Keeping provider code here means the API
+ * route and dashboard can retain their current contract if the provider changes.
+ */
+export async function searchLeads({ city, businessType, limit }: LeadSearchInput): Promise<Lead[]> {
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+  if (!apiKey) {
+    throw new Error("Restaurant search is not configured. Add GOOGLE_PLACES_API_KEY to your environment.");
+  }
+
+  const textQuery = `${businessType.trim() || "Restaurant"} in ${city.trim()}`;
+  const leads: Lead[] = [];
+  let pageToken: string | undefined;
+
+  do {
+    const response = await searchGooglePlaces(apiKey, textQuery, Math.min(20, limit - leads.length), pageToken);
+    const pageLeads = (response.places ?? []).flatMap((place): Lead[] => {
+      if (!place.id || !place.displayName?.text) return [];
+      const website = place.websiteUri ?? null;
+      return [{
+        id: place.id,
+        businessName: place.displayName.text,
+        website,
+        location: place.formattedAddress ?? city.trim(),
+        status: website ? "Ready" : "Needs review",
+      }];
+    });
+    leads.push(...pageLeads);
+    pageToken = response.nextPageToken;
+  } while (leads.length < limit && pageToken);
+
+  return leads.slice(0, limit);
 }

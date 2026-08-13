@@ -14,6 +14,12 @@ export async function POST(request: Request) {
   if (!Number.isInteger(limit) || limit < 1 || limit > 50) return NextResponse.json({ error: "Number of leads must be between 1 and 50." }, { status: 400 });
 
   const query = { city, businessType: businessType || "Restaurant", limit };
-  const leads = await searchLeads(query);
-  return NextResponse.json({ leads, query });
+  try {
+    const leads = await searchLeads(query);
+    return NextResponse.json({ leads, query });
+  } catch (error) {
+    console.error("Lead search failed", error);
+    const message = error instanceof Error ? error.message : "Restaurant search failed.";
+    return NextResponse.json({ error: message }, { status: 502 });
+  }
 }
