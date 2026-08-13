@@ -1,0 +1,19 @@
+import { searchLeads } from "@/lib/lead-search";
+import { NextResponse } from "next/server";
+
+type SearchRequest = { city?: unknown; businessType?: unknown; limit?: unknown };
+
+export async function POST(request: Request) {
+  let body: SearchRequest;
+  try { body = await request.json(); } catch { return NextResponse.json({ error: "Request body must be valid JSON." }, { status: 400 }); }
+  const city = typeof body.city === "string" ? body.city.trim() : "";
+  const businessType = typeof body.businessType === "string" ? body.businessType.trim() : "Restaurant";
+  const limit = typeof body.limit === "number" ? body.limit : Number(body.limit);
+
+  if (!city) return NextResponse.json({ error: "City is required." }, { status: 400 });
+  if (!Number.isInteger(limit) || limit < 1 || limit > 50) return NextResponse.json({ error: "Number of leads must be between 1 and 50." }, { status: 400 });
+
+  const query = { city, businessType: businessType || "Restaurant", limit };
+  const leads = await searchLeads(query);
+  return NextResponse.json({ leads, query });
+}
