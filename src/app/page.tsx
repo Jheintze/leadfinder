@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { SubmitEvent } from "react";
 
 type Lead = {
   id: string;
@@ -27,7 +28,7 @@ export default function Home() {
   const [hasSearched, setHasSearched] = useState(false);
   const [lastQuery, setLastQuery] = useState<SearchResponse["query"] | null>(null);
 
-  async function handleSubmit(event: SubmitEvent) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmedCity = city.trim();
 
@@ -66,7 +67,7 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
