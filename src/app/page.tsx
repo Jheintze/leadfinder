@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 
 type Lead = {
   id: string;
@@ -27,7 +27,7 @@ export default function Home() {
   const [hasSearched, setHasSearched] = useState(false);
   const [lastQuery, setLastQuery] = useState<SearchResponse["query"] | null>(null);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent) {
     event.preventDefault();
     const trimmedCity = city.trim();
 
@@ -46,7 +46,9 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ city: trimmedCity, businessType, limit }),
       });
-      const data = (await response.json()) as SearchResponse & { error?: string };
+      const data = (await response.json()) as SearchResponse & {
+        error?: string;
+      };
 
       if (!response.ok) {
         throw new Error(data.error || "We could not find leads right now.");
@@ -56,7 +58,11 @@ export default function Home() {
       setLastQuery(data.query);
     } catch (caughtError) {
       setLeads([]);
-      setError(caughtError instanceof Error ? caughtError.message : "Something went wrong. Please try again.");
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Something went wrong. Please try again.",
+      );
     } finally {
       setIsLoading(false);
     }
