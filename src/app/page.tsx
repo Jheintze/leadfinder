@@ -8,7 +8,7 @@ type Lead = {
   businessName: string;
   website: string | null;
   location: string;
-  status: "Ready" | "Needs review";
+  status: "Website found" | "Website missing";
 };
 
 type SearchResponse = {
