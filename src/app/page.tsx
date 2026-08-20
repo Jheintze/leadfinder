@@ -74,7 +74,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
-      <div className="mx-auto flex min-h-screen max-w-7xl">
+      <div className="mx-auto flex min-h-screen max-w-[1600px]">
         <aside className="hidden w-60 shrink-0 border-r border-slate-200 bg-white px-5 py-6 md:flex md:flex-col">
           <div className="flex items-center gap-3 px-2">
             <div className="grid h-9 w-9 place-items-center rounded-lg bg-blue-600 text-sm font-bold text-white">
