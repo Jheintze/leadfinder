@@ -19,13 +19,6 @@ export async function POST(request: Request) {
     );
   }
 
-  const { data, error } = await supabase
-    .from("restaurants")
-    .select("*")
-    .limit(5);
-
-  console.log("Supabase test:", { data, error });
-  
   const city = typeof body.city === "string" ? body.city.trim() : "";
   const businessType =
     typeof body.businessType === "string"
@@ -41,10 +34,31 @@ export async function POST(request: Request) {
       { error: "Number of leads must be between 1 and 50." },
       { status: 400 },
     );
-  
+
   const query = { city, businessType: businessType || "Restaurant", limit };
   try {
     const leads = await searchLeads(query);
+
+    const restaurants = leads.map((lead) => ({
+      source_id: lead.id,
+      name: lead.businessName,
+      address: lead.location,
+      website: lead.website,
+      email: lead.email,
+      city,
+    }));
+
+    const { error: insertError } = await supabase
+      .from("restaurants")
+      .upsert(restaurants, {
+        onConflict: "source_id",
+        ignoreDuplicates: true,
+      });
+
+    if (insertError) {
+      throw insertError;
+    }
+
     return NextResponse.json({ leads, query });
   } catch (error) {
     console.error("Lead search failed", error);
