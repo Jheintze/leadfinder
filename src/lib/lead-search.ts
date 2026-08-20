@@ -55,6 +55,7 @@ export async function searchLeads({
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "LeadFinder/1.0",
     },
     body: `data=${encodeURIComponent(query)}`,
     cache: "no-store",
