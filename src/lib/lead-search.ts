@@ -4,6 +4,7 @@ export type Lead = {
   id: string;
   businessName: string;
   website: string | null;
+  email: string | null;
   location: string;
   status: LeadStatus;
 };
@@ -21,6 +22,8 @@ type OverpassElement = {
     name?: string;
     website?: string;
     "contact:website"?: string;
+    email?: string;
+    "contact:email"?: string;
     "addr:street"?: string;
     "addr:housenumber"?: string;
     "addr:postcode"?: string;
@@ -81,6 +84,7 @@ export async function searchLeads({
     }
 
     const website = tags.website ?? tags["contact:website"] ?? null;
+    const email = tags.email ?? tags["contact:email"] ?? null;
 
     const address = [
       tags["addr:street"] && tags["addr:housenumber"]
@@ -96,6 +100,7 @@ export async function searchLeads({
       id: `${element.type}/${element.id}`,
       businessName: tags.name,
       website,
+      email,
       location: address || city.trim(),
       status: website ? "Ready" : "Needs review",
     });
