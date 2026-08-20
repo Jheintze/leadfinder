@@ -1,7 +1,6 @@
 export type LeadStatus = "Ready" | "Needs review";
 
 export type Lead = {
-  /** Google Place ID: use this as the stable external identifier. */
   id: string;
   businessName: string;
   website: string | null;
@@ -9,79 +8,101 @@ export type Lead = {
   status: LeadStatus;
 };
 
-export type LeadSearchInput = { city: string; businessType: string; limit: number };
-
-type GooglePlace = {
-  id?: string;
-  displayName?: { text?: string };
-  formattedAddress?: string;
-  websiteUri?: string;
+export type LeadSearchInput = {
+  city: string;
+  businessType: string;
+  limit: number;
 };
 
-type GooglePlacesResponse = {
-  places?: GooglePlace[];
-  nextPageToken?: string;
-  error?: { message?: string };
+type OverpassElement = {
+  type: string;
+  id: number;
+  tags?: {
+    name?: string;
+    website?: string;
+    "contact:website"?: string;
+    "addr:street"?: string;
+    "addr:housenumber"?: string;
+    "addr:postcode"?: string;
+    "addr:city"?: string;
+  };
 };
 
-const GOOGLE_PLACES_ENDPOINT = "https://places.googleapis.com/v1/places:searchText";
-const FIELD_MASK = "places.id,places.displayName,places.formattedAddress,places.websiteUri,nextPageToken";
+type OverpassResponse = {
+  elements?: OverpassElement[];
+};
 
-async function searchGooglePlaces(
-  apiKey: string,
-  textQuery: string,
-  pageSize: number,
-  pageToken?: string,
-): Promise<GooglePlacesResponse> {
-  const response = await fetch(GOOGLE_PLACES_ENDPOINT, {
+const OVERPASS_ENDPOINT = "https://overpass-api.de/api/interpreter";
+
+export async function searchLeads({
+  city,
+  businessType,
+  limit,
+}: LeadSearchInput): Promise<Lead[]> {
+  const query = `
+    [out:json][timeout:25];
+
+    area["name"="${city.trim()}"]["boundary"="administrative"]->.searchArea;
+
+    (
+      nwr["amenity"="${businessType.trim().toLowerCase()}"](area.searchArea);
+    );
+
+    out tags center;
+  `;
+
+  const response = await fetch(OVERPASS_ENDPOINT, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
-      "X-Goog-Api-Key": apiKey,
-      "X-Goog-FieldMask": FIELD_MASK,
+      "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: JSON.stringify({ textQuery, pageSize, ...(pageToken ? { pageToken } : {}) }),
+    body: `data=${encodeURIComponent(query)}`,
     cache: "no-store",
   });
 
-  const data = (await response.json()) as GooglePlacesResponse;
   if (!response.ok) {
-    throw new Error(data.error?.message || "Google Places search failed.");
+    const errorText = await response.text();
+
+    throw new Error(
+      `OpenStreetMap search failed (${response.status}): ${errorText}`,
+    );
   }
 
-  return data;
-}
+  const data = (await response.json()) as OverpassResponse;
 
-/**
- * Google Places Text Search adapter. Keeping provider code here means the API
- * route and dashboard can retain their current contract if the provider changes.
- */
-export async function searchLeads({ city, businessType, limit }: LeadSearchInput): Promise<Lead[]> {
-  const apiKey = process.env.GOOGLE_PLACES_API_KEY;
-  if (!apiKey) {
-    throw new Error("Restaurant search is not configured. Add GOOGLE_PLACES_API_KEY to your environment.");
-  }
-
-  const textQuery = `${businessType.trim() || "Restaurant"} in ${city.trim()}`;
   const leads: Lead[] = [];
-  let pageToken: string | undefined;
 
-  do {
-    const response = await searchGooglePlaces(apiKey, textQuery, Math.min(20, limit - leads.length), pageToken);
-    const pageLeads = (response.places ?? []).flatMap((place): Lead[] => {
-      if (!place.id || !place.displayName?.text) return [];
-      const website = place.websiteUri ?? null;
-      return [{
-        id: place.id,
-        businessName: place.displayName.text,
-        website,
-        location: place.formattedAddress ?? city.trim(),
-        status: website ? "Ready" : "Needs review",
-      }];
+  for (const element of data.elements ?? []) {
+    const tags = element.tags;
+
+    if (!tags?.name) {
+      continue;
+    }
+
+    const website = tags.website ?? tags["contact:website"] ?? null;
+
+    const address = [
+      tags["addr:street"] && tags["addr:housenumber"]
+        ? `${tags["addr:street"]} ${tags["addr:housenumber"]}`
+        : tags["addr:street"],
+      tags["addr:postcode"],
+      tags["addr:city"],
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    leads.push({
+      id: `${element.type}/${element.id}`,
+      businessName: tags.name,
+      website,
+      location: address || city.trim(),
+      status: website ? "Ready" : "Needs review",
     });
-    leads.push(...pageLeads);
-    pageToken = response.nextPageToken;
-  } while (leads.length < limit && pageToken);
 
-  return leads.slice(0, limit);
+    if (leads.length >= limit) {
+      break;
+    }
+  }
+
+  return leads;
 }
