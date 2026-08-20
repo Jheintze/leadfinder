@@ -7,6 +7,7 @@ type Lead = {
   id: string;
   businessName: string;
   website: string | null;
+  email: string | null;
   location: string;
   status: "Website found" | "Website missing";
 };
@@ -250,6 +251,7 @@ function ResultsTable({ leads }: { leads: Lead[] }) {
             <tr>
               <th className="px-5 py-3.5">Business</th>
               <th className="px-5 py-3.5">Website</th>
+              <th className="px-5 py-3.5">Email</th>
               <th className="px-5 py-3.5">Location</th>
               <th className="px-5 py-3.5">Place ID</th>
               <th className="px-5 py-3.5">Status</th>
@@ -275,6 +277,18 @@ function ResultsTable({ leads }: { leads: Lead[] }) {
                     <span className="text-slate-400">Not available</span>
                   )}
                 </td>
+                <td className="px-5 py-4">
+                  {lead.email ? (
+                    <a
+                      className="text-blue-600 hover:text-blue-700 hover:underline"
+                      href={`mailto:${lead.email}`}
+                    >
+                      {lead.email}
+                    </a>
+                  ) : (
+                    <span className="text-slate-400">Not available</span>
+                  )}
+                </td>
                 <td className="px-5 py-4 text-slate-600">{lead.location}</td>
                 <td
                   className="max-w-44 truncate px-5 py-4 font-mono text-xs text-slate-500"
@@ -285,7 +299,7 @@ function ResultsTable({ leads }: { leads: Lead[] }) {
                 <td className="px-5 py-4">
                   <span
                     className={
-                      lead.status === "Ready" ? "status-ready" : "status-review"
+                      lead.status === "Website found" ? "status-ready" : "status-review"
                     }
                   >
                     {lead.status}

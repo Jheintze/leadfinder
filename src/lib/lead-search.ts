@@ -1,4 +1,4 @@
-export type LeadStatus = "Ready" | "Needs review";
+export type LeadStatus = "Website found" | "Website missing";
 
 export type Lead = {
   id: string;
@@ -102,7 +102,7 @@ export async function searchLeads({
       website,
       email,
       location: address || city.trim(),
-      status: website ? "Ready" : "Needs review",
+      status: website ? "Website found" : "Website missing",
     });
 
     if (leads.length >= limit) {
