@@ -40,7 +40,7 @@ const OVERPASS_ENDPOINT = "https://overpass-api.de/api/interpreter";
 export async function searchLeads({
   city,
   businessType,
-  limit,
+  
 }: LeadSearchInput): Promise<Lead[]> {
   const query = `
     [out:json][timeout:25];
@@ -104,10 +104,6 @@ export async function searchLeads({
       location: address || city.trim(),
       status: website ? "Website found" : "Website missing",
     });
-
-    if (leads.length >= limit) {
-      break;
-    }
   }
 
   return leads;
