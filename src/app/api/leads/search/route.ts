@@ -37,28 +37,9 @@ export async function POST(request: Request) {
 
   const query = { city, businessType: businessType || "Restaurant", limit };
   try {
-    const candidates = await searchLeads(query);
+    const leads = await searchLeads(query);
 
-    const candidateIds = candidates.map((lead) => lead.id);
-
-    const { data: existingRestaurants, error: existingError } = await supabase
-      .from("restaurants")
-      .select("source_id")
-      .in("source_id", candidateIds);
-
-    if (existingError) {
-      throw existingError;
-    }
-
-    const existingIds = new Set(
-      (existingRestaurants ?? []).map((restaurant) => restaurant.source_id),
-    );
-
-    const newLeads = candidates
-      .filter((lead) => !existingIds.has(lead.id))
-      .slice(0, limit);
-
-    const restaurants = newLeads.map((lead) => ({
+    const restaurants = leads.map((lead) => ({
       source_id: lead.id,
       name: lead.businessName,
       address: lead.location,
@@ -67,23 +48,22 @@ export async function POST(request: Request) {
       city,
     }));
 
-    if (restaurants.length > 0) {
-      const { error: insertError } = await supabase
-        .from("restaurants")
-        .insert(restaurants);
+    const { error: insertError } = await supabase
+      .from("restaurants")
+      .upsert(restaurants, {
+        onConflict: "source_id",
+        ignoreDuplicates: true,
+      });
 
-      if (insertError) {
-        throw insertError;
-      }
+    if (insertError) {
+      throw insertError;
     }
 
-    return NextResponse.json({ leads: newLeads, query });
+    return NextResponse.json({ leads, query });
   } catch (error) {
     console.error("Lead search failed", error);
-
     const message =
       error instanceof Error ? error.message : "Restaurant search failed.";
-
     return NextResponse.json({ error: message }, { status: 502 });
   }
 }
