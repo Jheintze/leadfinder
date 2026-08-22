@@ -101,7 +101,7 @@ export async function POST(request: Request) {
       newLeads.push(...freshLeads);
 
       // Move to the next Open Places page.
-      offset += batchSize;
+      offset += leads.length;
     }
 
     // Save only the requested number of NEW restaurants.
