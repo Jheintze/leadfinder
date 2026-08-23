@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { SubmitEvent } from "react";
+import { AppSidebar } from "../components/app-sidebar";
 
 type Lead = {
   id: string;
@@ -75,32 +76,9 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto flex min-h-screen max-w-[1600px]">
-        <aside className="hidden w-60 shrink-0 border-r border-slate-200 bg-white px-5 py-6 md:flex md:flex-col">
-          <div className="flex items-center gap-3 px-2">
-            <div className="grid h-9 w-9 place-items-center rounded-lg bg-blue-600 text-sm font-bold text-white">
-              L
-            </div>
-            <span className="text-lg font-semibold tracking-tight">
-              LeadFinder
-            </span>
-          </div>
-          <nav className="mt-10">
-            <a
-              className="flex items-center gap-3 rounded-lg bg-blue-50 px-3 py-2.5 text-sm font-medium text-blue-700"
-              href="#dashboard"
-            >
-              <DashboardIcon /> Dashboard
-            </a>
-          </nav>
-          <p className="mt-auto px-2 text-xs leading-5 text-slate-400">
-            DishBoost internal tools
-            <br />
-            Lead research workspace
-          </p>
-        </aside>
+        <AppSidebar activePage="restaurant-search" />
 
         <section
-          id="dashboard"
           className="min-w-0 flex-1 px-5 py-6 sm:px-8 lg:px-12 lg:py-10"
         >
           <header className="flex items-center justify-between border-b border-slate-200 pb-5 md:hidden">
@@ -362,23 +340,6 @@ function SearchIcon() {
     >
       <circle cx="11" cy="11" r="6" />
       <path d="m20 20-4.2-4.2" />
-    </svg>
-  );
-}
-function DashboardIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-4 w-4"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <rect x="3" y="3" width="7" height="7" rx="1" />
-      <rect x="14" y="3" width="7" height="7" rx="1" />
-      <rect x="3" y="14" width="7" height="7" rx="1" />
-      <rect x="14" y="14" width="7" height="7" rx="1" />
     </svg>
   );
 }
