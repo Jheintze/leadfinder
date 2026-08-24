@@ -27,12 +27,16 @@ export async function findEmailFromWebsite(
       return { email: null };
     }
 
-    const email = matches.find(
-      (value) =>
-        !value.toLowerCase().includes("example.com") &&
-        !value.toLowerCase().includes("sentry"),
-    );
+    const email = matches.find((value) => {
+      const normalizedEmail = value.toLowerCase();
 
+      return (
+        !normalizedEmail.includes("example.com") &&
+        !normalizedEmail.includes("domain.com") &&
+        !normalizedEmail.includes("sentry")
+      );
+    });
+    
     return {
       email: email ?? null,
     };
