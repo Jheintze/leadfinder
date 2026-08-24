@@ -2,14 +2,35 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { findEmailFromWebsite } from "@/lib/email-finder";
 
-export async function POST() {
+xport async function POST(request: Request) {
+  let body: { limit?: unknown };
+
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { error: "Request body must be valid JSON." },
+      { status: 400 },
+    );
+  }
+
+  const limit =
+    typeof body.limit === "number" ? body.limit : Number(body.limit);
+
+  if (!Number.isInteger(limit) || limit < 1 || limit > 50) {
+    return NextResponse.json(
+      { error: "Number to process must be between 1 and 50." },
+      { status: 400 },
+    );
+  }
+
   try {
     const { data: restaurants, error: fetchError } = await supabase
       .from("restaurants")
       .select("id, name, website, email")
       .not("website", "is", null)
       .is("email", null)
-      .limit(5);
+      .limit(limit);
 
     if (fetchError) {
       throw fetchError;
