@@ -46,15 +46,18 @@ export async function POST(request: Request) {
 
       const { email } = await findEmailFromWebsite(restaurant.website);
 
-      if (email) {
-        const { error: updateError } = await supabase
-          .from("restaurants")
-          .update({ email })
-          .eq("id", restaurant.id);
+      const updateData = {
+        email,
+        email_checked: true,
+      };
 
-        if (updateError) {
-          throw updateError;
-        }
+      const { error: updateError } = await supabase
+        .from("restaurants")
+        .update(updateData)
+        .eq("id", restaurant.id);
+
+      if (updateError) {
+        throw updateError;
       }
 
       results.push({
