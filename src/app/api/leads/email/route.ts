@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { findEmailFromWebsite } from "@/lib/email-finder";
 
-xport async function POST(request: Request) {
+export async function POST(request: Request) {
   let body: { limit?: unknown };
 
   try {
@@ -30,6 +30,7 @@ xport async function POST(request: Request) {
       .select("id, name, website, email")
       .not("website", "is", null)
       .is("email", null)
+      .eq("email_checked", false)
       .limit(limit);
 
     if (fetchError) {
