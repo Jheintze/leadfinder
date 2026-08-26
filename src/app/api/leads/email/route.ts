@@ -37,14 +37,11 @@ export async function POST(request: Request) {
       throw fetchError;
     }
 
-    const results = [];
-
-    for (const restaurant of restaurants ?? []) {
-      if (!restaurant.website) {
-        continue;
-      }
-
-      const { email } = await findEmailFromWebsite(restaurant.website);
+    const results = await Promise.all(
+  (restaurants ?? [])
+    .filter((restaurant) => restaurant.website)
+    .map(async (restaurant) => {
+      const { email } = await findEmailFromWebsite(restaurant.website!);
 
       const updateData = {
         email,
@@ -60,14 +57,14 @@ export async function POST(request: Request) {
         throw updateError;
       }
 
-      results.push({
+      return {
         id: restaurant.id,
         name: restaurant.name,
         website: restaurant.website,
         email,
-      });
-    }
-
+      };
+    }),
+);
     return NextResponse.json({
       processed: results.length,
       found: results.filter((result) => result.email).length,
