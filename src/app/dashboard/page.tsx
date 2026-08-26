@@ -9,7 +9,10 @@ export default async function DashboardPage() {
   const totalRestaurants = restaurants?.length ?? 0;
   const emailsFound =
     restaurants?.filter((restaurant) => restaurant.email).length ?? 0;
-  const emailsMissing = totalRestaurants - emailsFound;
+  const emailCoverage =
+  totalRestaurants > 0
+    ? Math.round((emailsFound / totalRestaurants) * 100)
+    : 0;
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -48,9 +51,9 @@ export default async function DashboardPage() {
               />
 
               <StatCard
-                label="Need email"
-                value={emailsMissing}
-              />
+  label="Email coverage"
+  value={`${emailCoverage}%`}
+/>
             </div>
           )}
         </section>
