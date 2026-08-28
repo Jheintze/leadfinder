@@ -11,6 +11,14 @@ type Restaurant = {
   city: string | null;
 };
 
+type Draft = {
+  restaurantId: string;
+  restaurantName: string;
+  email: string;
+  subject: string;
+  body: string;
+};
+
 type OutreachResponse = {
   restaurants: Restaurant[];
 };
@@ -19,6 +27,7 @@ export default function OutreachPage() {
   const [instruction, setInstruction] = useState("");
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [selectedRestaurants, setSelectedRestaurants] = useState<string[]>([]);
+  const [drafts, setDrafts] = useState<Draft[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -57,6 +66,39 @@ export default function OutreachPage() {
         : [...current, id],
     );
   }
+
+   {/* Email content */}
+  const emailSubject = "A quick idea for {restaurant_name}";
+  const emailTemplate = `Hi {restaurant_name},
+
+  I’m building DishBoost, a tool that helps restaurants turn their food photos into social media content.
+
+  I’d love to give you a free trial and get your feedback.
+
+  Best,
+  Jakob`;
+  
+  function generateDrafts() {
+  const selected = restaurants.filter((restaurant) =>
+    selectedRestaurants.includes(restaurant.id),
+  );
+
+  const generatedDrafts = selected.map((restaurant) => ({
+    restaurantId: restaurant.id,
+    restaurantName: restaurant.name,
+    email: restaurant.email,
+    subject: emailSubject.replace(
+      "{restaurant_name}",
+      restaurant.name,
+    ),
+    body: emailTemplate.replaceAll(
+      "{restaurant_name}",
+      restaurant.name,
+    ),
+  }));
+
+  setDrafts(generatedDrafts);
+}
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -114,6 +156,7 @@ Write a short, friendly outreach email offering them a free trial.`}
             <div className="mt-5 flex justify-end">
               <button
                 type="button"
+                onClick={generateDrafts}
                 disabled={!instruction.trim() || selectedRestaurants.length === 0}
                 className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
               >
