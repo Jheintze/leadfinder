@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 type AppSidebarProps = {
-  activePage: "dashboard" | "restaurant-search" | "email-finder";
+  activePage: "dashboard" | "restaurant-search" | "email-finder" | "outreach";
 };
 
 const navigationItems = [
@@ -18,6 +18,12 @@ const navigationItems = [
     page: "email-finder",
     icon: EmailIcon,
   },
+  {
+  href: "/outreach",
+  label: "Outreach",
+  page: "outreach",
+  icon: OutreachIcon,
+},
 ] as const;
 
 export function AppSidebar({ activePage }: AppSidebarProps) {
@@ -78,6 +84,22 @@ function EmailIcon() {
     <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
       <rect x="3" y="5" width="18" height="14" rx="2" />
       <path d="m3 7 9 6 9-6" />
+    </svg>
+  );
+}
+
+function OutreachIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-4 w-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <path d="M3 11.5 21 4l-5.5 17-4-7.5L3 11.5Z" />
+      <path d="m11.5 13.5 4-4" />
     </svg>
   );
 }
