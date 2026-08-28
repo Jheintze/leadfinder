@@ -96,6 +96,19 @@ Jakob`);
   setDrafts(generatedDrafts);
 }
 
+function updateDraft(
+  restaurantId: string,
+  field: "subject" | "body",
+  value: string,
+) {
+  setDrafts((currentDrafts) =>
+    currentDrafts.map((draft) =>
+      draft.restaurantId === restaurantId
+        ? { ...draft, [field]: value }
+        : draft,
+    ),
+  );
+}
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto flex min-h-screen max-w-[1600px]">
@@ -295,11 +308,24 @@ Jakob`);
             </p>
 
             <p className="mt-1 text-sm font-medium text-slate-800">
-              {draft.subject}
+              <input
+  type="text"
+  value={draft.subject}
+  onChange={(event) =>
+    updateDraft(draft.restaurantId, "subject", event.target.value)
+  }
+  className="input mt-1 w-full"
+/>
             </p>
 
             <p className="mt-4 whitespace-pre-line text-sm leading-6 text-slate-600">
-              {draft.body}
+              <textarea
+  value={draft.body}
+  onChange={(event) =>
+    updateDraft(draft.restaurantId, "body", event.target.value)
+  }
+  className="mt-4 min-h-48 w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm leading-6 text-slate-900 outline-none transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+/>
             </p>
           </div>
         </article>
