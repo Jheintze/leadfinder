@@ -24,18 +24,15 @@ type OutreachResponse = {
 };
 
 export default function OutreachPage() {
-  
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [selectedRestaurants, setSelectedRestaurants] = useState<string[]>([]);
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [subject, setSubject] = useState(
-  "A quick idea for {restaurant_name}",
-);
+  const [subject, setSubject] = useState("A quick idea for {restaurant_name}");
 
-const [body, setBody] = useState(`Hi {restaurant_name},
+  const [body, setBody] = useState(`Hi {restaurant_name},
 
 I’m building DishBoost, a tool that helps restaurants turn their food photos into social media content.
 
@@ -81,34 +78,41 @@ Jakob`);
   }
 
   function generateDrafts() {
-  const selected = restaurants.filter((restaurant) =>
-    selectedRestaurants.includes(restaurant.id),
-  );
+    const selected = restaurants.filter((restaurant) =>
+      selectedRestaurants.includes(restaurant.id),
+    );
 
-  const generatedDrafts = selected.map((restaurant) => ({
-    restaurantId: restaurant.id,
-    restaurantName: restaurant.name,
-    email: restaurant.email,
-    subject: subject.replaceAll("{restaurant_name}", restaurant.name),
-    body: body.replaceAll("{restaurant_name}", restaurant.name),
-  }));
+    const generatedDrafts = selected.map((restaurant) => ({
+      restaurantId: restaurant.id,
+      restaurantName: restaurant.name,
+      email: restaurant.email,
+      subject: subject.replaceAll("{restaurant_name}", restaurant.name),
+      body: body.replaceAll("{restaurant_name}", restaurant.name),
+    }));
 
-  setDrafts(generatedDrafts);
-}
+    setDrafts(generatedDrafts);
+  }
 
-function updateDraft(
-  restaurantId: string,
-  field: "subject" | "body",
-  value: string,
-) {
-  setDrafts((currentDrafts) =>
-    currentDrafts.map((draft) =>
-      draft.restaurantId === restaurantId
-        ? { ...draft, [field]: value }
-        : draft,
-    ),
-  );
-}
+  function updateDraft(
+    restaurantId: string,
+    field: "subject" | "body",
+    value: string,
+  ) {
+    setDrafts((currentDrafts) =>
+      currentDrafts.map((draft) =>
+        draft.restaurantId === restaurantId
+          ? { ...draft, [field]: value }
+          : draft,
+      ),
+    );
+  }
+
+  function removeDraft(restaurantId: string) {
+    setDrafts((currentDrafts) =>
+      currentDrafts.filter((draft) => draft.restaurantId !== restaurantId),
+    );
+  }
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto flex min-h-screen max-w-[1600px]">
@@ -132,53 +136,52 @@ function updateDraft(
           </div>
 
           {/* Email template */}
-<section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-  <div>
-    <h2 className="text-lg font-semibold tracking-tight">
-      Email template
-    </h2>
+          <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <div>
+              <h2 className="text-lg font-semibold tracking-tight">
+                Email template
+              </h2>
 
-    <p className="mt-1 text-sm leading-6 text-slate-500">
-      Write the email you want to send. Use {"{restaurant_name}"} where the
-      restaurant's name should appear.
-    </p>
-  </div>
+              <p className="mt-1 text-sm leading-6 text-slate-500">
+                Write the email you want to send. Use {"{restaurant_name}"}{" "}
+                where the restaurant's name should appear.
+              </p>
+            </div>
 
-  <div className="mt-5 grid gap-5">
-    <div>
-      <label
-        htmlFor="subject"
-        className="mb-2 block text-sm font-medium text-slate-700"
-      >
-        Subject
-      </label>
+            <div className="mt-5 grid gap-5">
+              <div>
+                <label
+                  htmlFor="subject"
+                  className="mb-2 block text-sm font-medium text-slate-700"
+                >
+                  Subject
+                </label>
+                <input
+                  id="subject"
+                  type="text"
+                  value={subject}
+                  onChange={(event) => setSubject(event.target.value)}
+                  className="input w-full"
+                />{" "}
+              </div>
 
-      <input
-        id="subject"
-        type="text"
-        value={subject}
-  onChange={(event) => setSubject(event.target.value)}
-        className="input w-full"
-      />
-    </div>
+              <div>
+                <label
+                  htmlFor="body"
+                  className="mb-2 block text-sm font-medium text-slate-700"
+                >
+                  Email body
+                </label>
 
-    <div>
-      <label
-        htmlFor="body"
-        className="mb-2 block text-sm font-medium text-slate-700"
-      >
-        Email body
-      </label>
-
-      <textarea
-        id="body"
-        value={body}
-  onChange={(event) => setBody(event.target.value)}
-        className="min-h-48 w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm leading-6 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-      />
-    </div>
-  </div>
-</section>
+                <textarea
+                  id="body"
+                  value={body}
+                  onChange={(event) => setBody(event.target.value)}
+                  className="min-h-48 w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm leading-6 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
+            </div>
+          </section>
 
           {/* Restaurant selection */}
           <section className="mt-8 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
@@ -254,85 +257,121 @@ function updateDraft(
               </div>
             )}
             <div className="mt-5 flex justify-end">
-  <button
-    type="button"
-    onClick={generateDrafts}
-    disabled={selectedRestaurants.length === 0}
-    className="inline-flex h-10 items-center justify-center rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
-  >
-    Generate drafts
-  </button>
-</div>
+              <button
+                type="button"
+                onClick={generateDrafts}
+                disabled={selectedRestaurants.length === 0}
+                className="inline-flex h-10 items-center justify-center rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
+              >
+                Generate drafts
+              </button>
+            </div>
           </section>
 
           {/* Email drafts */}
           <section className="mt-8">
-  <div className="mb-4">
-    <h2 className="text-lg font-semibold tracking-tight">
-      Email drafts
-    </h2>
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold tracking-tight">
+                Email drafts
+              </h2>
 
-    <p className="mt-1 text-sm text-slate-500">
-      Generated emails will appear here for review.
-    </p>
-  </div>
-
-  {drafts.length === 0 ? (
-    <DraftEmptyState />
-  ) : (
-    <div className="grid gap-4 xl:grid-cols-2">
-      {drafts.map((draft) => (
-        <article
-          key={draft.restaurantId}
-          className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
-        >
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <h3 className="font-medium text-slate-800">
-                {draft.restaurantName}
-              </h3>
-
-              <p className="mt-1 truncate text-xs text-slate-500">
-                {draft.email}
+              <p className="mt-1 text-sm text-slate-500">
+                Generated emails will appear here for review.
               </p>
             </div>
 
-            <span className="shrink-0 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
-              Draft
-            </span>
-          </div>
+            {drafts.length === 0 ? (
+              <DraftEmptyState />
+            ) : (
+              <div className="grid gap-4 xl:grid-cols-2">
+                {drafts.map((draft) => (
+                  <article
+                    key={draft.restaurantId}
+                    className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+                  >
+                    {drafts.map((draft) => (
+                      <article
+                        key={draft.restaurantId}
+                        className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="min-w-0">
+                            <h3 className="font-medium text-slate-800">
+                              {draft.restaurantName}
+                            </h3>
 
-          <div className="mt-5 border-t border-slate-100 pt-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-              Subject
-            </p>
+                            <p className="mt-1 truncate text-xs text-slate-500">
+                              {draft.email}
+                            </p>
+                          </div>
 
-            <p className="mt-1 text-sm font-medium text-slate-800">
-              <input
-  type="text"
-  value={draft.subject}
-  onChange={(event) =>
-    updateDraft(draft.restaurantId, "subject", event.target.value)
-  }
-  className="input mt-1 w-full"
-/>
-            </p>
+                          <div className="flex shrink-0 items-center gap-2">
+                            <button
+                              type="button"
+                              className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700"
+                            >
+                              Send
+                            </button>
 
-            <p className="mt-4 whitespace-pre-line text-sm leading-6 text-slate-600">
-              <textarea
-  value={draft.body}
-  onChange={(event) =>
-    updateDraft(draft.restaurantId, "body", event.target.value)
-  }
-  className="mt-4 min-h-48 w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm leading-6 text-slate-900 outline-none transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-/>
-            </p>
-          </div>
-        </article>
-      ))}
-    </div>
-  )}
-</section>
+                            <button
+                              type="button"
+                              onClick={() => removeDraft(draft.restaurantId)}
+                              className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="mt-5 border-t border-slate-100 pt-4">
+                          <label
+                            htmlFor={`subject-${draft.restaurantId}`}
+                            className="text-xs font-medium uppercase tracking-wide text-slate-400"
+                          >
+                            Subject
+                          </label>
+
+                          <input
+                            id={`subject-${draft.restaurantId}`}
+                            type="text"
+                            value={draft.subject}
+                            onChange={(event) =>
+                              updateDraft(
+                                draft.restaurantId,
+                                "subject",
+                                event.target.value,
+                              )
+                            }
+                            className="input mt-1 w-full"
+                          />
+
+                          <label
+                            htmlFor={`body-${draft.restaurantId}`}
+                            className="mt-4 block text-xs font-medium uppercase tracking-wide text-slate-400"
+                          >
+                            Email body
+                          </label>
+
+                          <textarea
+                            id={`body-${draft.restaurantId}`}
+                            value={draft.body}
+                            onChange={(event) =>
+                              updateDraft(
+                                draft.restaurantId,
+                                "body",
+                                event.target.value,
+                              )
+                            }
+                            className="mt-1 min-h-48 w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm leading-6 text-slate-900 outline-none transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                          />
+                        </div>
+                      </article>
+                    ))}
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
         </section>
       </div>
     </main>
@@ -365,8 +404,7 @@ function EmptyState() {
         </h3>
 
         <p className="mt-1 max-w-sm text-sm leading-6 text-slate-500">
-          Restaurants need a contact email and must not have been contacted
-          yet.
+          Restaurants need a contact email and must not have been contacted yet.
         </p>
       </div>
     </div>
