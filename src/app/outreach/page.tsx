@@ -242,18 +242,59 @@ Write a short, friendly outreach email offering them a free trial.`}
 
           {/* Email drafts */}
           <section className="mt-8">
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold tracking-tight">
-                Email drafts
-              </h2>
+  <div className="mb-4">
+    <h2 className="text-lg font-semibold tracking-tight">
+      Email drafts
+    </h2>
 
-              <p className="mt-1 text-sm text-slate-500">
-                Generated emails will appear here for review.
+    <p className="mt-1 text-sm text-slate-500">
+      Generated emails will appear here for review.
+    </p>
+  </div>
+
+  {drafts.length === 0 ? (
+    <DraftEmptyState />
+  ) : (
+    <div className="grid gap-4 xl:grid-cols-2">
+      {drafts.map((draft) => (
+        <article
+          key={draft.restaurantId}
+          className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+        >
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h3 className="font-medium text-slate-800">
+                {draft.restaurantName}
+              </h3>
+
+              <p className="mt-1 truncate text-xs text-slate-500">
+                {draft.email}
               </p>
             </div>
 
-            <DraftEmptyState />
-          </section>
+            <span className="shrink-0 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+              Draft
+            </span>
+          </div>
+
+          <div className="mt-5 border-t border-slate-100 pt-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+              Subject
+            </p>
+
+            <p className="mt-1 text-sm font-medium text-slate-800">
+              {draft.subject}
+            </p>
+
+            <p className="mt-4 whitespace-pre-line text-sm leading-6 text-slate-600">
+              {draft.body}
+            </p>
+          </div>
+        </article>
+      ))}
+    </div>
+  )}
+</section>
         </section>
       </div>
     </main>
