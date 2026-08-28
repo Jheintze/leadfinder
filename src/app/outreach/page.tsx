@@ -24,12 +24,25 @@ type OutreachResponse = {
 };
 
 export default function OutreachPage() {
-  const [instruction, setInstruction] = useState("");
+  
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [selectedRestaurants, setSelectedRestaurants] = useState<string[]>([]);
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [subject, setSubject] = useState(
+  "A quick idea for {restaurant_name}",
+);
+
+const [body, setBody] = useState(`Hi {restaurant_name},
+
+I’m building DishBoost, a tool that helps restaurants turn their food photos into social media content.
+
+I’d love to give you a free trial and get your feedback.
+
+Best,
+Jakob`);
 
   useEffect(() => {
     async function loadRestaurants() {
@@ -67,17 +80,6 @@ export default function OutreachPage() {
     );
   }
 
-   {/* Email content */}
-  const emailSubject = "A quick idea for {restaurant_name}";
-  const emailTemplate = `Hi {restaurant_name},
-
-  I’m building DishBoost, a tool that helps restaurants turn their food photos into social media content.
-
-  I’d love to give you a free trial and get your feedback.
-
-  Best,
-  Jakob`;
-  
   function generateDrafts() {
   const selected = restaurants.filter((restaurant) =>
     selectedRestaurants.includes(restaurant.id),
@@ -87,14 +89,8 @@ export default function OutreachPage() {
     restaurantId: restaurant.id,
     restaurantName: restaurant.name,
     email: restaurant.email,
-    subject: emailSubject.replace(
-      "{restaurant_name}",
-      restaurant.name,
-    ),
-    body: emailTemplate.replaceAll(
-      "{restaurant_name}",
-      restaurant.name,
-    ),
+    subject: subject.replaceAll("{restaurant_name}", restaurant.name),
+    body: body.replaceAll("{restaurant_name}", restaurant.name),
   }));
 
   setDrafts(generatedDrafts);
@@ -122,48 +118,54 @@ export default function OutreachPage() {
             </p>
           </div>
 
-          {/* Campaign instruction */}
-          <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            <div>
-              <h2 className="text-lg font-semibold tracking-tight">
-                Campaign instruction
-              </h2>
+          {/* Email template */}
+<section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+  <div>
+    <h2 className="text-lg font-semibold tracking-tight">
+      Email template
+    </h2>
 
-              <p className="mt-1 text-sm leading-6 text-slate-500">
-                Tell the AI what you want the outreach email to communicate.
-              </p>
-            </div>
+    <p className="mt-1 text-sm leading-6 text-slate-500">
+      Write the email you want to send. Use {"{restaurant_name}"} where the
+      restaurant's name should appear.
+    </p>
+  </div>
 
-            <div className="mt-5">
-              <label
-                htmlFor="instruction"
-                className="mb-2 block text-sm font-medium text-slate-700"
-              >
-                What should the email say?
-              </label>
+  <div className="mt-5 grid gap-5">
+    <div>
+      <label
+        htmlFor="subject"
+        className="mb-2 block text-sm font-medium text-slate-700"
+      >
+        Subject
+      </label>
 
-              <textarea
-                id="instruction"
-                value={instruction}
-                onChange={(event) => setInstruction(event.target.value)}
-                placeholder={`I built DishBoost, a tool that helps restaurants turn food photos into social media content.
+      <input
+        id="subject"
+        type="text"
+        value={subject}
+  onChange={(event) => setSubject(event.target.value)}
+        className="input w-full"
+      />
+    </div>
 
-Write a short, friendly outreach email offering them a free trial.`}
-                className="min-h-48 w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm leading-6 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              />
-            </div>
+    <div>
+      <label
+        htmlFor="body"
+        className="mb-2 block text-sm font-medium text-slate-700"
+      >
+        Email body
+      </label>
 
-            <div className="mt-5 flex justify-end">
-              <button
-                type="button"
-                onClick={generateDrafts}
-                disabled={!instruction.trim() || selectedRestaurants.length === 0}
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
-              >
-                Generate drafts
-              </button>
-            </div>
-          </section>
+      <textarea
+        id="body"
+        value={body}
+  onChange={(event) => setBody(event.target.value)}
+        className="min-h-48 w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm leading-6 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+      />
+    </div>
+  </div>
+</section>
 
           {/* Restaurant selection */}
           <section className="mt-8 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
@@ -238,6 +240,16 @@ Write a short, friendly outreach email offering them a free trial.`}
                 })}
               </div>
             )}
+            <div className="mt-5 flex justify-end">
+  <button
+    type="button"
+    onClick={generateDrafts}
+    disabled={selectedRestaurants.length === 0}
+    className="inline-flex h-10 items-center justify-center rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
+  >
+    Generate drafts
+  </button>
+</div>
           </section>
 
           {/* Email drafts */}
