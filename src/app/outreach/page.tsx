@@ -1,12 +1,62 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AppSidebar } from "../../components/app-sidebar";
 
+type Restaurant = {
+  id: string;
+  name: string;
+  email: string;
+  city: string | null;
+};
+
+type OutreachResponse = {
+  restaurants: Restaurant[];
+};
+
 export default function OutreachPage() {
   const [instruction, setInstruction] = useState("");
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [selectedRestaurants, setSelectedRestaurants] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    async function loadRestaurants() {
+      try {
+        const response = await fetch("/api/leads/outreach");
+
+        const data = (await response.json()) as OutreachResponse & {
+          error?: string;
+        };
+
+        if (!response.ok) {
+          throw new Error(data.error || "Could not load restaurants.");
+        }
+
+        setRestaurants(data.restaurants);
+      } catch (caughtError) {
+        setError(
+          caughtError instanceof Error
+            ? caughtError.message
+            : "Something went wrong while loading restaurants.",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadRestaurants();
+  }, []);
+
+  function toggleRestaurant(id: string) {
+    setSelectedRestaurants((current) =>
+      current.includes(id)
+        ? current.filter((restaurantId) => restaurantId !== id)
+        : [...current, id],
+    );
+  }
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -64,113 +114,90 @@ Write a short, friendly outreach email offering them a free trial.`}
             <div className="mt-5 flex justify-end">
               <button
                 type="button"
-                disabled={!instruction.trim()}
+                disabled={!instruction.trim() || selectedRestaurants.length === 0}
                 className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
               >
                 Generate drafts
               </button>
             </div>
           </section>
+
           {/* Restaurant selection */}
-<section className="mt-8 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-  <div className="flex items-end justify-between gap-4">
-    <div>
-      <h2 className="text-lg font-semibold tracking-tight">
-        Select restaurants
-      </h2>
+          <section className="mt-8 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold tracking-tight">
+                  Select restaurants
+                </h2>
 
-      <p className="mt-1 text-sm leading-6 text-slate-500">
-        Choose which restaurants should receive a generated outreach email.
-      </p>
-    </div>
+                <p className="mt-1 text-sm leading-6 text-slate-500">
+                  Choose which restaurants should receive a generated outreach
+                  email.
+                </p>
+              </div>
 
-    <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
-      {selectedRestaurants.length} selected
-    </span>
-  </div>
+              <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                {selectedRestaurants.length} selected
+              </span>
+            </div>
 
-  <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-    {[
-      {
-        id: "1",
-        name: "La Casa de Tacos",
-        email: "info@lacasadetacos.com",
-        city: "Roma Norte",
-      },
-      {
-        id: "2",
-        name: "Bistro Central",
-        email: "hello@bistrocentral.com",
-        city: "Condesa",
-      },
-      {
-        id: "3",
-        name: "Café Reforma",
-        email: "contacto@caferforma.com",
-        city: "Juárez",
-      },
-      {
-        id: "4",
-        name: "Verde Cocina",
-        email: "info@verdecocina.com",
-        city: "Polanco",
-      },
-      {
-        id: "5",
-        name: "Casa del Mar",
-        email: "hola@casadelmar.com",
-        city: "Roma Norte",
-      },
-      {
-        id: "6",
-        name: "El Patio",
-        email: "info@elpatio.com",
-        city: "Condesa",
-      },
-    ].map((restaurant) => {
-      const isSelected = selectedRestaurants.includes(restaurant.id);
+            {isLoading ? (
+              <LoadingState />
+            ) : error ? (
+              <p
+                role="alert"
+                className="mt-5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+              >
+                {error}
+              </p>
+            ) : restaurants.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                {restaurants.map((restaurant) => {
+                  const isSelected = selectedRestaurants.includes(
+                    restaurant.id,
+                  );
 
-      return (
-        <label
-          key={restaurant.id}
-          className={`relative flex cursor-pointer rounded-lg border p-4 transition-colors ${
-            isSelected
-              ? "border-blue-300 bg-blue-50/60"
-              : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
-          }`}
-        >
-          <input
-            type="checkbox"
-            checked={isSelected}
-            onChange={() => {
-              setSelectedRestaurants((current) =>
-                current.includes(restaurant.id)
-                  ? current.filter((id) => id !== restaurant.id)
-                  : [...current, restaurant.id],
-              );
-            }}
-            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-          />
+                  return (
+                    <label
+                      key={restaurant.id}
+                      className={`relative flex cursor-pointer rounded-lg border p-4 transition-colors ${
+                        isSelected
+                          ? "border-blue-300 bg-blue-50/60"
+                          : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleRestaurant(restaurant.id)}
+                        className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      />
 
-          <div className="ml-3 min-w-0">
-            <p className="truncate text-sm font-medium text-slate-800">
-              {restaurant.name}
-            </p>
+                      <div className="ml-3 min-w-0">
+                        <p className="truncate text-sm font-medium text-slate-800">
+                          {restaurant.name}
+                        </p>
 
-            <p className="mt-1 truncate text-xs text-slate-500">
-              {restaurant.email}
-            </p>
+                        <p className="mt-1 truncate text-xs text-slate-500">
+                          {restaurant.email}
+                        </p>
 
-            <p className="mt-1 text-xs text-slate-400">
-              {restaurant.city}
-            </p>
-          </div>
-        </label>
-      );
-    })}
-  </div>
-</section>
-          {/* Drafts */}
+                        {restaurant.city && (
+                          <p className="mt-1 text-xs text-slate-400">
+                            {restaurant.city}
+                          </p>
+                        )}
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+
+          {/* Email drafts */}
           <section className="mt-8">
             <div className="mb-4">
               <h2 className="text-lg font-semibold tracking-tight">
@@ -182,7 +209,7 @@ Write a short, friendly outreach email offering them a free trial.`}
               </p>
             </div>
 
-            <EmptyState />
+            <DraftEmptyState />
           </section>
         </section>
       </div>
@@ -190,9 +217,43 @@ Write a short, friendly outreach email offering them a free trial.`}
   );
 }
 
-/* Empty state */
+/* Loading state */
+
+function LoadingState() {
+  return (
+    <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <div
+          key={index}
+          className="h-24 animate-pulse rounded-lg bg-slate-100"
+        />
+      ))}
+    </div>
+  );
+}
+
+/* Empty restaurant state */
 
 function EmptyState() {
+  return (
+    <div className="mt-5 grid min-h-40 place-items-center rounded-lg border border-dashed border-slate-300 px-6 text-center">
+      <div>
+        <h3 className="font-medium text-slate-800">
+          No restaurants ready for outreach
+        </h3>
+
+        <p className="mt-1 max-w-sm text-sm leading-6 text-slate-500">
+          Restaurants need a contact email and must not have been contacted
+          yet.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* Empty drafts state */
+
+function DraftEmptyState() {
   return (
     <div className="grid min-h-60 place-items-center rounded-xl border border-dashed border-slate-300 bg-white px-6 text-center">
       <div>
@@ -205,8 +266,8 @@ function EmptyState() {
         </h3>
 
         <p className="mt-1 max-w-sm text-sm leading-6 text-slate-500">
-          Write a campaign instruction above and generate personalized
-          outreach emails for your restaurant leads.
+          Select restaurants and generate personalized outreach emails to see
+          your drafts here.
         </p>
       </div>
     </div>
