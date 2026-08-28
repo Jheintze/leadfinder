@@ -5,9 +5,9 @@ type AppSidebarProps = {
 };
 
 const navigationItems = [
-  { href: "/dashboard", label: "Dashboard", page: "dashboard", icon: DashboardIcon },
+  { href: "/", label: "Dashboard", page: "dashboard", icon: DashboardIcon },
   {
-    href: "/",
+    href: "/restaurant-search",
     label: "Restaurant Search",
     page: "restaurant-search",
     icon: SearchIcon,
