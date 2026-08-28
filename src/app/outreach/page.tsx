@@ -6,6 +6,7 @@ import { AppSidebar } from "../../components/app-sidebar";
 
 export default function OutreachPage() {
   const [instruction, setInstruction] = useState("");
+  const [selectedRestaurants, setSelectedRestaurants] = useState<string[]>([]);
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -70,7 +71,105 @@ Write a short, friendly outreach email offering them a free trial.`}
               </button>
             </div>
           </section>
+          {/* Restaurant selection */}
+<section className="mt-8 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+  <div className="flex items-end justify-between gap-4">
+    <div>
+      <h2 className="text-lg font-semibold tracking-tight">
+        Select restaurants
+      </h2>
 
+      <p className="mt-1 text-sm leading-6 text-slate-500">
+        Choose which restaurants should receive a generated outreach email.
+      </p>
+    </div>
+
+    <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+      {selectedRestaurants.length} selected
+    </span>
+  </div>
+
+  <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+    {[
+      {
+        id: "1",
+        name: "La Casa de Tacos",
+        email: "info@lacasadetacos.com",
+        city: "Roma Norte",
+      },
+      {
+        id: "2",
+        name: "Bistro Central",
+        email: "hello@bistrocentral.com",
+        city: "Condesa",
+      },
+      {
+        id: "3",
+        name: "Café Reforma",
+        email: "contacto@caferforma.com",
+        city: "Juárez",
+      },
+      {
+        id: "4",
+        name: "Verde Cocina",
+        email: "info@verdecocina.com",
+        city: "Polanco",
+      },
+      {
+        id: "5",
+        name: "Casa del Mar",
+        email: "hola@casadelmar.com",
+        city: "Roma Norte",
+      },
+      {
+        id: "6",
+        name: "El Patio",
+        email: "info@elpatio.com",
+        city: "Condesa",
+      },
+    ].map((restaurant) => {
+      const isSelected = selectedRestaurants.includes(restaurant.id);
+
+      return (
+        <label
+          key={restaurant.id}
+          className={`relative flex cursor-pointer rounded-lg border p-4 transition-colors ${
+            isSelected
+              ? "border-blue-300 bg-blue-50/60"
+              : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+          }`}
+        >
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => {
+              setSelectedRestaurants((current) =>
+                current.includes(restaurant.id)
+                  ? current.filter((id) => id !== restaurant.id)
+                  : [...current, restaurant.id],
+              );
+            }}
+            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+          />
+
+          <div className="ml-3 min-w-0">
+            <p className="truncate text-sm font-medium text-slate-800">
+              {restaurant.name}
+            </p>
+
+            <p className="mt-1 truncate text-xs text-slate-500">
+              {restaurant.email}
+            </p>
+
+            <p className="mt-1 text-xs text-slate-400">
+              {restaurant.city}
+            </p>
+          </div>
+        </label>
+      );
+    })}
+  </div>
+</section>
           {/* Drafts */}
           <section className="mt-8">
             <div className="mb-4">
