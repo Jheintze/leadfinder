@@ -78,20 +78,26 @@ Jakob`);
   }
 
   function generateDrafts() {
-    const selected = restaurants.filter((restaurant) =>
-      selectedRestaurants.includes(restaurant.id),
-    );
+  const selected = restaurants.filter((restaurant) =>
+    selectedRestaurants.includes(restaurant.id),
+  );
 
-    const generatedDrafts = selected.map((restaurant) => ({
-      restaurantId: restaurant.id,
-      restaurantName: restaurant.name,
-      email: restaurant.email,
-      subject: subject.replaceAll("{restaurant_name}", restaurant.name),
-      body: body.replaceAll("{restaurant_name}", restaurant.name),
-    }));
+  const generatedDrafts = selected.map((restaurant) => ({
+    restaurantId: restaurant.id,
+    restaurantName: restaurant.name,
+    email: restaurant.email,
+    subject: subject.replaceAll("{restaurant_name}", restaurant.name),
+    body: body.replaceAll("{restaurant_name}", restaurant.name),
+  }));
 
-    setDrafts(generatedDrafts);
-  }
+  setDrafts(generatedDrafts);
+
+  setTimeout(() => {
+    document
+      .getElementById("email-drafts")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 0);
+}
 
   function updateDraft(
     restaurantId: string,
@@ -291,7 +297,7 @@ Jakob`);
           </section>
 
           {/* Email drafts */}
-          <section className="mt-8">
+          <section id="email-drafts" className="mt-8">
             <div className="mb-4 flex items-end justify-between gap-4">
               <div>
                 <h2 className="text-lg font-semibold tracking-tight">
