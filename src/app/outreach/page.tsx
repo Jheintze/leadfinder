@@ -428,7 +428,8 @@ function EmptyState() {
         </h3>
 
         <p className="mt-1 max-w-sm text-sm leading-6 text-slate-500">
-          Restaurants need a contact email and must not have been contacted yet.
+          Find restaurants and their contact emails first. Restaurants will
+          appear here once they have an email and haven't been contacted yet.
         </p>
       </div>
     </div>
