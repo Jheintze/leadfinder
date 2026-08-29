@@ -95,7 +95,7 @@ Jakob`);
   setTimeout(() => {
     document
       .getElementById("email-drafts")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      ?.scrollIntoView({ block: "start" });
   }, 0);
 }
 
