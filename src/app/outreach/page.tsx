@@ -196,12 +196,9 @@ Jakob`);
                   email.
                 </p>
               </div>
-               <p className="mt-2 text-xs font-medium text-blue-600">
-  {selectedRestaurants.length} of {restaurants.length} selected
-</p>
               <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
-                {selectedRestaurants.length} selected
-              </span>
+  {selectedRestaurants.length} of {restaurants.length} selected
+</span>
             </div>
 
             {isLoading ? (
