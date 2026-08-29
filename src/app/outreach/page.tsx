@@ -308,7 +308,7 @@ Jakob`);
                 disabled={drafts.length === 0}
                 className="shrink-0 rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
               >
-                Send all
+                Send all ({drafts.length})
               </button>
             </div>
             {drafts.length === 0 ? (
