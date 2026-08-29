@@ -292,16 +292,25 @@ Jakob`);
 
           {/* Email drafts */}
           <section className="mt-8">
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold tracking-tight">
-                Email drafts
-              </h2>
+            <div className="mb-4 flex items-end justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold tracking-tight">
+                  Email drafts
+                </h2>
 
-              <p className="mt-1 text-sm text-slate-500">
-                Generated emails will appear here for review.
-              </p>
+                <p className="mt-1 text-sm text-slate-500">
+                  Generated emails will appear here for review.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                disabled={drafts.length === 0}
+                className="shrink-0 rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+              >
+                Send all
+              </button>
             </div>
-
             {drafts.length === 0 ? (
               <DraftEmptyState />
             ) : (
