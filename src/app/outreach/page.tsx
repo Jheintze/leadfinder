@@ -113,6 +113,9 @@ Jakob`);
     );
   }
 
+  const allSelected =
+    restaurants.length > 0 && selectedRestaurants.length === restaurants.length;
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto flex min-h-screen max-w-[1600px]">
@@ -196,9 +199,29 @@ Jakob`);
                   email.
                 </p>
               </div>
-              <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
-  {selectedRestaurants.length} of {restaurants.length} selected
-</span>
+              <div className="flex shrink-0 items-center gap-3">
+                <label className="flex cursor-pointer items-center gap-2 text-xs font-medium text-slate-600">
+                  <input
+                    type="checkbox"
+                    checked={allSelected}
+                    onChange={() => {
+                      if (allSelected) {
+                        setSelectedRestaurants([]);
+                      } else {
+                        setSelectedRestaurants(
+                          restaurants.map((restaurant) => restaurant.id),
+                        );
+                      }
+                    }}
+                    className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  Select all
+                </label>
+
+                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                  {selectedRestaurants.length} of {restaurants.length} selected
+                </span>
+              </div>
             </div>
 
             {isLoading ? (
@@ -283,85 +306,84 @@ Jakob`);
               <DraftEmptyState />
             ) : (
               <div className="grid gap-4 xl:grid-cols-2">
-                
-                    {drafts.map((draft) => (
-                      <article
-                        key={draft.restaurantId}
-                        className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+                {drafts.map((draft) => (
+                  <article
+                    key={draft.restaurantId}
+                    className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <h3 className="font-medium text-slate-800">
+                          {draft.restaurantName}
+                        </h3>
+
+                        <p className="mt-1 truncate text-xs text-slate-500">
+                          {draft.email}
+                        </p>
+                      </div>
+
+                      <div className="flex shrink-0 items-center gap-2">
+                        <button
+                          type="button"
+                          className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700"
+                        >
+                          Send
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => removeDraft(draft.restaurantId)}
+                          className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mt-5 border-t border-slate-100 pt-4">
+                      <label
+                        htmlFor={`subject-${draft.restaurantId}`}
+                        className="text-xs font-medium uppercase tracking-wide text-slate-400"
                       >
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="min-w-0">
-                            <h3 className="font-medium text-slate-800">
-                              {draft.restaurantName}
-                            </h3>
+                        Subject
+                      </label>
 
-                            <p className="mt-1 truncate text-xs text-slate-500">
-                              {draft.email}
-                            </p>
-                          </div>
+                      <input
+                        id={`subject-${draft.restaurantId}`}
+                        type="text"
+                        value={draft.subject}
+                        onChange={(event) =>
+                          updateDraft(
+                            draft.restaurantId,
+                            "subject",
+                            event.target.value,
+                          )
+                        }
+                        className="input mt-1 w-full"
+                      />
 
-                          <div className="flex shrink-0 items-center gap-2">
-                            <button
-                              type="button"
-                              className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700"
-                            >
-                              Send
-                            </button>
+                      <label
+                        htmlFor={`body-${draft.restaurantId}`}
+                        className="mt-4 block text-xs font-medium uppercase tracking-wide text-slate-400"
+                      >
+                        Email body
+                      </label>
 
-                            <button
-                              type="button"
-                              onClick={() => removeDraft(draft.restaurantId)}
-                              className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="mt-5 border-t border-slate-100 pt-4">
-                          <label
-                            htmlFor={`subject-${draft.restaurantId}`}
-                            className="text-xs font-medium uppercase tracking-wide text-slate-400"
-                          >
-                            Subject
-                          </label>
-
-                          <input
-                            id={`subject-${draft.restaurantId}`}
-                            type="text"
-                            value={draft.subject}
-                            onChange={(event) =>
-                              updateDraft(
-                                draft.restaurantId,
-                                "subject",
-                                event.target.value,
-                              )
-                            }
-                            className="input mt-1 w-full"
-                          />
-
-                          <label
-                            htmlFor={`body-${draft.restaurantId}`}
-                            className="mt-4 block text-xs font-medium uppercase tracking-wide text-slate-400"
-                          >
-                            Email body
-                          </label>
-
-                          <textarea
-                            id={`body-${draft.restaurantId}`}
-                            value={draft.body}
-                            onChange={(event) =>
-                              updateDraft(
-                                draft.restaurantId,
-                                "body",
-                                event.target.value,
-                              )
-                            }
-                            className="mt-1 min-h-48 w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm leading-6 text-slate-900 outline-none transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                          />
-                        </div>
-                      </article>
-                    ))}               
+                      <textarea
+                        id={`body-${draft.restaurantId}`}
+                        value={draft.body}
+                        onChange={(event) =>
+                          updateDraft(
+                            draft.restaurantId,
+                            "body",
+                            event.target.value,
+                          )
+                        }
+                        className="mt-1 min-h-48 w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm leading-6 text-slate-900 outline-none transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      />
+                    </div>
+                  </article>
+                ))}
               </div>
             )}
           </section>
