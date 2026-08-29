@@ -144,7 +144,7 @@ Jakob`);
 
               <p className="mt-1 text-sm leading-6 text-slate-500">
                 Write the email you want to send. Use {"{restaurant_name}"}{" "}
-                where the restaurant's name should appear.
+                where the restaurant&apos;s name should appear.
               </p>
             </div>
 
@@ -196,7 +196,9 @@ Jakob`);
                   email.
                 </p>
               </div>
-
+               <p className="mt-2 text-xs font-medium text-blue-600">
+  {selectedRestaurants.length} of {restaurants.length} selected
+</p>
               <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
                 {selectedRestaurants.length} selected
               </span>
@@ -284,11 +286,7 @@ Jakob`);
               <DraftEmptyState />
             ) : (
               <div className="grid gap-4 xl:grid-cols-2">
-                {drafts.map((draft) => (
-                  <article
-                    key={draft.restaurantId}
-                    className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
-                  >
+                
                     {drafts.map((draft) => (
                       <article
                         key={draft.restaurantId}
@@ -366,9 +364,7 @@ Jakob`);
                           />
                         </div>
                       </article>
-                    ))}
-                  </article>
-                ))}
+                    ))}               
               </div>
             )}
           </section>
