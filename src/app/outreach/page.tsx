@@ -91,7 +91,7 @@ Jakob`);
   }));
 
   setDrafts(generatedDrafts);
-
+  setSelectedRestaurants([]);
   setTimeout(() => {
     document
       .getElementById("email-drafts")
