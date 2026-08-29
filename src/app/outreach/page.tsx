@@ -303,13 +303,24 @@ Jakob`);
                 </p>
               </div>
 
-              <button
-                type="button"
-                disabled={drafts.length === 0}
-                className="shrink-0 rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
-              >
-                Send all ({drafts.length})
-              </button>
+              <div className="flex shrink-0 items-center gap-2">
+                <button
+                  type="button"
+                  disabled={drafts.length === 0}
+                  onClick={() => setDrafts([])}
+                  className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400"
+                >
+                  Remove all ({drafts.length})
+                </button>
+
+                <button
+                  type="button"
+                  disabled={drafts.length === 0}
+                  className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+                >
+                  Send all ({drafts.length})
+                </button>
+              </div>
             </div>
             {drafts.length === 0 ? (
               <DraftEmptyState />
