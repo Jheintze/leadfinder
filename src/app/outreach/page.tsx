@@ -155,6 +155,12 @@ Jakob`);
     }
   }
 
+  async function sendAllDrafts() {
+    for (const draft of drafts) {
+      await sendDraft(draft);
+    }
+  }
+
   const allSelected =
     restaurants.length > 0 && selectedRestaurants.length === restaurants.length;
 
@@ -357,6 +363,7 @@ Jakob`);
 
                 <button
                   type="button"
+                  onClick={sendAllDrafts}
                   disabled={drafts.length === 0}
                   className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
                 >
