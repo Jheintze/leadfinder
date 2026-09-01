@@ -145,6 +145,11 @@ Jakob`);
           (currentDraft) => currentDraft.restaurantId !== draft.restaurantId,
         ),
       );
+      setRestaurants((currentRestaurants) =>
+        currentRestaurants.filter(
+          (restaurant) => restaurant.id !== draft.restaurantId,
+        ),
+      );
     } catch (error) {
       console.error("Failed to send draft:", error);
     }
