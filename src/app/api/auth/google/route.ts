@@ -9,9 +9,10 @@ export async function GET() {
   );
 
   const authUrl = oauth2Client.generateAuthUrl({
-    access_type: "offline",
-    scope: ["https://www.googleapis.com/auth/gmail.send"],
-  });
+  access_type: "offline",
+  prompt: "consent",
+  scope: ["https://www.googleapis.com/auth/gmail.send"],
+});
 
   return NextResponse.redirect(authUrl);
 }
