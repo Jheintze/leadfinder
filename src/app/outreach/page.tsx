@@ -78,26 +78,26 @@ Jakob`);
   }
 
   function generateDrafts() {
-  const selected = restaurants.filter((restaurant) =>
-    selectedRestaurants.includes(restaurant.id),
-  );
+    const selected = restaurants.filter((restaurant) =>
+      selectedRestaurants.includes(restaurant.id),
+    );
 
-  const generatedDrafts = selected.map((restaurant) => ({
-    restaurantId: restaurant.id,
-    restaurantName: restaurant.name,
-    email: restaurant.email,
-    subject: subject.replaceAll("{restaurant_name}", restaurant.name),
-    body: body.replaceAll("{restaurant_name}", restaurant.name),
-  }));
+    const generatedDrafts = selected.map((restaurant) => ({
+      restaurantId: restaurant.id,
+      restaurantName: restaurant.name,
+      email: restaurant.email,
+      subject: subject.replaceAll("{restaurant_name}", restaurant.name),
+      body: body.replaceAll("{restaurant_name}", restaurant.name),
+    }));
 
-  setDrafts(generatedDrafts);
-  setSelectedRestaurants([]);
-  setTimeout(() => {
-    document
-      .getElementById("email-drafts")
-      ?.scrollIntoView({ block: "start" });
-  }, 0);
-}
+    setDrafts(generatedDrafts);
+    setSelectedRestaurants([]);
+    setTimeout(() => {
+      document
+        .getElementById("email-drafts")
+        ?.scrollIntoView({ block: "start" });
+    }, 0);
+  }
 
   function updateDraft(
     restaurantId: string,
@@ -117,6 +117,37 @@ Jakob`);
     setDrafts((currentDrafts) =>
       currentDrafts.filter((draft) => draft.restaurantId !== restaurantId),
     );
+  }
+
+  async function sendDraft(draft: Draft) {
+    try {
+      const response = await fetch("/api/leads/outreach/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          restaurantId: draft.restaurantId,
+          to: draft.email,
+          subject: draft.subject,
+          body: draft.body,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error ?? "Could not send email.");
+      }
+
+      setDrafts((currentDrafts) =>
+        currentDrafts.filter(
+          (currentDraft) => currentDraft.restaurantId !== draft.restaurantId,
+        ),
+      );
+    } catch (error) {
+      console.error("Failed to send draft:", error);
+    }
   }
 
   const allSelected =
@@ -351,6 +382,7 @@ Jakob`);
                       <div className="flex shrink-0 items-center gap-2">
                         <button
                           type="button"
+                          onClick={() => sendDraft(draft)}
                           className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700"
                         >
                           Send
