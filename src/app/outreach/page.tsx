@@ -510,7 +510,7 @@ function EmptyState() {
 
         <p className="mt-1 max-w-sm text-sm leading-6 text-slate-500">
           Find restaurants and their contact emails first. Restaurants will
-          appear here once they have an email and haven't been contacted yet.
+          appear here once they have an email and haven&apos;t been contacted yet.
         </p>
       </div>
     </div>

@@ -1,7 +1,12 @@
+"use client";
+
+import { useState } from "react";
 import { AppSidebar } from "../../components/app-sidebar";
 import { MobileHeader } from "../../components/mobile-header";
 
 export default function AgentPage() {
+  const [task, setTask] = useState("");
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto flex min-h-screen max-w-[1600px]">
@@ -18,7 +23,8 @@ export default function AgentPage() {
             </h1>
 
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-              Give the agent a task and let it work through your lead generation workflow.
+              Give the agent a task and let it work through your lead generation
+              workflow.
             </p>
           </div>
 
@@ -33,12 +39,15 @@ export default function AgentPage() {
             <textarea
               id="agent-task"
               rows={5}
+              value={task}
+              onChange={(event) => setTask(event.target.value)}
               placeholder="e.g. Find 20 suitable restaurants in Berlin and prepare personalized outreach..."
               className="mt-3 w-full rounded-lg border border-slate-300 p-3 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             />
 
             <button
               type="button"
+              onClick={() => console.log(task)}
               className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
             >
               Run Agent
@@ -49,4 +58,3 @@ export default function AgentPage() {
     </main>
   );
 }
-
