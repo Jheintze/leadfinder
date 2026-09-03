@@ -131,7 +131,7 @@ Jakob`);
         },
         body: JSON.stringify({
           restaurantId: draft.restaurantId,
-          to: draft.email,
+          to: "dr.nick@gmx.net",
           subject: draft.subject,
           body: draft.body,
         }),
