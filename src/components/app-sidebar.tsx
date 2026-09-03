@@ -4,7 +4,7 @@ type AppSidebarProps = {
   activePage: "dashboard" | "restaurant-search" | "email-finder" | "outreach" | "agent";
 };
 
-const navigationItems = [
+ export const navigationItems = [
   { href: "/", label: "Dashboard", page: "dashboard", icon: DashboardIcon },
   {
     href: "/restaurant-search",

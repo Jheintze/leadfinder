@@ -1,3 +1,8 @@
+"use client";
+
+import { useState } from "react";
+import { navigationItems } from "./app-sidebar";
+
 export function MobileHeader() {
   return (
     <header className="flex items-center justify-between border-b border-slate-200 pb-5 md:hidden">
