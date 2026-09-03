@@ -47,7 +47,19 @@ export default function AgentPage() {
 
             <button
               type="button"
-              onClick={() => console.log(task)}
+              onClick={async () => {
+                const response = await fetch("/api/agent", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ task }),
+                });
+
+                const data = await response.json();
+
+                console.log(data);
+              }}
               className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
             >
               Run Agent
