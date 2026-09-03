@@ -410,17 +410,13 @@ Jakob`);
                       <div className="flex shrink-0 items-center gap-2">
                         <button
                           type="button"
-                          onClick={sendAllDrafts}
-                          disabled={
-                            drafts.length === 0 ||
-                            sendingDraftId !== null ||
-                            isSendingAll
-                          }
-                          className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+                          onClick={() => sendDraft(draft)}
+                          disabled={sendingDraftId !== null || isSendingAll}
+                          className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
                         >
-                          {isSendingAll
+                          {sendingDraftId === draft.restaurantId
                             ? "Sending..."
-                            : `Send all (${drafts.length})`}
+                            : "Send"}
                         </button>
 
                         <button
