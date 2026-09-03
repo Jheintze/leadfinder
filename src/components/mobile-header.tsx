@@ -2,14 +2,23 @@
 
 import { useState } from "react";
 import { navigationItems } from "./app-sidebar";
-
+import Link from "next/link";
 
 export function MobileHeader() {
+  const [menuOpen, setMenuOpen] = useState(false);
 
-    const [menuOpen, setMenuOpen] = useState(false);
-    
   return (
     <header className="flex items-center justify-between border-b border-slate-200 pb-5 md:hidden">
+      {menuOpen && (
+        <nav>
+          {navigationItems.map(({ href, label, icon: Icon }) => (
+            <Link key={href} href={href}>
+              <Icon />
+              {label}
+            </Link>
+          ))}
+        </nav>
+      )}
       <div className="flex items-center gap-2">
         <div className="grid h-8 w-8 place-items-center rounded-lg bg-blue-600 text-xs font-bold text-white">
           L
