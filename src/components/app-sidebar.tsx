@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 type AppSidebarProps = {
-  activePage: "dashboard" | "restaurant-search" | "email-finder" | "outreach";
+  activePage: "dashboard" | "restaurant-search" | "email-finder" | "outreach" | "agent";
 };
 
 const navigationItems = [
@@ -23,6 +23,12 @@ const navigationItems = [
   label: "Outreach",
   page: "outreach",
   icon: OutreachIcon,
+},
+{
+  href: "/agent",
+  label: "Agent",
+  page: "agent",
+  icon: AgentIcon,
 },
 ] as const;
 
@@ -100,6 +106,28 @@ function OutreachIcon() {
     >
       <path d="M3 11.5 21 4l-5.5 17-4-7.5L3 11.5Z" />
       <path d="m11.5 13.5 4-4" />
+    </svg>
+  );
+}
+
+function AgentIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-4 w-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="5" y="7" width="14" height="12" rx="3" />
+      <path d="M12 7V4" />
+      <circle cx="12" cy="3" r="1" />
+      <circle cx="9" cy="12" r="1" />
+      <circle cx="15" cy="12" r="1" />
+      <path d="M9 16h6" />
     </svg>
   );
 }
