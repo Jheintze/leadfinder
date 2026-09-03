@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   const { task } = await request.json();
 
   const response = await openai.responses.create({
-    model: "gpt-5-mini",
+    model: "gpt-4.1-mini",
     input: task,
   });
 

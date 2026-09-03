@@ -6,6 +6,7 @@ import { MobileHeader } from "../../components/mobile-header";
 
 export default function AgentPage() {
   const [task, setTask] = useState("");
+  const [response, setResponse] = useState("");
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -48,7 +49,7 @@ export default function AgentPage() {
             <button
               type="button"
               onClick={async () => {
-                const response = await fetch("/api/agent", {
+                const res = await fetch("/api/agent", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
@@ -56,14 +57,19 @@ export default function AgentPage() {
                   body: JSON.stringify({ task }),
                 });
 
-                const data = await response.json();
+                const data = await res.json();
 
-                console.log(data);
+                setResponse(data.message);
               }}
               className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
             >
               Run Agent
             </button>
+            {response && (
+              <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <p className="text-sm leading-6 text-slate-700">{response}</p>
+              </div>
+            )}
           </div>
         </section>
       </div>
