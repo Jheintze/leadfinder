@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import { AppSidebar } from "../../components/app-sidebar";
 
 type Restaurant = {
@@ -29,6 +28,8 @@ export default function OutreachPage() {
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [sendingDraftId, setSendingDraftId] = useState<string | null>(null);
+  const [isSendingAll, setIsSendingAll] = useState(false);
 
   const [subject, setSubject] = useState("A quick idea for {restaurant_name}");
 
@@ -120,6 +121,8 @@ Jakob`);
   }
 
   async function sendDraft(draft: Draft) {
+    setSendingDraftId(draft.restaurantId);
+
     try {
       const response = await fetch("/api/leads/outreach/send", {
         method: "POST",
@@ -128,7 +131,7 @@ Jakob`);
         },
         body: JSON.stringify({
           restaurantId: draft.restaurantId,
-          to: "dr.nick@gmx.net",
+          to: draft.email,
           subject: draft.subject,
           body: draft.body,
         }),
@@ -145,6 +148,7 @@ Jakob`);
           (currentDraft) => currentDraft.restaurantId !== draft.restaurantId,
         ),
       );
+
       setRestaurants((currentRestaurants) =>
         currentRestaurants.filter(
           (restaurant) => restaurant.id !== draft.restaurantId,
@@ -152,12 +156,20 @@ Jakob`);
       );
     } catch (error) {
       console.error("Failed to send draft:", error);
+    } finally {
+      setSendingDraftId(null);
     }
   }
 
   async function sendAllDrafts() {
-    for (const draft of drafts) {
-      await sendDraft(draft);
+    setIsSendingAll(true);
+
+    try {
+      for (const draft of drafts) {
+        await sendDraft(draft);
+      }
+    } finally {
+      setIsSendingAll(false);
     }
   }
 
@@ -364,10 +376,14 @@ Jakob`);
                 <button
                   type="button"
                   onClick={sendAllDrafts}
-                  disabled={drafts.length === 0}
+                  disabled={
+                    drafts.length === 0 ||
+                    sendingDraftId !== null ||
+                    isSendingAll
+                  }
                   className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
                 >
-                  Send all ({drafts.length})
+                  {isSendingAll ? "Sending..." : `Send all (${drafts.length})`}
                 </button>
               </div>
             </div>
@@ -394,10 +410,17 @@ Jakob`);
                       <div className="flex shrink-0 items-center gap-2">
                         <button
                           type="button"
-                          onClick={() => sendDraft(draft)}
-                          className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700"
+                          onClick={sendAllDrafts}
+                          disabled={
+                            drafts.length === 0 ||
+                            sendingDraftId !== null ||
+                            isSendingAll
+                          }
+                          className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
                         >
-                          Send
+                          {isSendingAll
+                            ? "Sending..."
+                            : `Send all (${drafts.length})`}
                         </button>
 
                         <button
