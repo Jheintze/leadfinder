@@ -37,15 +37,17 @@ export async function POST(request: Request) {
       version: "v1",
       auth: oauth2Client,
     });
+    
+    const encodedSubject = `=?UTF-8?B?${Buffer.from(subject).toString("base64")}?=`;
 
     const message = [
-      `From: ${connection.email}`,
-      `To: ${to}`,
-      `Subject: ${subject}`,
-      "Content-Type: text/plain; charset=utf-8",
-      "",
-      body,
-    ].join("\r\n");
+  `From: ${connection.email}`,
+  `To: ${to}`,
+  `Subject: ${encodedSubject}`,
+  "Content-Type: text/plain; charset=utf-8",
+  "",
+  body,
+].join("\r\n");
 
     const raw = Buffer.from(message)
       .toString("base64")
