@@ -17,7 +17,15 @@ export async function searchAndSaveRestaurants({
     const newLeads = [];
     const seenIds = new Set<string>();
 
-    let offset = 0;
+    const { data: progress } = await supabase
+  .from("search_progress")
+  .select("next_offset")
+  .eq("city", city)
+  .eq("business_type", businessType || "Restaurant")
+  .maybeSingle();
+
+let offset = progress?.next_offset ?? 0;
+
     const batchSize = limit;
 
     while (newLeads.length < limit) {
@@ -26,13 +34,27 @@ export async function searchAndSaveRestaurants({
       console.time(`searchLeads offset ${offset}`);
 
 
-      const leads = await searchLeads({
+      const { leads, nextOffset } = await searchLeads({
         city,
         businessType: businessType || "Restaurant",
         limit: batchSize,
         offset,
       });
-       
+       if (nextOffset !== null) {
+  await supabase
+    .from("search_progress")
+    .upsert(
+      {
+        city,
+        business_type: businessType || "Restaurant",
+        next_offset: nextOffset,
+        updated_at: new Date().toISOString(),
+      },
+      {
+        onConflict: "city,business_type",
+      },
+    );
+}
       console.timeEnd(`searchLeads offset ${offset}`);
       
       if (leads.length === 0) {
