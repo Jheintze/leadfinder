@@ -7,9 +7,11 @@ const openai = new OpenAI({
 
 export async function POST(request: Request) {
   const { task } = await request.json();
+  
 
   const response = await openai.responses.create({
   model: "gpt-4.1-mini",
+
   instructions: `
     You are the LeadFinder agent.
 
@@ -19,10 +21,48 @@ export async function POST(request: Request) {
     Your job is to help the user complete lead-generation tasks.
     Be concise and practical.
   `,
+
+  tools: [
+  {
+    type: "function",
+    name: "search_restaurants",
+    description: "Search for restaurants in a city.",
+    strict: true,
+    parameters: {
+      type: "object",
+      properties: {
+        city: {
+          type: "string",
+          description: "The city to search in.",
+        },
+        businessType: {
+          type: "string",
+          description: "The type of restaurant or business to search for.",
+        },
+        limit: {
+          type: "number",
+          description: "The maximum number of restaurants to find.",
+        },
+      },
+      required: ["city", "businessType", "limit"],
+      additionalProperties: false,
+    },
+  },
+],
+
   input: task,
 });
 
-  return NextResponse.json({
-    message: response.output_text,
-  });
+ const toolCall = response.output.find(
+  (item) => item.type === "function_call",
+);
+
+if (toolCall) {
+  console.log("Tool requested:", toolCall.name);
+  console.log("Arguments:", toolCall.arguments);
+}
+
+return NextResponse.json({
+  message: response.output_text,
+});
 }
