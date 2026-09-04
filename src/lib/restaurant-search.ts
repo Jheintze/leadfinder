@@ -22,6 +22,9 @@ export async function searchAndSaveRestaurants({
 
     while (newLeads.length < limit) {
       const remaining = limit - newLeads.length;
+       
+      console.time(`searchLeads offset ${offset}`);
+
 
       const leads = await searchLeads({
         city,
@@ -29,7 +32,9 @@ export async function searchAndSaveRestaurants({
         limit: batchSize,
         offset,
       });
-
+       
+      console.timeEnd(`searchLeads offset ${offset}`);
+      
       if (leads.length === 0) {
         break;
       }

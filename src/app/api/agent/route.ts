@@ -72,7 +72,7 @@ if (toolCall) {
       businessType: toolArguments.businessType,
       limit: toolArguments.limit,
     });
-
+    console.timeEnd("restaurant search");
     console.time("follow up");
     const followUp = await openai.responses.create({
       model: "gpt-4.1-mini",
@@ -100,7 +100,7 @@ if (toolCall) {
   },
 ],
     });
-
+ console.timeEnd("follow up");
     return NextResponse.json({
       message: followUp.output_text,
     });
