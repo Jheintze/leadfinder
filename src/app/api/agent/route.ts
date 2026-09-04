@@ -92,13 +92,13 @@ if (toolCall) {
   Do not put all restaurants into one paragraph.
       `,
       input: [
-        ...response.output,
-        {
-          type: "function_call_output",
-          call_id: toolCall.call_id,
-          output: JSON.stringify(restaurants),
-        },
-      ],
+  toolCall,
+  {
+    type: "function_call_output",
+    call_id: toolCall.call_id,
+    output: JSON.stringify(restaurants),
+  },
+],
     });
 
     return NextResponse.json({
