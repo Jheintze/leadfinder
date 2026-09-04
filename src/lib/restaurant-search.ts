@@ -1,4 +1,17 @@
+import { searchLeads } from "@/lib/lead-search";
+import { supabase } from "@/lib/supabase";
 
+type SearchAndSaveInput = {
+  city: string;
+  businessType: string;
+  limit: number;
+};
+
+export async function searchAndSaveRestaurants({
+  city,
+  businessType,
+  limit,
+}: SearchAndSaveInput) {
 
 
     const newLeads = [];
@@ -58,7 +71,7 @@
     }
 
     // Save only the requested number of NEW restaurants.
-    if (newLeads.length > 0) {
+        if (newLeads.length > 0) {
       const restaurants = newLeads.map((lead) => ({
         source_id: lead.id,
         name: lead.businessName,
@@ -78,3 +91,7 @@
       if (insertError) {
         throw insertError;
       }
+    }
+
+    return newLeads;
+}
