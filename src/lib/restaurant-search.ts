@@ -40,21 +40,7 @@ let offset = progress?.next_offset ?? 0;
         limit: batchSize,
         offset,
       });
-       if (nextOffset !== null) {
-  await supabase
-    .from("search_progress")
-    .upsert(
-      {
-        city,
-        business_type: businessType || "Restaurant",
-        next_offset: nextOffset,
-        updated_at: new Date().toISOString(),
-      },
-      {
-        onConflict: "city,business_type",
-      },
-    );
-}
+     
       console.timeEnd(`searchLeads offset ${offset}`);
       
       if (leads.length === 0) {
@@ -93,31 +79,54 @@ let offset = progress?.next_offset ?? 0;
 
       newLeads.push(...freshLeads);
 
-      // Move to the next Open Places page.
-      offset += leads.length;
-    }
+if (freshLeads.length > 0) {
+  const restaurants = freshLeads.map((lead) => ({
+    source_id: lead.id,
+    name: lead.businessName,
+    address: lead.location,
+    website: lead.website,
+    email: lead.email,
+    city,
+  }));
 
-    // Save only the requested number of NEW restaurants.
-        if (newLeads.length > 0) {
-      const restaurants = newLeads.map((lead) => ({
-        source_id: lead.id,
-        name: lead.businessName,
-        address: lead.location,
-        website: lead.website,
-        email: lead.email,
+  const { error: insertError } = await supabase
+    .from("restaurants")
+    .upsert(restaurants, {
+      onConflict: "source_id",
+      ignoreDuplicates: true,
+    });
+
+  if (insertError) {
+    throw insertError;
+  }
+}
+
+if (nextOffset !== null) {
+  const { error: progressError } = await supabase
+    .from("search_progress")
+    .upsert(
+      {
         city,
-      }));
+        business_type: businessType || "Restaurant",
+        next_offset: nextOffset,
+        updated_at: new Date().toISOString(),
+      },
+      {
+        onConflict: "city,business_type",
+      },
+    );
 
-      const { error: insertError } = await supabase
-        .from("restaurants")
-        .upsert(restaurants, {
-          onConflict: "source_id",
-          ignoreDuplicates: true,
-        });
+  if (progressError) {
+    throw progressError;
+  }
+}
 
-      if (insertError) {
-        throw insertError;
-      }
+// Move to the next Open Places page.
+if (nextOffset === null) {
+  break;
+}
+
+offset = nextOffset;
     }
 
     return newLeads;
