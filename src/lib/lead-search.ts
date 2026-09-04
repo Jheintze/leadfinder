@@ -58,9 +58,7 @@ type OpenPlacesResponse = {
 };
 
 const NOMINATIM_ENDPOINT = "https://nominatim.openstreetmap.org/search";
-
 const OPEN_PLACES_ENDPOINT = "https://api.openplacesapi.com/v1/places";
-
 const OPEN_PLACES_API_KEY = process.env.OPEN_PLACES_API_KEY;
 
 async function getCityCoordinates(city: string): Promise<CityCoordinates> {
