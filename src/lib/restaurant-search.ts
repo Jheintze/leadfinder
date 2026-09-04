@@ -1,5 +1,5 @@
 import { searchLeads } from "@/lib/lead-search";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 type SearchAndSaveInput = {
   city: string;
@@ -17,7 +17,7 @@ export async function searchAndSaveRestaurants({
     const newLeads = [];
     const seenIds = new Set<string>();
 
-    const { data: progress } = await supabase
+    const { data: progress } = await supabaseAdmin
   .from("search_progress")
   .select("next_offset")
   .eq("city", city)
@@ -30,19 +30,14 @@ let offset = progress?.next_offset ?? 0;
 
     while (newLeads.length < limit) {
       const remaining = limit - newLeads.length;
-       
-      console.time(`searchLeads offset ${offset}`);
-
-
+        
       const { leads, nextOffset } = await searchLeads({
         city,
         businessType: businessType || "Restaurant",
         limit: batchSize,
         offset,
       });
-     
-      console.timeEnd(`searchLeads offset ${offset}`);
-      
+         
       if (leads.length === 0) {
         break;
       }
@@ -60,7 +55,7 @@ let offset = progress?.next_offset ?? 0;
       const sourceIds = uniqueLeads.map((lead) => lead.id);
 
       // Check which of these restaurants are already in Supabase.
-      const { data: existingRestaurants, error: lookupError } = await supabase
+      const { data: existingRestaurants, error: lookupError } = await supabaseAdmin
         .from("restaurants")
         .select("source_id")
         .in("source_id", sourceIds);
@@ -89,7 +84,7 @@ if (freshLeads.length > 0) {
     city,
   }));
 
-  const { error: insertError } = await supabase
+  const { error: insertError } = await supabaseAdmin
     .from("restaurants")
     .upsert(restaurants, {
       onConflict: "source_id",
@@ -102,7 +97,7 @@ if (freshLeads.length > 0) {
 }
 
 if (nextOffset !== null) {
-  const { error: progressError } = await supabase
+  const { error: progressError } = await supabaseAdmin
     .from("search_progress")
     .upsert(
       {

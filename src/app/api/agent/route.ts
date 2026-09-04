@@ -60,20 +60,16 @@ export async function POST(request: Request) {
 );
 
 if (toolCall) {
-  console.log("Tool requested:", toolCall.name);
-  console.log("Arguments:", toolCall.arguments);
 
   if (toolCall.name === "search_restaurants") {
     const toolArguments = JSON.parse(toolCall.arguments);
-   
-    console.time("restaurant search");
+       
     const restaurants = await searchAndSaveRestaurants({
       city: toolArguments.city,
       businessType: toolArguments.businessType,
       limit: toolArguments.limit,
     });
-    console.timeEnd("restaurant search");
-    console.time("follow up");
+    
     const followUp = await openai.responses.create({
       model: "gpt-4.1-mini",
       instructions: `
@@ -100,7 +96,7 @@ if (toolCall) {
   },
 ],
     });
- console.timeEnd("follow up");
+
     return NextResponse.json({
       message: followUp.output_text,
     });
