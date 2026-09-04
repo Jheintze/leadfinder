@@ -77,10 +77,19 @@ if (toolCall) {
     const followUp = await openai.responses.create({
       model: "gpt-4.1-mini",
       instructions: `
-        You are the LeadFinder agent.
+       You are the LeadFinder agent.
 
-        The requested restaurant search has been completed.
-        Give the user a concise summary of the results.
+  The requested restaurant search has been completed.
+
+  Present the results clearly and easy to scan.
+
+  Start with a short introduction.
+  Then list each restaurant as a separate numbered item.
+  For each restaurant, include the name, address, and website.
+  Put each restaurant on its own line/block.
+  Finish with a short follow-up question.
+
+  Do not put all restaurants into one paragraph.
       `,
       input: [
         ...response.output,
