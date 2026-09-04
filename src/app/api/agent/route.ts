@@ -63,12 +63,12 @@ if (toolCall) {
   console.log("Arguments:", toolCall.arguments);
 
   if (toolCall.name === "search_restaurants") {
-    const arguments = JSON.parse(toolCall.arguments);
+    const toolArguments = JSON.parse(toolCall.arguments);
 
     const restaurants = await searchAndSaveRestaurants({
-      city: arguments.city,
-      businessType: arguments.businessType,
-      limit: arguments.limit,
+      city: toolArguments.city,
+      businessType: toolArguments.businessType,
+      limit: toolArguments.limit,
     });
 
     const followUp = await openai.responses.create({
