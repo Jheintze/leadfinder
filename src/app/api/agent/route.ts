@@ -38,7 +38,8 @@ export async function POST(request: Request) {
         },
         businessType: {
           type: "string",
-          description: "The type of restaurant or business to search for.",
+          description:
+  "The type of business to search for. Use a valid Overture category such as 'restaurant', 'cafe', or 'bar'. Do not include cuisine names like sushi or Italian.",
         },
         limit: {
           type: "number",
@@ -70,6 +71,8 @@ if (toolCall) {
       businessType: toolArguments.businessType,
       limit: toolArguments.limit,
     });
+
+    console.log("Restaurants found:", restaurants);
 
     const followUp = await openai.responses.create({
       model: "gpt-4.1-mini",
