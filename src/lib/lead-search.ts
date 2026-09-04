@@ -161,7 +161,7 @@ export async function searchLeads({
   businessType,
   limit,
   offset = 0,
-}: LeadSearchInput): Promise<Lead[]> {
+}: LeadSearchInput): Promise<{ leads: Lead[]; nextOffset: number | null }> {
   if (!OPEN_PLACES_API_KEY) {
     throw new Error("OPEN_PLACES_API_KEY is not configured.");
   }
@@ -224,5 +224,8 @@ export async function searchLeads({
     });
   }
 
-  return leads;
+ return {
+  leads,
+  nextOffset: data.meta?.next_offset ?? null,
+};
 }
