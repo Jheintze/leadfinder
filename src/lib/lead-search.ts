@@ -181,7 +181,11 @@ export async function searchLeads({
     throw new Error("Business type is required.");
   }
 
-  const coordinates = await getCityCoordinates(trimmedCity);
+  const searchLocation = area
+  ? `${area.trim()}, ${trimmedCity}`
+  : trimmedCity;
+
+const coordinates = await getLocationCoordinates(searchLocation);
 
   const params = new URLSearchParams({
     category: trimmedBusinessType,
