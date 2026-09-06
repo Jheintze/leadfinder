@@ -13,7 +13,9 @@ export type Lead = {
 
 export type LeadSearchInput = {
   city: string;
+  area?: string;
   businessType: string;
+  cuisine?: string;
   limit: number;
   offset?: number;
 };
