@@ -67,37 +67,51 @@ const OPEN_PLACES_API_KEY = process.env.OPEN_PLACES_API_KEY;
 
 async function getLocationCoordinates(
   city: string,
-  district?: string,
+  area?: string,
 ): Promise<LocationCoordinates> {
   const normalizedCity = city.trim().toLowerCase();
-const normalizedDistrict = district?.trim().toLowerCase() || null;
+  const normalizedArea = area?.trim().toLowerCase() || null;
 
   // Check our Supabase cache first.
-  const { data: cachedLocation, error: cacheError } = await supabase
-  .from("location_coordinates")
-  .select("latitude, longitude, boundary")
-  .eq("city", normalizedCity)
-  .eq("district", normalizedDistrict)
-  .maybeSingle();
+  let cacheQuery = supabase
+    .from("location_coordinates")
+    .select("latitude, longitude, boundary")
+    .eq("city", normalizedCity);
+
+  if (normalizedArea) {
+    cacheQuery = cacheQuery.eq("district", normalizedArea);
+  } else {
+    cacheQuery = cacheQuery.is("district", null);
+  }
+
+  const { data: cachedLocation, error: cacheError } =
+    await cacheQuery.maybeSingle();
 
   if (cacheError) {
     throw new Error(
-      `Failed to read city coordinates cache: ${cacheError.message}`,
+      `Failed to read location coordinates cache: ${cacheError.message}`,
     );
   }
 
-  if (cachedCity) {
+  if (cachedLocation) {
     return {
-      latitude: cachedCity.latitude,
-      longitude: cachedCity.longitude,
+      latitude: cachedLocation.latitude,
+      longitude: cachedLocation.longitude,
+      boundary: cachedLocation.boundary,
     };
   }
 
-  // City isn't cached, so geocode it with Nominatim.
+  // Build the location name that Nominatim should search for.
+  const location = normalizedArea
+    ? `${area}, ${city}`
+    : city;
+
+  // Location isn't cached, so geocode it with Nominatim.
   const params = new URLSearchParams({
-   q: location.trim(),
+    q: location.trim(),
     format: "jsonv2",
     limit: "1",
+    polygon_geojson: "1",
   });
 
   const response = await fetch(`${NOMINATIM_ENDPOINT}?${params.toString()}`, {
@@ -130,22 +144,31 @@ const normalizedDistrict = district?.trim().toLowerCase() || null;
     throw new Error(`Invalid coordinates returned for: ${location.trim()}`);
   }
 
-  // Cache the coordinates for future searches.
+  if (!result.geojson) {
+    throw new Error(`No boundary returned for: ${location.trim()}`);
+  }
+
+  // Cache the location for future searches.
   const { error: insertError } = await supabase
-    .from("city_coordinates")
+    .from("location_coordinates")
     .insert({
-     city: normalizedLocation,
+      city: normalizedCity,
+      district: normalizedArea,
       latitude,
       longitude,
+      boundary: result.geojson,
     });
 
   if (insertError) {
-    throw new Error(`Failed to cache city coordinates: ${insertError.message}`);
+    throw new Error(
+      `Failed to cache location coordinates: ${insertError.message}`,
+    );
   }
 
   return {
     latitude,
     longitude,
+    boundary: result.geojson,
   };
 }
 
@@ -187,11 +210,10 @@ export async function searchLeads({
     throw new Error("Business type is required.");
   }
 
-  const searchLocation = area
-  ? `${area.trim()}, ${trimmedCity}`
-  : trimmedCity;
-
-const coordinates = await getLocationCoordinates(searchLocation);
+const coordinates = await getLocationCoordinates(
+  trimmedCity,
+  area,
+);
 
   const params = new URLSearchParams({
     category: trimmedBusinessType,
