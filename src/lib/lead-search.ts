@@ -90,7 +90,6 @@ async function getLocationCoordinates(location: string): Promise<CityCoordinates
   const params = new URLSearchParams({
    q: location.trim(),
     format: "jsonv2",
-    featureType: "city",
     limit: "1",
   });
 
