@@ -63,14 +63,14 @@ const NOMINATIM_ENDPOINT = "https://nominatim.openstreetmap.org/search";
 const OPEN_PLACES_ENDPOINT = "https://api.openplacesapi.com/v1/places";
 const OPEN_PLACES_API_KEY = process.env.OPEN_PLACES_API_KEY;
 
-async function getCityCoordinates(city: string): Promise<CityCoordinates> {
-  const normalizedCity = city.trim().toLowerCase();
+async function getLocationCoordinates(location: string): Promise<CityCoordinates> {
+  const normalizedLocation = location.trim().toLowerCase();
 
   // Check our Supabase cache first.
   const { data: cachedCity, error: cacheError } = await supabase
     .from("city_coordinates")
     .select("latitude, longitude")
-    .eq("city", normalizedCity)
+    .eq("city", normalizedLocation)
     .maybeSingle();
 
   if (cacheError) {
@@ -88,7 +88,7 @@ async function getCityCoordinates(city: string): Promise<CityCoordinates> {
 
   // City isn't cached, so geocode it with Nominatim.
   const params = new URLSearchParams({
-    q: city.trim(),
+   q: location.trim(),
     format: "jsonv2",
     featureType: "city",
     limit: "1",
@@ -114,21 +114,21 @@ async function getCityCoordinates(city: string): Promise<CityCoordinates> {
   const result = results[0];
 
   if (!result?.lat || !result?.lon) {
-    throw new Error(`Could not find city: ${city.trim()}`);
+    throw new Error(`Could not find location: ${location.trim()}`);
   }
 
   const latitude = Number(result.lat);
   const longitude = Number(result.lon);
 
   if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-    throw new Error(`Invalid coordinates returned for: ${city.trim()}`);
+    throw new Error(`Invalid coordinates returned for: ${location.trim()}`);
   }
 
   // Cache the coordinates for future searches.
   const { error: insertError } = await supabase
     .from("city_coordinates")
     .insert({
-      city: normalizedCity,
+     city: normalizedLocation,
       latitude,
       longitude,
     });
