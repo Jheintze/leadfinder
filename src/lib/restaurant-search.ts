@@ -119,7 +119,6 @@ export async function searchAndSaveRestaurants({
             business_type: normalizedBusinessType,
             cuisine: normalizedCuisine,
             next_offset: nextOffset,
-            updated_at: new Date().toISOString(),
           },
           {
             onConflict: "city,area,business_type,cuisine",

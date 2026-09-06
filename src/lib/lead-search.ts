@@ -210,72 +210,99 @@ export async function searchLeads({
     throw new Error("Business type is required.");
   }
 
+  // Cuisine is part of the search configuration/pagination state,
+  // but is not yet used as an Open Places filter.
+  void cuisine;
+
   const coordinates = await getLocationCoordinates(trimmedCity, area);
+  
+  console.log("SEARCH LOCATION:", {
+  city: trimmedCity,
+  area,
+  latitude: coordinates.latitude,
+  longitude: coordinates.longitude,
+  boundaryType: coordinates.boundary.type,
+});
 
-    const params = new URLSearchParams({
-      category: trimmedBusinessType,
-      lat: String(coordinates.latitude),
-      lon: String(coordinates.longitude),
-      radius_mi: "25",
-      limit: String(limit),
-      offset: String(offset),
-    });
+  const params = new URLSearchParams({
+    category: trimmedBusinessType,
+    lat: String(coordinates.latitude),
+    lon: String(coordinates.longitude),
+    radius_mi: "25",
+    limit: String(limit),
+    offset: String(offset),
+  });
 
-    const response = await fetch(
-      `${OPEN_PLACES_ENDPOINT}?${params.toString()}`,
-      {
-        headers: {
-          Authorization: `Bearer ${OPEN_PLACES_API_KEY}`,
-        },
-        cache: "no-store",
+  const response = await fetch(
+    `${OPEN_PLACES_ENDPOINT}?${params.toString()}`,
+    {
+      headers: {
+        Authorization: `Bearer ${OPEN_PLACES_API_KEY}`,
       },
+      cache: "no-store",
+    },
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+
+    throw new Error(
+      `Open Places search failed (${response.status}): ${errorText}`,
     );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-
-      throw new Error(
-        `Open Places search failed (${response.status}): ${errorText}`,
-      );
-    }
-
-    const data = (await response.json()) as OpenPlacesResponse;
-
-    const leads: Lead[] = [];
-
-    for (const place of data.results ?? []) {
-      if (!place.place_id || !place.name) continue;
-
-      if (typeof place.lat !== "number" || typeof place.lon !== "number") {
-        continue;
-      }
-
-      // Exact geographical filtering.
-      // Open Places radius is only used to retrieve candidates.
-      const insideBoundary = booleanPointInPolygon(
-        [place.lon, place.lat],
-        coordinates.boundary,
-      );
-
-      if (!insideBoundary) {
-        continue;
-      }
-
-      const website = place.website ?? null;
-
-      leads.push({
-        id: place.place_id,
-        businessName: place.name,
-        website,
-        email: null,
-        location: formatAddress(place.address) || trimmedCity,
-        status: website ? "Website found" : "Website missing",
-      });
-    }
-
-    return {
-      leads,
-      nextOffset: data.meta?.next_offset ?? null,
-    };
   }
+
+  const data = (await response.json()) as OpenPlacesResponse;
+  
+  console.log("OPEN PLACES RESULTS:", {
+  count: data.results?.length ?? 0,
+  nextOffset: data.meta?.next_offset,
+});
+
+  const leads: Lead[] = [];
+
+  for (const place of data.results ?? []) {
+    if (!place.place_id || !place.name) {
+      continue;
+    }
+
+    if (typeof place.lat !== "number" || typeof place.lon !== "number") {
+      continue;
+    }
+
+    // Open Places radius only retrieves candidates.
+    // The Nominatim boundary determines whether the restaurant
+    // actually belongs to the requested city/area.
+    const insideBoundary = booleanPointInPolygon(
+      [place.lon, place.lat],
+      coordinates.boundary,
+    );
+    
+    console.log("BOUNDARY CHECK:", {
+  name: place.name,
+  lat: place.lat,
+  lon: place.lon,
+  insideBoundary,
+});
+
+    if (!insideBoundary) {
+      continue;
+    }
+
+    const website = place.website ?? null;
+
+    leads.push({
+      id: place.place_id,
+      businessName: place.name,
+      website,
+      email: null,
+      location: formatAddress(place.address) || trimmedCity,
+      status: website ? "Website found" : "Website missing",
+    });
+  }
+
+  return {
+    leads,
+    nextOffset: data.meta?.next_offset ?? null,
+  };
 }
+
