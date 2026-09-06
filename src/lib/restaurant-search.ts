@@ -3,13 +3,17 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 type SearchAndSaveInput = {
   city: string;
+  area?: string;
   businessType: string;
+  cuisine?: string;
   limit: number;
 };
 
 export async function searchAndSaveRestaurants({
   city,
+  area,
   businessType,
+  cuisine,
   limit,
 }: SearchAndSaveInput) {
 
@@ -32,11 +36,13 @@ let offset = progress?.next_offset ?? 0;
       const remaining = limit - newLeads.length;
         
       const { leads, nextOffset } = await searchLeads({
-        city,
-        businessType: businessType || "Restaurant",
-        limit: batchSize,
-        offset,
-      });
+  city,
+  area,
+  businessType: businessType || "restaurant",
+  cuisine,
+  limit: batchSize,
+  offset,
+});
          
       if (leads.length === 0) {
         break;

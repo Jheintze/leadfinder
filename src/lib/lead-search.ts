@@ -160,7 +160,9 @@ function formatAddress(address?: OpenPlacesAddress): string {
 
 export async function searchLeads({
   city,
+  area,
   businessType,
+  cuisine,
   limit,
   offset = 0,
 }: LeadSearchInput): Promise<{ leads: Lead[]; nextOffset: number | null }> {
