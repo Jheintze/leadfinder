@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { booleanPointInPolygon } from "@turf/boolean-point-in-polygon";
+import type { Polygon, MultiPolygon } from "geojson";
 
 export type LeadStatus = "Website found" | "Website missing";
 
@@ -24,14 +25,14 @@ export type LeadSearchInput = {
 type LocationCoordinates = {
   latitude: number;
   longitude: number;
-  boundary: unknown;
+  boundary: Polygon | MultiPolygon;
 };
 
 type NominatimResult = {
   lat: string;
   lon: string;
   display_name?: string;
-  geojson?: unknown;
+  geojson?: Polygon | MultiPolygon;
 };
 
 type OpenPlacesAddress = {
@@ -103,9 +104,7 @@ async function getLocationCoordinates(
   }
 
   // Build the location name that Nominatim should search for.
-  const location = normalizedArea
-    ? `${area}, ${city}`
-    : city;
+  const location = normalizedArea ? `${area}, ${city}` : city;
 
   // Location isn't cached, so geocode it with Nominatim.
   const params = new URLSearchParams({
@@ -196,7 +195,6 @@ export async function searchLeads({
   limit,
   offset = 0,
 }: LeadSearchInput): Promise<{ leads: Lead[]; nextOffset: number | null }> {
-
   if (!OPEN_PLACES_API_KEY) {
     throw new Error("OPEN_PLACES_API_KEY is not configured.");
   }
@@ -212,58 +210,89 @@ export async function searchLeads({
     throw new Error("Business type is required.");
   }
 
-const coordinates = await getLocationCoordinates(
-  trimmedCity,
-  area,
-);
-
-  const params = new URLSearchParams({
-    category: trimmedBusinessType,
-    lat: String(coordinates.latitude),
-    lon: String(coordinates.longitude),
-    radius_mi: "25",
-    limit: String(limit),
-    offset: String(offset),
-  });
-
-  const response = await fetch(`${OPEN_PLACES_ENDPOINT}?${params.toString()}`, {
-    headers: {
-      Authorization: `Bearer ${OPEN_PLACES_API_KEY}`,
-    },
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-
-    throw new Error(
-      `Open Places search failed (${response.status}): ${errorText}`,
-    );
-  }
-
-  const data = (await response.json()) as OpenPlacesResponse;
+  const coordinates = await getLocationCoordinates(trimmedCity, area);
 
   const leads: Lead[] = [];
+  let currentOffset = offset;
 
-  for (const place of data.results ?? []) {
-    if (!place.place_id || !place.name) {
-      continue;
+  while (leads.length < limit) {
+    const remaining = limit - leads.length;
+
+    const params = new URLSearchParams({
+      category: trimmedBusinessType,
+      lat: String(coordinates.latitude),
+      lon: String(coordinates.longitude),
+      radius_mi: "25",
+      limit: String(remaining),
+      offset: String(currentOffset),
+    });
+
+    const response = await fetch(
+      `${OPEN_PLACES_ENDPOINT}?${params.toString()}`,
+      {
+        headers: {
+          Authorization: `Bearer ${OPEN_PLACES_API_KEY}`,
+        },
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+
+      throw new Error(
+        `Open Places search failed (${response.status}): ${errorText}`,
+      );
     }
 
-    const website = place.website ?? null;
+    const data = (await response.json()) as OpenPlacesResponse;
 
-    leads.push({
-      id: place.place_id,
-      businessName: place.name,
-      website,
-      email: null,
-      location: formatAddress(place.address) || trimmedCity,
-      status: website ? "Website found" : "Website missing",
-    });
+    for (const place of data.results ?? []) {
+      if (!place.place_id || !place.name) {
+        continue;
+      }
+
+      // Skip places without coordinates.
+      if (typeof place.lat !== "number" || typeof place.lon !== "number") {
+        continue;
+      }
+
+      const insideBoundary = booleanPointInPolygon(
+        [place.lon, place.lat],
+        coordinates.boundary,
+      );
+
+      const website = place.website ?? null;
+
+      leads.push({
+        id: place.place_id,
+        businessName: place.name,
+        website,
+        email: null,
+        location: formatAddress(place.address) || trimmedCity,
+        status: website ? "Website found" : "Website missing",
+      });
+
+      if (leads.length >= limit) {
+        break;
+      }
+    }
+
+    const nextOffset = data.meta?.next_offset ?? null;
+
+    // No more Open Places results.
+    if (nextOffset === null) {
+      return {
+        leads,
+        nextOffset: null,
+      };
+    }
+
+    currentOffset = nextOffset;
   }
 
- return {
-  leads,
-  nextOffset: data.meta?.next_offset ?? null,
-};
+  return {
+    leads,
+    nextOffset: currentOffset,
+  };
 }
