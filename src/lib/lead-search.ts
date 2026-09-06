@@ -252,7 +252,6 @@ export async function searchLeads({
         continue;
       }
 
-      // Skip places without coordinates.
       if (typeof place.lat !== "number" || typeof place.lon !== "number") {
         continue;
       }
@@ -261,6 +260,10 @@ export async function searchLeads({
         [place.lon, place.lat],
         coordinates.boundary,
       );
+
+      if (!insideBoundary) {
+        continue;
+      }
 
       const website = place.website ?? null;
 
