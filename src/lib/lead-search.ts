@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export type LeadStatus = "Website found" | "Website missing";
 
