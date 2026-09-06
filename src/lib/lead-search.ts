@@ -79,9 +79,9 @@ async function getLocationCoordinates(
     .eq("city", normalizedCity);
 
   if (normalizedArea) {
-    cacheQuery = cacheQuery.eq("district", normalizedArea);
+    cacheQuery = cacheQuery.eq("area", normalizedArea);
   } else {
-    cacheQuery = cacheQuery.is("district", null);
+    cacheQuery = cacheQuery.is("area", null);
   }
 
   const { data: cachedLocation, error: cacheError } =
@@ -153,7 +153,7 @@ async function getLocationCoordinates(
     .from("location_coordinates")
     .insert({
       city: normalizedCity,
-      district: normalizedArea,
+      area: normalizedArea,
       latitude,
       longitude,
       boundary: result.geojson,
