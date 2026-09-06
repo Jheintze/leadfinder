@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export type LeadStatus = "Website found" | "Website missing";
 
@@ -73,7 +74,7 @@ async function getLocationCoordinates(
   const normalizedArea = area?.trim().toLowerCase() || null;
 
   // Check our Supabase cache first.
-  let cacheQuery = supabase
+  let cacheQuery = supabaseAdmin
     .from("location_coordinates")
     .select("latitude, longitude, boundary")
     .eq("city", normalizedCity);
@@ -149,7 +150,7 @@ async function getLocationCoordinates(
   }
 
   // Cache the location for future searches.
-  const { error: insertError } = await supabase
+  const { error: insertError } = await supabaseAdmin
     .from("location_coordinates")
     .insert({
       city: normalizedCity,
