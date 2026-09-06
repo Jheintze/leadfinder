@@ -212,12 +212,6 @@ export async function searchLeads({
 
   const coordinates = await getLocationCoordinates(trimmedCity, area);
 
-  const leads: Lead[] = [];
-  let currentOffset = offset;
-
-  while (leads.length < limit) {
-    const remaining = limit - leads.length;
-
     const params = new URLSearchParams({
       category: trimmedBusinessType,
       lat: String(coordinates.latitude),
