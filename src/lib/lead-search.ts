@@ -20,15 +20,17 @@ export type LeadSearchInput = {
   offset?: number;
 };
 
-type CityCoordinates = {
+type LocationCoordinates = {
   latitude: number;
   longitude: number;
+  boundary: unknown;
 };
 
 type NominatimResult = {
   lat: string;
   lon: string;
   display_name?: string;
+  geojson?: unknown;
 };
 
 type OpenPlacesAddress = {
@@ -63,15 +65,20 @@ const NOMINATIM_ENDPOINT = "https://nominatim.openstreetmap.org/search";
 const OPEN_PLACES_ENDPOINT = "https://api.openplacesapi.com/v1/places";
 const OPEN_PLACES_API_KEY = process.env.OPEN_PLACES_API_KEY;
 
-async function getLocationCoordinates(location: string): Promise<CityCoordinates> {
-  const normalizedLocation = location.trim().toLowerCase();
+async function getLocationCoordinates(
+  city: string,
+  district?: string,
+): Promise<LocationCoordinates> {
+  const normalizedCity = city.trim().toLowerCase();
+const normalizedDistrict = district?.trim().toLowerCase() || null;
 
   // Check our Supabase cache first.
-  const { data: cachedCity, error: cacheError } = await supabase
-    .from("city_coordinates")
-    .select("latitude, longitude")
-    .eq("city", normalizedLocation)
-    .maybeSingle();
+  const { data: cachedLocation, error: cacheError } = await supabase
+  .from("location_coordinates")
+  .select("latitude, longitude, boundary")
+  .eq("city", normalizedCity)
+  .eq("district", normalizedDistrict)
+  .maybeSingle();
 
   if (cacheError) {
     throw new Error(
