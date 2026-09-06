@@ -19,6 +19,7 @@ export async function searchAndSaveRestaurants({
   const newLeads = [];
   const seenIds = new Set<string>();
 
+  const normalizedCity = city.trim().toLowerCase();
   const normalizedArea = area?.trim().toLowerCase() || "";
   const normalizedCuisine = cuisine?.trim().toLowerCase() || "";
   const normalizedBusinessType =
@@ -27,7 +28,7 @@ export async function searchAndSaveRestaurants({
   const { data: progress } = await supabaseAdmin
     .from("search_progress")
     .select("next_offset")
-    .eq("city", city.trim().toLowerCase())
+    .eq("city", normalizedCity)
     .eq("area", normalizedArea)
     .eq("business_type", normalizedBusinessType)
     .eq("cuisine", normalizedCuisine)

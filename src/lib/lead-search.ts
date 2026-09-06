@@ -223,8 +223,8 @@ export async function searchLeads({
       lat: String(coordinates.latitude),
       lon: String(coordinates.longitude),
       radius_mi: "25",
-      limit: String(remaining),
-      offset: String(currentOffset),
+      limit: String(limit),
+      offset: String(offset),
     });
 
     const response = await fetch(
@@ -247,15 +247,17 @@ export async function searchLeads({
 
     const data = (await response.json()) as OpenPlacesResponse;
 
+    const leads: Lead[] = [];
+
     for (const place of data.results ?? []) {
-      if (!place.place_id || !place.name) {
-        continue;
-      }
+      if (!place.place_id || !place.name) continue;
 
       if (typeof place.lat !== "number" || typeof place.lon !== "number") {
         continue;
       }
 
+      // Exact geographical filtering.
+      // Open Places radius is only used to retrieve candidates.
       const insideBoundary = booleanPointInPolygon(
         [place.lon, place.lat],
         coordinates.boundary,
@@ -275,27 +277,11 @@ export async function searchLeads({
         location: formatAddress(place.address) || trimmedCity,
         status: website ? "Website found" : "Website missing",
       });
-
-      if (leads.length >= limit) {
-        break;
-      }
     }
 
-    const nextOffset = data.meta?.next_offset ?? null;
-
-    // No more Open Places results.
-    if (nextOffset === null) {
-      return {
-        leads,
-        nextOffset: null,
-      };
-    }
-
-    currentOffset = nextOffset;
+    return {
+      leads,
+      nextOffset: data.meta?.next_offset ?? null,
+    };
   }
-
-  return {
-    leads,
-    nextOffset: currentOffset,
-  };
 }
