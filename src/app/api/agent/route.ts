@@ -27,7 +27,8 @@ export async function POST(request: Request) {
   {
     type: "function",
     name: "search_restaurants",
-    description: "Search for restaurants in a city.",
+    description:
+      "Search for businesses in a city, optionally limited to a specific area and cuisine.",
     strict: true,
     parameters: {
       type: "object",
@@ -36,17 +37,27 @@ export async function POST(request: Request) {
           type: "string",
           description: "The city to search in.",
         },
+        area: {
+          type: ["string", "null"],
+          description:
+            "The specific area, neighborhood, or district within the city. Use null if no specific area was requested.",
+        },
         businessType: {
           type: "string",
           description:
-  "The type of business to search for. Use a valid Overture category such as 'restaurant', 'cafe', or 'bar'. Do not include cuisine names like sushi or Italian.",
+            "The type of business to search for. Use a valid Overture category such as 'restaurant', 'cafe', or 'bar'. Do not include cuisine names like sushi or Italian.",
+        },
+        cuisine: {
+          type: ["string", "null"],
+          description:
+            "The cuisine requested, such as 'sushi', 'Italian', or 'Mexican'. Use null if no cuisine was requested.",
         },
         limit: {
           type: "number",
-          description: "The maximum number of restaurants to find.",
+          description: "The maximum number of businesses to find.",
         },
       },
-      required: ["city", "businessType", "limit"],
+      required: ["city", "area", "businessType", "cuisine", "limit"],
       additionalProperties: false,
     },
   },
@@ -66,7 +77,9 @@ if (toolCall) {
        
     const restaurants = await searchAndSaveRestaurants({
       city: toolArguments.city,
+      area: toolArguments.area ?? undefined, 
       businessType: toolArguments.businessType,
+      cuisine: toolArguments.cuisine ?? undefined,
       limit: toolArguments.limit,
     });
     

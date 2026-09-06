@@ -1,4 +1,3 @@
-import { supabase } from "@/lib/supabase";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export type LeadStatus = "Website found" | "Website missing";
@@ -196,6 +195,7 @@ export async function searchLeads({
   limit,
   offset = 0,
 }: LeadSearchInput): Promise<{ leads: Lead[]; nextOffset: number | null }> {
+
   if (!OPEN_PLACES_API_KEY) {
     throw new Error("OPEN_PLACES_API_KEY is not configured.");
   }
