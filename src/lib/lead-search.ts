@@ -215,33 +215,32 @@ export async function searchLeads({
   void cuisine;
 
   const coordinates = await getLocationCoordinates(trimmedCity, area);
-  
+
   console.log("SEARCH LOCATION:", {
-  city: trimmedCity,
-  area,
-  latitude: coordinates.latitude,
-  longitude: coordinates.longitude,
-  boundaryType: coordinates.boundary.type,
-});
+    city: trimmedCity,
+    area,
+    latitude: coordinates.latitude,
+    longitude: coordinates.longitude,
+    boundaryType: coordinates.boundary.type,
+  });
+  
+  const candidateLimit = Math.max(limit * 5, 20);
 
   const params = new URLSearchParams({
     category: trimmedBusinessType,
     lat: String(coordinates.latitude),
     lon: String(coordinates.longitude),
     radius_mi: "25",
-    limit: String(limit),
+    limit: String(candidateLimit),
     offset: String(offset),
   });
 
-  const response = await fetch(
-    `${OPEN_PLACES_ENDPOINT}?${params.toString()}`,
-    {
-      headers: {
-        Authorization: `Bearer ${OPEN_PLACES_API_KEY}`,
-      },
-      cache: "no-store",
+  const response = await fetch(`${OPEN_PLACES_ENDPOINT}?${params.toString()}`, {
+    headers: {
+      Authorization: `Bearer ${OPEN_PLACES_API_KEY}`,
     },
-  );
+    cache: "no-store",
+  });
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -252,11 +251,11 @@ export async function searchLeads({
   }
 
   const data = (await response.json()) as OpenPlacesResponse;
-  
+
   console.log("OPEN PLACES RESULTS:", {
-  count: data.results?.length ?? 0,
-  nextOffset: data.meta?.next_offset,
-});
+    count: data.results?.length ?? 0,
+    nextOffset: data.meta?.next_offset,
+  });
 
   const leads: Lead[] = [];
 
@@ -276,13 +275,13 @@ export async function searchLeads({
       [place.lon, place.lat],
       coordinates.boundary,
     );
-    
+
     console.log("BOUNDARY CHECK:", {
-  name: place.name,
-  lat: place.lat,
-  lon: place.lon,
-  insideBoundary,
-});
+      name: place.name,
+      lat: place.lat,
+      lon: place.lon,
+      insideBoundary,
+    });
 
     if (!insideBoundary) {
       continue;
@@ -305,4 +304,3 @@ export async function searchLeads({
     nextOffset: data.meta?.next_offset ?? null,
   };
 }
-
