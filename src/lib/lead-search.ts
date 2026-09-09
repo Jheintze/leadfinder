@@ -262,7 +262,7 @@ export async function searchLeads({
 
   const trimmedCity = city.trim();
   const trimmedBusinessType = businessType.trim().toLowerCase();
-  const trimmedCuisine = cuisine?.trim() || "";
+  const trimmedCuisine = cuisine?.trim().toLowerCase() || "";
 
   if (!trimmedCity) {
     throw new Error("City is required.");
