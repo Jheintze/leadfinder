@@ -288,13 +288,12 @@ export async function searchLeads({
   boundingbox: coordinates.boundingbox,
 });
   const params = new URLSearchParams({
-    category: trimmedBusinessType,
-    lat: String(coordinates.latitude),
-    lon: String(coordinates.longitude),
-    radius_mi: String(radiusMiles),
-    limit: String(limit),
-    offset: String(offset),
-  });
+  q: cuisine || trimmedBusinessType,
+  lat: String(coordinates.latitude),
+  lon: String(coordinates.longitude),
+  radius_mi: String(radiusMiles),
+  limit: String(limit),
+});
 
   const response = await fetch(`${OPEN_PLACES_ENDPOINT}?${params.toString()}`, {
     headers: {
