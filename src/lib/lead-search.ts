@@ -24,6 +24,7 @@ type LocationCoordinates = {
   latitude: number;
   longitude: number;
   boundary: unknown;
+  boundingbox: [string, string, string, string];
 };
 
 type NominatimResult = {
@@ -31,6 +32,7 @@ type NominatimResult = {
   lon: string;
   display_name?: string;
   geojson?: unknown;
+  boundingbox?: [string, string, string, string];
 };
 
 type OpenPlacesAddress = {
@@ -65,6 +67,8 @@ const NOMINATIM_ENDPOINT = "https://nominatim.openstreetmap.org/search";
 const OPEN_PLACES_ENDPOINT = "https://api.openplacesapi.com/v1/places";
 const OPEN_PLACES_API_KEY = process.env.OPEN_PLACES_API_KEY;
 
+const MAX_RADIUS_MI = 25;
+
 async function getLocationCoordinates(
   city: string,
   area?: string,
@@ -74,7 +78,7 @@ async function getLocationCoordinates(
 
   let cacheQuery = supabaseAdmin
     .from("location_coordinates")
-    .select("latitude, longitude, boundary")
+    .select("latitude, longitude, boundary, boundingbox")
     .eq("city", normalizedCity);
 
   if (normalizedArea) {
@@ -97,6 +101,7 @@ async function getLocationCoordinates(
       latitude: cachedLocation.latitude,
       longitude: cachedLocation.longitude,
       boundary: cachedLocation.boundary,
+      boundingbox: cachedLocation.boundingbox,
     };
   }
 
@@ -142,14 +147,19 @@ async function getLocationCoordinates(
     throw new Error(`No boundary returned for: ${location.trim()}`);
   }
 
+  if (!result.boundingbox || result.boundingbox.length !== 4) {
+    throw new Error(`No bounding box returned for: ${location.trim()}`);
+  }
+
   const { error: insertError } = await supabaseAdmin
     .from("location_coordinates")
     .insert({
       city: normalizedCity,
       area: normalizedArea,
+      boundary: result.geojson,
+      boundingbox: result.boundingbox,
       latitude,
       longitude,
-      boundary: result.geojson,
     });
 
   if (insertError) {
@@ -162,7 +172,61 @@ async function getLocationCoordinates(
     latitude,
     longitude,
     boundary: result.geojson,
+    boundingbox: result.boundingbox,
   };
+}
+
+function calculateDistanceMiles(
+  latitude1: number,
+  longitude1: number,
+  latitude2: number,
+  longitude2: number,
+): number {
+  const earthRadiusMiles = 3958.8;
+
+  const latitudeDifference = ((latitude2 - latitude1) * Math.PI) / 180;
+  const longitudeDifference = ((longitude2 - longitude1) * Math.PI) / 180;
+
+  const latitude1Radians = (latitude1 * Math.PI) / 180;
+  const latitude2Radians = (latitude2 * Math.PI) / 180;
+
+  const a =
+    Math.sin(latitudeDifference / 2) ** 2 +
+    Math.cos(latitude1Radians) *
+      Math.cos(latitude2Radians) *
+      Math.sin(longitudeDifference / 2) ** 2;
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return earthRadiusMiles * c;
+}
+
+function calculateSearchRadius(
+  latitude: number,
+  longitude: number,
+  boundingbox: [string, string, string, string],
+): number {
+  const [south, north, west, east] = boundingbox.map(Number);
+
+  if (
+    !Number.isFinite(south) ||
+    !Number.isFinite(north) ||
+    !Number.isFinite(west) ||
+    !Number.isFinite(east)
+  ) {
+    return MAX_RADIUS_MI;
+  }
+
+  const distancesToCorners = [
+    calculateDistanceMiles(latitude, longitude, south, west),
+    calculateDistanceMiles(latitude, longitude, south, east),
+    calculateDistanceMiles(latitude, longitude, north, west),
+    calculateDistanceMiles(latitude, longitude, north, east),
+  ];
+
+  const radius = Math.max(...distancesToCorners);
+
+  return Math.min(Math.ceil(radius), MAX_RADIUS_MI);
 }
 
 function formatAddress(address?: OpenPlacesAddress): string {
@@ -211,11 +275,17 @@ export async function searchLeads({
 
   const coordinates = await getLocationCoordinates(trimmedCity, area);
 
+  const radiusMiles = calculateSearchRadius(
+    coordinates.latitude,
+    coordinates.longitude,
+    coordinates.boundingbox,
+  );
+
   const params = new URLSearchParams({
     category: trimmedBusinessType,
     lat: String(coordinates.latitude),
     lon: String(coordinates.longitude),
-    radius_mi: "25",
+    radius_mi: String(radiusMiles),
     limit: String(limit),
     offset: String(offset),
   });
@@ -265,5 +335,3 @@ export async function searchLeads({
     nextOffset: data.meta?.next_offset ?? null,
   };
 }
-
-
