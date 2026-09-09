@@ -1,6 +1,4 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { booleanPointInPolygon } from "@turf/boolean-point-in-polygon";
-import type { Polygon, MultiPolygon } from "geojson";
 
 export type LeadStatus = "Website found" | "Website missing";
 
@@ -25,14 +23,14 @@ export type LeadSearchInput = {
 type LocationCoordinates = {
   latitude: number;
   longitude: number;
-  boundary: Polygon | MultiPolygon;
+  boundary: unknown;
 };
 
 type NominatimResult = {
   lat: string;
   lon: string;
   display_name?: string;
-  geojson?: Polygon | MultiPolygon;
+  geojson?: unknown;
 };
 
 type OpenPlacesAddress = {
@@ -74,7 +72,6 @@ async function getLocationCoordinates(
   const normalizedCity = city.trim().toLowerCase();
   const normalizedArea = area?.trim().toLowerCase() || null;
 
-  // Check our Supabase cache first.
   let cacheQuery = supabaseAdmin
     .from("location_coordinates")
     .select("latitude, longitude, boundary")
@@ -103,10 +100,8 @@ async function getLocationCoordinates(
     };
   }
 
-  // Build the location name that Nominatim should search for.
   const location = normalizedArea ? `${area}, ${city}` : city;
 
-  // Location isn't cached, so geocode it with Nominatim.
   const params = new URLSearchParams({
     q: location.trim(),
     format: "jsonv2",
@@ -130,7 +125,6 @@ async function getLocationCoordinates(
   }
 
   const results = (await response.json()) as NominatimResult[];
-
   const result = results[0];
 
   if (!result?.lat || !result?.lon) {
@@ -148,7 +142,6 @@ async function getLocationCoordinates(
     throw new Error(`No boundary returned for: ${location.trim()}`);
   }
 
-  // Cache the location for future searches.
   const { error: insertError } = await supabaseAdmin
     .from("location_coordinates")
     .insert({
@@ -194,7 +187,10 @@ export async function searchLeads({
   cuisine,
   limit,
   offset = 0,
-}: LeadSearchInput): Promise<{ leads: Lead[]; nextOffset: number | null }> {
+}: LeadSearchInput): Promise<{
+  leads: Lead[];
+  nextOffset: number | null;
+}> {
   if (!OPEN_PLACES_API_KEY) {
     throw new Error("OPEN_PLACES_API_KEY is not configured.");
   }
@@ -210,28 +206,17 @@ export async function searchLeads({
     throw new Error("Business type is required.");
   }
 
-  // Cuisine is part of the search configuration/pagination state,
-  // but is not yet used as an Open Places filter.
+  // Cuisine will be implemented as an actual search/filter later.
   void cuisine;
 
   const coordinates = await getLocationCoordinates(trimmedCity, area);
-
-  console.log("SEARCH LOCATION:", {
-    city: trimmedCity,
-    area,
-    latitude: coordinates.latitude,
-    longitude: coordinates.longitude,
-    boundaryType: coordinates.boundary.type,
-  });
-  
-  const candidateLimit = Math.max(limit * 5, 20);
 
   const params = new URLSearchParams({
     category: trimmedBusinessType,
     lat: String(coordinates.latitude),
     lon: String(coordinates.longitude),
     radius_mi: "25",
-    limit: String(candidateLimit),
+    limit: String(limit),
     offset: String(offset),
   });
 
@@ -252,11 +237,6 @@ export async function searchLeads({
 
   const data = (await response.json()) as OpenPlacesResponse;
 
-  console.log("OPEN PLACES RESULTS:", {
-    count: data.results?.length ?? 0,
-    nextOffset: data.meta?.next_offset,
-  });
-
   const leads: Lead[] = [];
 
   for (const place of data.results ?? []) {
@@ -265,25 +245,6 @@ export async function searchLeads({
     }
 
     if (typeof place.lat !== "number" || typeof place.lon !== "number") {
-      continue;
-    }
-
-    // Open Places radius only retrieves candidates.
-    // The Nominatim boundary determines whether the restaurant
-    // actually belongs to the requested city/area.
-    const insideBoundary = booleanPointInPolygon(
-      [place.lon, place.lat],
-      coordinates.boundary,
-    );
-
-    console.log("BOUNDARY CHECK:", {
-      name: place.name,
-      lat: place.lat,
-      lon: place.lon,
-      insideBoundary,
-    });
-
-    if (!insideBoundary) {
       continue;
     }
 
@@ -304,3 +265,5 @@ export async function searchLeads({
     nextOffset: data.meta?.next_offset ?? null,
   };
 }
+
+
