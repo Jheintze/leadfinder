@@ -262,6 +262,7 @@ export async function searchLeads({
 
   const trimmedCity = city.trim();
   const trimmedBusinessType = businessType.trim().toLowerCase();
+  const trimmedCuisine = cuisine?.trim() || "";
 
   if (!trimmedCity) {
     throw new Error("City is required.");
@@ -271,9 +272,6 @@ export async function searchLeads({
     throw new Error("Business type is required.");
   }
 
-  // Cuisine will be implemented as an actual search/filter later.
-  void cuisine;
-
   const coordinates = await getLocationCoordinates(trimmedCity, area);
 
   const radiusMiles = calculateSearchRadius(
@@ -281,20 +279,25 @@ export async function searchLeads({
     coordinates.longitude,
     coordinates.boundingbox,
   );
- console.log("SEARCH RADIUS:", {
-  city: trimmedCity,
-  area: area ?? null,
-  radiusMiles,
-  boundingbox: coordinates.boundingbox,
-});
-  const params = new URLSearchParams({
-  q: cuisine || trimmedBusinessType,
-  lat: String(coordinates.latitude),
-  lon: String(coordinates.longitude),
-  radius_mi: String(radiusMiles),
-  limit: String(limit),
-});
+  console.log("SEARCH RADIUS:", {
+    city: trimmedCity,
+    area: area ?? null,
+    radiusMiles,
+    boundingbox: coordinates.boundingbox,
+  });
 
+  const params = new URLSearchParams({
+    category: trimmedBusinessType,
+    lat: String(coordinates.latitude),
+    lon: String(coordinates.longitude),
+    radius_mi: String(radiusMiles),
+    limit: String(limit),
+    offset: String(offset),
+  });
+
+  if (trimmedCuisine) {
+    params.set("q", trimmedCuisine);
+  }
   const response = await fetch(`${OPEN_PLACES_ENDPOINT}?${params.toString()}`, {
     headers: {
       Authorization: `Bearer ${OPEN_PLACES_API_KEY}`,
@@ -311,13 +314,14 @@ export async function searchLeads({
   }
 
   const data = (await response.json()) as OpenPlacesResponse;
-   
-  console.log("OPEN PLACES DISTANCES:", 
-  (data.results ?? []).map((place) => ({
-    name: place.name,
-    distanceMiles: place.distance_mi,
-  }))
-);
+
+  console.log(
+    "OPEN PLACES DISTANCES:",
+    (data.results ?? []).map((place) => ({
+      name: place.name,
+      distanceMiles: place.distance_mi,
+    })),
+  );
 
   const leads: Lead[] = [];
 
