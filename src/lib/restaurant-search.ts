@@ -16,16 +16,16 @@ export async function searchAndSaveRestaurants({
   cuisine,
   limit,
 }: SearchAndSaveInput) {
+  const normalizedCity = city.trim().toLowerCase();
+  const normalizedArea = area?.trim().toLowerCase() || "";
+  const normalizedBusinessType =
+    businessType?.trim().toLowerCase() || "restaurant";
+  const normalizedCuisine = cuisine?.trim().toLowerCase() || "";
+
   const newLeads = [];
   const seenIds = new Set<string>();
 
-  const normalizedCity = city.trim().toLowerCase();
-  const normalizedArea = area?.trim().toLowerCase() || "";
-  const normalizedCuisine = cuisine?.trim().toLowerCase() || "";
-  const normalizedBusinessType =
-    businessType?.trim().toLowerCase() || "restaurant";
-
-  const { data: progress } = await supabaseAdmin
+  const { data: progress, error: progressLookupError } = await supabaseAdmin
     .from("search_progress")
     .select("next_offset")
     .eq("city", normalizedCity)
@@ -33,6 +33,10 @@ export async function searchAndSaveRestaurants({
     .eq("business_type", normalizedBusinessType)
     .eq("cuisine", normalizedCuisine)
     .maybeSingle();
+
+  if (progressLookupError) {
+    throw progressLookupError;
+  }
 
   let offset = progress?.next_offset ?? 0;
 
@@ -42,10 +46,10 @@ export async function searchAndSaveRestaurants({
     const remaining = limit - newLeads.length;
 
     const { leads, nextOffset } = await searchLeads({
-      city,
-      area,
-      businessType: businessType || "restaurant",
-      cuisine,
+      city: normalizedCity,
+      area: normalizedArea || undefined,
+      businessType: normalizedBusinessType,
+      cuisine: normalizedCuisine || undefined,
       limit: batchSize,
       offset,
     });
@@ -54,7 +58,6 @@ export async function searchAndSaveRestaurants({
       break;
     }
 
-    // Prevent duplicates within this search session.
     const uniqueLeads = leads.filter((lead) => {
       if (seenIds.has(lead.id)) {
         return false;
@@ -66,7 +69,6 @@ export async function searchAndSaveRestaurants({
 
     const sourceIds = uniqueLeads.map((lead) => lead.id);
 
-    // Check which of these restaurants are already in Supabase.
     const { data: existingRestaurants, error: lookupError } =
       await supabaseAdmin
         .from("restaurants")
@@ -94,7 +96,7 @@ export async function searchAndSaveRestaurants({
         address: lead.location,
         website: lead.website,
         email: lead.email,
-        city,
+        city: normalizedCity,
       }));
 
       const { error: insertError } = await supabaseAdmin
@@ -114,7 +116,7 @@ export async function searchAndSaveRestaurants({
         .from("search_progress")
         .upsert(
           {
-            city: city.trim().toLowerCase(),
+            city: normalizedCity,
             area: normalizedArea,
             business_type: normalizedBusinessType,
             cuisine: normalizedCuisine,
@@ -130,7 +132,6 @@ export async function searchAndSaveRestaurants({
       }
     }
 
-    // Move to the next Open Places page.
     if (nextOffset === null) {
       break;
     }
@@ -140,3 +141,5 @@ export async function searchAndSaveRestaurants({
 
   return newLeads;
 }
+
+
