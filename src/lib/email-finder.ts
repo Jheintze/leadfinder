@@ -11,6 +11,7 @@ export type FindAndSaveEmailsInput = {
 export type SavedEmailResult = {
   id: string;
   name: string;
+  address: string | null;
   website: string;
   email: string | null;
 };
@@ -24,7 +25,7 @@ export async function findAndSaveEmails({
 }: FindAndSaveEmailsInput): Promise<SavedEmailResult[]> {
   const { data: restaurants, error: fetchError } = await supabaseAdmin
     .from("restaurants")
-    .select("id, name, website, email")
+    .select("id, name,address, website, email")
     .not("website", "is", null)
     .is("email", null)
     .eq("email_checked", false)
@@ -57,6 +58,7 @@ export async function findAndSaveEmails({
         return {
           id: restaurant.id,
           name: restaurant.name,
+          address: restaurant.address,
           website: restaurant.website!,
           email,
         };
@@ -79,9 +81,7 @@ export async function findEmailFromWebsite(
 
   const urls = [
     baseUrl.toString(),
-    ...CONTACT_PATHS.map(
-      (path) => new URL(path, baseUrl.origin).toString(),
-    ),
+    ...CONTACT_PATHS.map((path) => new URL(path, baseUrl.origin).toString()),
   ];
 
   for (const url of urls) {
