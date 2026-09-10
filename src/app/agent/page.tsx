@@ -72,7 +72,9 @@ export default function AgentPage() {
             </button>
             {response && (
               <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
-                <p className="text-sm leading-6 text-slate-700">{response}</p>
+                <div className="whitespace-pre-line text-sm leading-6 text-slate-700">
+                  {response}
+                </div>
               </div>
             )}
           </div>
