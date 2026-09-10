@@ -1,10 +1,70 @@
-type EmailFinderResult = {
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
+
+export type EmailFinderResult = {
+  email: string | null;
+};
+
+export type FindAndSaveEmailsInput = {
+  limit: number;
+};
+
+export type SavedEmailResult = {
+  id: string;
+  name: string;
+  website: string;
   email: string | null;
 };
 
 const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 
 const CONTACT_PATHS = ["/contact", "/kontakt", "/impressum"];
+
+export async function findAndSaveEmails({
+  limit,
+}: FindAndSaveEmailsInput): Promise<SavedEmailResult[]> {
+  const { data: restaurants, error: fetchError } = await supabaseAdmin
+    .from("restaurants")
+    .select("id, name, website, email")
+    .not("website", "is", null)
+    .is("email", null)
+    .eq("email_checked", false)
+    .limit(limit);
+
+  if (fetchError) {
+    throw fetchError;
+  }
+
+  const results = await Promise.all(
+    (restaurants ?? [])
+      .filter((restaurant) => restaurant.website)
+      .map(async (restaurant) => {
+        const { email } = await findEmailFromWebsite(restaurant.website!);
+
+        const updateData = {
+          email,
+          email_checked: true,
+        };
+
+        const { error: updateError } = await supabaseAdmin
+          .from("restaurants")
+          .update(updateData)
+          .eq("id", restaurant.id);
+
+        if (updateError) {
+          throw updateError;
+        }
+
+        return {
+          id: restaurant.id,
+          name: restaurant.name,
+          website: restaurant.website!,
+          email,
+        };
+      }),
+  );
+
+  return results;
+}
 
 export async function findEmailFromWebsite(
   website: string,

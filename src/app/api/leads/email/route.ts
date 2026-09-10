@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
-import { findEmailFromWebsite } from "@/lib/email-finder";
+import { findAndSaveEmails } from "@/lib/email-finder";
 
 export async function POST(request: Request) {
   let body: { limit?: unknown };
@@ -25,46 +24,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { data: restaurants, error: fetchError } = await supabase
-      .from("restaurants")
-      .select("id, name, website, email")
-      .not("website", "is", null)
-      .is("email", null)
-      .eq("email_checked", false)
-      .limit(limit);
+    const results = await findAndSaveEmails({ limit });
 
-    if (fetchError) {
-      throw fetchError;
-    }
-
-    const results = await Promise.all(
-  (restaurants ?? [])
-    .filter((restaurant) => restaurant.website)
-    .map(async (restaurant) => {
-      const { email } = await findEmailFromWebsite(restaurant.website!);
-
-      const updateData = {
-        email,
-        email_checked: true,
-      };
-
-      const { error: updateError } = await supabase
-        .from("restaurants")
-        .update(updateData)
-        .eq("id", restaurant.id);
-
-      if (updateError) {
-        throw updateError;
-      }
-
-      return {
-        id: restaurant.id,
-        name: restaurant.name,
-        website: restaurant.website,
-        email,
-      };
-    }),
-);
     return NextResponse.json({
       processed: results.length,
       found: results.filter((result) => result.email).length,
