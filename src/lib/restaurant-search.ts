@@ -141,5 +141,3 @@ export async function searchAndSaveRestaurants({
 
   return newLeads;
 }
-
-

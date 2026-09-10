@@ -279,12 +279,6 @@ export async function searchLeads({
     coordinates.longitude,
     coordinates.boundingbox,
   );
-  console.log("SEARCH RADIUS:", {
-    city: trimmedCity,
-    area: area ?? null,
-    radiusMiles,
-    boundingbox: coordinates.boundingbox,
-  });
 
   const params = new URLSearchParams({
     category: trimmedBusinessType,
@@ -314,14 +308,6 @@ export async function searchLeads({
   }
 
   const data = (await response.json()) as OpenPlacesResponse;
-
-  console.log(
-    "OPEN PLACES DISTANCES:",
-    (data.results ?? []).map((place) => ({
-      name: place.name,
-      distanceMiles: place.distance_mi,
-    })),
-  );
 
   const leads: Lead[] = [];
 
