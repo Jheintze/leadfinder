@@ -134,34 +134,50 @@ export async function POST(request: Request) {
     if (toolCall.name === "find_emails") {
       const toolArguments = JSON.parse(toolCall.arguments);
 
-      const results = await findAndSaveEmails({
-        limit: toolArguments.limit,
-      });
+      const targetCount = toolArguments.limit;
+      const allResults = [];
+
+      while (allResults.filter((result) => result.email).length < targetCount) {
+        const remaining =
+          targetCount - allResults.filter((result) => result.email).length;
+
+        const results = await findAndSaveEmails({
+          limit: remaining,
+        });
+
+        if (results.length === 0) {
+          break;
+        }
+
+        allResults.push(...results);
+      }
+
+      const foundResults = allResults.filter((result) => result.email);
 
       const followUp = await openai.responses.create({
         model: "gpt-4.1-mini",
         instructions: `
-        You are the LeadFinder agent.
+      You are the LeadFinder agent.
 
-        The requested email search has been completed.
+      The requested email search has been completed.
 
-        Present the results clearly and easy to scan.
+      Present the results clearly and easy to scan.
 
-        Start with a short introduction.
-        Then list each restaurant as a separate numbered item.
-        For each restaurant, include the name, address, and email.
-        If no email was found, say "Email: Not found".
-        Put each restaurant in its own line/block.
-        Finish with a short follow-up question.
+      Start with a short introduction.
+      Then list each restaurant with a successfully found email as a separate numbered item.
+      For each restaurant, include the name, address, and email.
+      Do not include restaurants where no email was found.
+      If fewer emails were found than requested, clearly say how many were found.
+      Finish with a short follow-up question.
 
-        Do not put all restaurants into one paragraph.
-      `,
+      Do not put all restaurants into one paragraph.
+    `,
         input: [
           toolCall,
           {
             type: "function_call_output",
             call_id: toolCall.call_id,
-            output: JSON.stringify(results),
+            output: JSON.stringify(foundResults),
           },
         ],
       });
