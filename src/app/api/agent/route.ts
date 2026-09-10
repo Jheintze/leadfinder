@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { searchAndSaveRestaurants } from "@/lib/restaurant-search";
+import { findAndSaveEmails } from "@/lib/email-finder";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -122,6 +123,45 @@ export async function POST(request: Request) {
             type: "function_call_output",
             call_id: toolCall.call_id,
             output: JSON.stringify(restaurants),
+          },
+        ],
+      });
+
+      return NextResponse.json({
+        message: followUp.output_text,
+      });
+    }
+    if (toolCall.name === "find_emails") {
+      const toolArguments = JSON.parse(toolCall.arguments);
+
+      const results = await findAndSaveEmails({
+        limit: toolArguments.limit,
+      });
+
+      const followUp = await openai.responses.create({
+        model: "gpt-4.1-mini",
+        instructions: `
+        You are the LeadFinder agent.
+
+        The requested email search has been completed.
+
+        Present the results clearly and easy to scan.
+
+        Start with a short introduction.
+        Then list each restaurant as a separate numbered item.
+        For each restaurant, include the name, website, and email.
+        If no email was found, say "Email: Not found".
+        Put each restaurant in its own line/block.
+        Finish with a short follow-up question.
+
+        Do not put all restaurants into one paragraph.
+      `,
+        input: [
+          toolCall,
+          {
+            type: "function_call_output",
+            call_id: toolCall.call_id,
+            output: JSON.stringify(results),
           },
         ],
       });
