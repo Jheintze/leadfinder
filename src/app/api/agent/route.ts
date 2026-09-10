@@ -149,7 +149,7 @@ export async function POST(request: Request) {
 
         Start with a short introduction.
         Then list each restaurant as a separate numbered item.
-        For each restaurant, include the name, website, and email.
+        For each restaurant, include the name, address, and email.
         If no email was found, say "Email: Not found".
         Put each restaurant in its own line/block.
         Finish with a short follow-up question.
