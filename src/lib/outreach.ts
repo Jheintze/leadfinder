@@ -1,5 +1,3 @@
-
-
 export type OutreachTemplate = {
   subject: string;
   body: string;
@@ -23,13 +21,7 @@ export function generateOutreachDrafts(
     restaurantId: restaurant.id,
     restaurantName: restaurant.name,
     email: restaurant.email,
-    subject: template.subject.replaceAll(
-      "{restaurant_name}",
-      restaurant.name,
-    ),
-    body: template.body.replaceAll(
-      "{restaurant_name}",
-      restaurant.name,
-    ),
+    subject: template.subject.replaceAll("{restaurant_name}", restaurant.name),
+    body: template.body.replaceAll("{restaurant_name}", restaurant.name),
   }));
 }
