@@ -1,25 +1,14 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
-
+import { getRestaurantsForOutreach } from "@/lib/outreach";
 
 export async function GET() {
   try {
-    const { data: restaurants, error } = await supabase
-      .from("restaurants")
-      .select("id, name, email, city")
-      .not("email", "is", null)
-      .eq("outreach_sent", false)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      throw error;
-    }
+    const restaurants = await getRestaurantsForOutreach();
 
     return NextResponse.json({
-      restaurants: restaurants ?? [],
+      restaurants,
     });
-  } 
-  catch (error) {
+  } catch (error) {
     console.error("Outreach restaurant fetch failed", error);
 
     const message =
