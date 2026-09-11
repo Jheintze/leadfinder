@@ -26,16 +26,16 @@ export async function GET(request: Request) {
       throw new Error("Google did not return a refresh token.");
     }
 
-    const { error: insertError } = await supabaseAdmin
-  .from("gmail_connections")
-  .insert({
-    email: "jakob.webdev33@gmail.com",
-    refresh_token: tokens.refresh_token,
-  });
+    const { error: updateError } = await supabaseAdmin
+      .from("gmail_connections")
+      .update({
+        refresh_token: tokens.refresh_token,
+      })
+      .eq("email", "jakob.webdev33@gmail.com");
 
-if (insertError) {
-  throw insertError;
-}
+    if (updateError) {
+      throw updateError;
+    }
 
     return NextResponse.json({
       message: "Google authorization successful.",
