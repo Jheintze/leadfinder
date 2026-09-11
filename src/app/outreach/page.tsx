@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AppSidebar } from "../../components/app-sidebar";
 import { MobileHeader } from "../../components/mobile-header";
+import { generateOutreachDrafts } from "@/lib/outreach";
 
 type Restaurant = {
   id: string;
@@ -84,13 +85,10 @@ Jakob`);
       selectedRestaurants.includes(restaurant.id),
     );
 
-    const generatedDrafts = selected.map((restaurant) => ({
-      restaurantId: restaurant.id,
-      restaurantName: restaurant.name,
-      email: restaurant.email,
-      subject: subject.replaceAll("{restaurant_name}", restaurant.name),
-      body: body.replaceAll("{restaurant_name}", restaurant.name),
-    }));
+    const generatedDrafts = generateOutreachDrafts(selected, {
+      subject,
+      body,
+    });
 
     setDrafts(generatedDrafts);
     setSelectedRestaurants([]);
@@ -510,7 +508,8 @@ function EmptyState() {
 
         <p className="mt-1 max-w-sm text-sm leading-6 text-slate-500">
           Find restaurants and their contact emails first. Restaurants will
-          appear here once they have an email and haven&apos;t been contacted yet.
+          appear here once they have an email and haven&apos;t been contacted
+          yet.
         </p>
       </div>
     </div>
