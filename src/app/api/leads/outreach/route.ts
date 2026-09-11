@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getRestaurantsForOutreach } from "@/lib/outreach";
+import { getRestaurantsForOutreach } from "@/lib/outreach-server";
 
 export async function GET() {
   try {
