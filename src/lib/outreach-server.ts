@@ -27,6 +27,7 @@ export async function sendOutreachEmail({
   subject: string;
   body: string;
 }) {
+ 
   const { data: connection, error: connectionError } = await supabaseAdmin
     .from("gmail_connections")
     .select("email, refresh_token")
