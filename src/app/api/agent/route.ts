@@ -79,6 +79,28 @@ export async function POST(request: Request) {
           additionalProperties: false,
         },
       },
+      {
+        type: "function",
+        name: "generate_outreach",
+        description:
+          "Generate outreach email drafts for restaurant leads using the current outreach template.",
+        strict: true,
+        parameters: {
+          type: "object",
+          properties: {
+            restaurantIds: {
+              type: "array",
+              items: {
+                type: "string",
+              },
+              description:
+                "The IDs of the restaurant leads to create outreach drafts for.",
+            },
+          },
+          required: ["restaurantIds"],
+          additionalProperties: false,
+        },
+      },
     ],
 
     input: task,
