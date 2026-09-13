@@ -41,6 +41,10 @@ export async function POST(request: Request) {
     - If the user asks for outreach after finding restaurants/emails, use
       generate_outreach with the relevant restaurant IDs.
     - Do not stop after the first tool if the user's request is not complete.
+    - If the user requests a number of restaurants with emails, continue searching
+      for additional matching restaurants when some found restaurants have no email,
+      until the requested number of usable email leads is reached or there are no
+      more results.
   `;
 
   const tools = [
