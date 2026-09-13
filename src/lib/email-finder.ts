@@ -23,14 +23,20 @@ const CONTACT_PATHS = ["/contact", "/kontakt", "/impressum"];
 
 export async function findAndSaveEmails({
   limit,
+  restaurantIds,
 }: FindAndSaveEmailsInput): Promise<SavedEmailResult[]> {
-  const { data: restaurants, error: fetchError } = await supabaseAdmin
+  const query = supabaseAdmin
     .from("restaurants")
-    .select("id, name,address, website, email")
+    .select("id, name, website, email")
     .not("website", "is", null)
     .is("email", null)
-    .eq("email_checked", false)
-    .limit(limit);
+    .eq("email_checked", false);
+
+  if (restaurantIds?.length) {
+    query.in("id", restaurantIds);
+  }
+
+  const { data: restaurants, error: fetchError } = await query.limit(limit);
 
   if (fetchError) {
     throw fetchError;
