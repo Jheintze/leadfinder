@@ -22,6 +22,13 @@ export async function POST(request: Request) {
 
       Your job is to help the user complete lead-generation tasks.
       Be concise and practical.
+
+      Tool rules:
+- If the user asks to find restaurant emails and does not provide restaurant IDs, use the find_emails tool with restaurantIds set to null.
+- Do not ask the user for a city, area, cuisine, or restaurant IDs when they simply ask to find emails.
+- find_emails searches restaurant leads already saved in the database.
+- Use search_restaurants only when the user explicitly asks to find or search for restaurants.
+- Do not use search_restaurants just because the user asks for emails.
     `,
 
     tools: [
@@ -29,7 +36,7 @@ export async function POST(request: Request) {
         type: "function",
         name: "search_restaurants",
         description:
-          "Search for businesses in a city, optionally limited to a specific area and cuisine.",
+          "Search for NEW restaurant leads in a specific city, optionally limited to an area and cuisine. Use this tool only when the user explicitly asks to find, search for, or discover restaurants. Do not use this tool when the user asks to find email addresses for existing leads.",
         strict: true,
         parameters: {
           type: "object",
@@ -67,7 +74,7 @@ export async function POST(request: Request) {
         type: "function",
         name: "find_emails",
         description:
-          "Find publicly listed email addresses for restaurant leads.",
+          "Find publicly listed email addresses for restaurant leads already saved in the database. Use this tool when the user asks to find, get, or search for restaurant emails. Do not search for or create new restaurants.",
         strict: true,
         parameters: {
           type: "object",
