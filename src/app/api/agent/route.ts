@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { searchAndSaveRestaurants } from "@/lib/restaurant-search";
 import { findAndSaveEmails } from "@/lib/email-finder";
+import { getRestaurantsForOutreach } from "@/lib/outreach-server";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -223,12 +224,39 @@ export async function POST(request: Request) {
     }
 
     if (toolCall.name === "generate_outreach") {
+      const toolArguments = JSON.parse(toolCall.arguments);
+
+      const restaurants = await getRestaurantsForOutreach(
+        toolArguments.restaurantIds,
+      );
+
+      const template = {
+        subject: "A quick idea for {restaurant_name}",
+        body: `Hi {restaurant_name},
+
+I’m building DishBoost, a tool that helps restaurants turn their food photos into social media content.
+
+I’d love to give you a free trial and get your feedback.
+
+Best,
+Jakob`,
+      };
+
       return NextResponse.json({
-        message: "generate_outreach is not implemented yet.",
+        message: `Outreach template ready for ${restaurants.length} restaurant${
+          restaurants.length === 1 ? "" : "s"
+        }.
+
+Subject:
+${template.subject}
+
+Body:
+${template.body}
+
+The {restaurant_name} placeholder will be replaced with each restaurant's name.`,
       });
     }
   }
-
   return NextResponse.json({
     message: response.output_text,
   });
