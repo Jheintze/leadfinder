@@ -144,6 +144,7 @@ export async function POST(request: Request) {
           Start with a short introduction.
           Then list each restaurant as a separate numbered item.
           For each restaurant, include the name, address, and website.
+          Do not use Markdown links or other link formatting for websites.
           Put each restaurant on its own line/block.
           Finish with a short follow-up question.
 
