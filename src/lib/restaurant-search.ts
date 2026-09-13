@@ -22,7 +22,15 @@ export async function searchAndSaveRestaurants({
     businessType?.trim().toLowerCase() || "restaurant";
   const normalizedCuisine = cuisine?.trim().toLowerCase() || "";
 
-  const newLeads = [];
+  const newLeads: {
+    id: string;
+    source_id: string;
+    name: string;
+    address: string | null;
+    website: string | null;
+    email: string | null;
+    city: string;
+  }[] = [];
   const seenIds = new Set<string>();
 
   const { data: progress, error: progressLookupError } = await supabaseAdmin
@@ -87,8 +95,6 @@ export async function searchAndSaveRestaurants({
       .filter((lead) => !existingIds.has(lead.id))
       .slice(0, remaining);
 
-    newLeads.push(...freshLeads);
-
     if (freshLeads.length > 0) {
       const restaurants = freshLeads.map((lead) => ({
         source_id: lead.id,
@@ -99,16 +105,19 @@ export async function searchAndSaveRestaurants({
         city: normalizedCity,
       }));
 
-      const { error: insertError } = await supabaseAdmin
+      const { data: savedRestaurants, error: insertError } = await supabaseAdmin
         .from("restaurants")
         .upsert(restaurants, {
           onConflict: "source_id",
           ignoreDuplicates: true,
-        });
+        })
+        .select("id, source_id, name, address, website, email, city");
 
       if (insertError) {
         throw insertError;
       }
+
+      newLeads.push(...(savedRestaurants ?? []));
     }
 
     if (nextOffset !== null) {
