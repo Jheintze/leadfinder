@@ -106,11 +106,19 @@ export async function POST(request: Request) {
     input: task,
   });
 
-  const toolCall = response.output.find(
-    (item) => item.type === "function_call",
-  );
+  let currentResponse = response;
 
-  if (toolCall) {
+  while (true) {
+    const toolCall = currentResponse.output.find(
+      (item) => item.type === "function_call",
+    );
+
+    if (!toolCall) {
+      return NextResponse.json({
+        message: currentResponse.output_text,
+      });
+    }
+
     if (toolCall.name === "search_restaurants") {
       const toolArguments = JSON.parse(toolCall.arguments);
 
@@ -122,25 +130,16 @@ export async function POST(request: Request) {
         limit: toolArguments.limit,
       });
 
-      const followUp = await openai.responses.create({
+      currentResponse = await openai.responses.create({
         model: "gpt-4.1-mini",
         instructions: `
-       You are the LeadFinder agent.
+        You are the LeadFinder agent.
 
-  The requested restaurant search has been completed.
-
-  Present the results clearly and easy to scan.
-
-  Start with a short introduction.
-  Then list each restaurant as a separate numbered item.
-  For each restaurant, include the name, address, and website.
-  Put each restaurant on its own line/block.
-  Finish with a short follow-up question.
-
-  Do not put all restaurants into one paragraph.
+        Continue helping the user complete their requested task.
+        Use another tool if more work is needed.
+        If the task is complete, give a concise final answer.
       `,
         input: [
-          toolCall,
           {
             type: "function_call_output",
             call_id: toolCall.call_id,
@@ -149,10 +148,9 @@ export async function POST(request: Request) {
         ],
       });
 
-      return NextResponse.json({
-        message: followUp.output_text,
-      });
+      continue;
     }
+
     if (toolCall.name === "find_emails") {
       const toolArguments = JSON.parse(toolCall.arguments);
 
@@ -176,26 +174,16 @@ export async function POST(request: Request) {
 
       const foundResults = allResults.filter((result) => result.email);
 
-      const followUp = await openai.responses.create({
+      currentResponse = await openai.responses.create({
         model: "gpt-4.1-mini",
         instructions: `
-      You are the LeadFinder agent.
+        You are the LeadFinder agent.
 
-      The requested email search has been completed.
-
-      Present the results clearly and easy to scan.
-
-      Start with a short introduction.
-      Then list each restaurant with a successfully found email as a separate numbered item.
-      For each restaurant, include the name, address, and email.
-      Do not include restaurants where no email was found.
-      If fewer emails were found than requested, clearly say how many were found.
-      Finish with a short follow-up question.
-
-      Do not put all restaurants into one paragraph.
-    `,
+        Continue helping the user complete their requested task.
+        Use another tool if more work is needed.
+        If the task is complete, give a concise final answer.
+      `,
         input: [
-          toolCall,
           {
             type: "function_call_output",
             call_id: toolCall.call_id,
@@ -204,8 +192,13 @@ export async function POST(request: Request) {
         ],
       });
 
+      continue;
+    }
+
+    if (toolCall.name === "generate_outreach") {
+      // We will implement this next.
       return NextResponse.json({
-        message: followUp.output_text,
+        message: "generate_outreach reached.",
       });
     }
   }
