@@ -14,14 +14,14 @@ export async function POST(request: Request) {
     model: "gpt-4.1-mini",
 
     instructions: `
-    You are the LeadFinder agent.
+      You are the LeadFinder agent.
 
-    LeadFinder is an internal tool for finding and contacting restaurant leads
-    for DishBoost, an AI marketing assistant for restaurants.
+      LeadFinder is an internal tool for finding and contacting restaurant leads
+      for DishBoost, an AI marketing assistant for restaurants.
 
-    Your job is to help the user complete lead-generation tasks.
-    Be concise and practical.
-  `,
+      Your job is to help the user complete lead-generation tasks.
+      Be concise and practical.
+    `,
 
     tools: [
       {
@@ -61,11 +61,12 @@ export async function POST(request: Request) {
           additionalProperties: false,
         },
       },
+
       {
         type: "function",
         name: "find_emails",
         description:
-          "Find publicly listed email addresses for restaurant leads. If restaurant IDs are available from a previous restaurant search, use those IDs so the email search applies to those exact restaurants.",
+          "Find publicly listed email addresses for restaurant leads.",
         strict: true,
         parameters: {
           type: "object",
@@ -87,6 +88,7 @@ export async function POST(request: Request) {
           additionalProperties: false,
         },
       },
+
       {
         type: "function",
         name: "generate_outreach",
@@ -114,19 +116,11 @@ export async function POST(request: Request) {
     input: task,
   });
 
-  let currentResponse = response;
+  const toolCall = response.output.find(
+    (item) => item.type === "function_call",
+  );
 
-  while (true) {
-    const toolCall = currentResponse.output.find(
-      (item) => item.type === "function_call",
-    );
-
-    if (!toolCall) {
-      return NextResponse.json({
-        message: currentResponse.output_text,
-      });
-    }
-
+  if (toolCall) {
     if (toolCall.name === "search_restaurants") {
       const toolArguments = JSON.parse(toolCall.arguments);
 
@@ -138,17 +132,25 @@ export async function POST(request: Request) {
         limit: toolArguments.limit,
       });
 
-      currentResponse = await openai.responses.create({
+      const followUp = await openai.responses.create({
         model: "gpt-4.1-mini",
-        previous_response_id: currentResponse.id,
         instructions: `
-        You are the LeadFinder agent.
+          You are the LeadFinder agent.
 
-        Continue helping the user complete their requested task.
-        Use another tool if more work is needed.
-        If the task is complete, give a concise final answer.
-      `,
+          The requested restaurant search has been completed.
+
+          Present the results clearly and easy to scan.
+
+          Start with a short introduction.
+          Then list each restaurant as a separate numbered item.
+          For each restaurant, include the name, address, and website.
+          Put each restaurant on its own line/block.
+          Finish with a short follow-up question.
+
+          Do not put all restaurants into one paragraph.
+        `,
         input: [
+          toolCall,
           {
             type: "function_call_output",
             call_id: toolCall.call_id,
@@ -157,7 +159,9 @@ export async function POST(request: Request) {
         ],
       });
 
-      continue;
+      return NextResponse.json({
+        message: followUp.output_text,
+      });
     }
 
     if (toolCall.name === "find_emails") {
@@ -184,17 +188,26 @@ export async function POST(request: Request) {
 
       const foundResults = allResults.filter((result) => result.email);
 
-      currentResponse = await openai.responses.create({
+      const followUp = await openai.responses.create({
         model: "gpt-4.1-mini",
-        previous_response_id: currentResponse.id,
         instructions: `
-        You are the LeadFinder agent.
+          You are the LeadFinder agent.
 
-        Continue helping the user complete their requested task.
-        Use another tool if more work is needed.
-        If the task is complete, give a concise final answer.
-      `,
+          The requested email search has been completed.
+
+          Present the results clearly and easy to scan.
+
+          Start with a short introduction.
+          Then list each restaurant with a successfully found email as a separate numbered item.
+          For each restaurant, include the name, address, and email.
+          Do not include restaurants where no email was found.
+          If fewer emails were found than requested, clearly say how many were found.
+          Finish with a short follow-up question.
+
+          Do not put all restaurants into one paragraph.
+        `,
         input: [
+          toolCall,
           {
             type: "function_call_output",
             call_id: toolCall.call_id,
@@ -203,13 +216,14 @@ export async function POST(request: Request) {
         ],
       });
 
-      continue;
+      return NextResponse.json({
+        message: followUp.output_text,
+      });
     }
 
     if (toolCall.name === "generate_outreach") {
-      // We will implement this next.
       return NextResponse.json({
-        message: "generate_outreach reached.",
+        message: "generate_outreach is not implemented yet.",
       });
     }
   }
