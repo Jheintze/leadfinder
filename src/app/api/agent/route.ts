@@ -11,181 +11,207 @@ const openai = new OpenAI({
 export async function POST(request: Request) {
   const { task } = await request.json();
 
-  const response = await openai.responses.create({
-    model: "gpt-4.1-mini",
+  const instructions = `
+    You are the LeadFinder agent.
 
-    instructions: `
-      You are the LeadFinder agent.
+    LeadFinder is an internal tool for finding and contacting restaurant leads
+    for DishBoost, an AI marketing assistant for restaurants.
 
-      LeadFinder is an internal tool for finding and contacting restaurant leads
-      for DishBoost, an AI marketing assistant for restaurants.
+    Your job is to help the user complete lead-generation tasks.
+    Be concise and practical.
 
-      Your job is to help the user complete lead-generation tasks.
-      Be concise and practical.
+    Tool rules:
+    - If the user asks to find restaurant emails and does not provide restaurant IDs,
+      use the find_emails tool with restaurantIds set to null.
+    - Do not ask the user for a city, area, cuisine, or restaurant IDs when they
+      simply ask to find emails.
+    - find_emails searches restaurant leads already saved in the database.
+    - Use search_restaurants only when the user explicitly asks to find or search
+      for restaurants.
+    - Do not use search_restaurants just because the user asks for emails.
 
-      Tool rules:
-- If the user asks to find restaurant emails and does not provide restaurant IDs, use the find_emails tool with restaurantIds set to null.
-- Do not ask the user for a city, area, cuisine, or restaurant IDs when they simply ask to find emails.
-- find_emails searches restaurant leads already saved in the database.
-- Use search_restaurants only when the user explicitly asks to find or search for restaurants.
-- Do not use search_restaurants just because the user asks for emails.
-    `,
+    Multi-step tasks:
+    - If the user asks for multiple operations, complete all of them.
+    - You may call multiple tools sequentially.
+    - After a tool returns results, use those results to decide whether another
+      tool is needed.
+    - For example, if the user asks to find restaurants and then get their emails,
+      first use search_restaurants, then use the restaurant IDs returned by that
+      tool with find_emails.
+    - If the user asks for outreach after finding restaurants/emails, use
+      generate_outreach with the relevant restaurant IDs.
+    - Do not stop after the first tool if the user's request is not complete.
+  `;
 
-    tools: [
-      {
-        type: "function",
-        name: "search_restaurants",
-        description:
-          "Search for NEW restaurant leads in a specific city, optionally limited to an area and cuisine. Use this tool only when the user explicitly asks to find, search for, or discover restaurants. Do not use this tool when the user asks to find email addresses for existing leads.",
-        strict: true,
-        parameters: {
-          type: "object",
-          properties: {
-            city: {
+  const tools = [
+    {
+      type: "function" as const,
+      name: "search_restaurants",
+      description:
+        "Search for NEW restaurant leads in a specific city, optionally limited to an area and cuisine. Use this tool only when the user explicitly asks to find, search for, or discover restaurants. Do not use this tool when the user asks to find email addresses for existing leads.",
+      strict: true,
+      parameters: {
+        type: "object",
+        properties: {
+          city: {
+            type: "string",
+            description: "The city to search in.",
+          },
+          area: {
+            type: ["string", "null"],
+            description:
+              "The specific area, neighborhood, or district within the city. Use null if no specific area was requested.",
+          },
+          businessType: {
+            type: "string",
+            description:
+              "The type of business to search for. Use a valid Overture category such as 'restaurant', 'cafe', or 'bar'. Do not include cuisine names like sushi or Italian.",
+          },
+          cuisine: {
+            type: ["string", "null"],
+            description:
+              "The cuisine requested, such as 'sushi', 'Italian', or 'Mexican'. Use null if no cuisine was requested.",
+          },
+          limit: {
+            type: "number",
+            description: "The maximum number of businesses to find.",
+          },
+        },
+        required: ["city", "area", "businessType", "cuisine", "limit"],
+        additionalProperties: false,
+      },
+    },
+
+    {
+      type: "function" as const,
+      name: "find_emails",
+      description:
+        "Find publicly listed email addresses for restaurant leads already saved in the database. Use this tool when the user asks to find, get, or search for restaurant emails. Do not search for or create new restaurants.",
+      strict: true,
+      parameters: {
+        type: "object",
+        properties: {
+          limit: {
+            type: "number",
+            description:
+              "The maximum number of restaurant leads to process.",
+          },
+          restaurantIds: {
+            type: ["array", "null"],
+            items: {
               type: "string",
-              description: "The city to search in.",
             },
-            area: {
-              type: ["string", "null"],
-              description:
-                "The specific area, neighborhood, or district within the city. Use null if no specific area was requested.",
-            },
-            businessType: {
+            description:
+              "The IDs of specific restaurant leads to process. Use null when no specific restaurant IDs are available.",
+          },
+        },
+        required: ["limit", "restaurantIds"],
+        additionalProperties: false,
+      },
+    },
+
+    {
+      type: "function" as const,
+      name: "generate_outreach",
+      description:
+        "Prepare an outreach email template for restaurant leads. Use this after the relevant restaurant IDs are known. This tool only prepares the outreach preview and never sends emails.",
+      strict: true,
+      parameters: {
+        type: "object",
+        properties: {
+          restaurantIds: {
+            type: "array",
+            items: {
               type: "string",
-              description:
-                "The type of business to search for. Use a valid Overture category such as 'restaurant', 'cafe', or 'bar'. Do not include cuisine names like sushi or Italian.",
             },
-            cuisine: {
-              type: ["string", "null"],
-              description:
-                "The cuisine requested, such as 'sushi', 'Italian', or 'Mexican'. Use null if no cuisine was requested.",
-            },
-            limit: {
-              type: "number",
-              description: "The maximum number of businesses to find.",
-            },
+            description:
+              "The IDs of the restaurant leads to create outreach drafts for.",
           },
-          required: ["city", "area", "businessType", "cuisine", "limit"],
-          additionalProperties: false,
         },
+        required: ["restaurantIds"],
+        additionalProperties: false,
       },
+    },
+  ];
 
-      {
-        type: "function",
-        name: "find_emails",
-        description:
-          "Find publicly listed email addresses for restaurant leads already saved in the database. Use this tool when the user asks to find, get, or search for restaurant emails. Do not search for or create new restaurants.",
-        strict: true,
-        parameters: {
-          type: "object",
-          properties: {
-            limit: {
-              type: "number",
-              description: "The maximum number of restaurant leads to process.",
-            },
-            restaurantIds: {
-              type: ["array", "null"],
-              items: {
-                type: "string",
-              },
-              description:
-                "The IDs of specific restaurant leads to process. Use null when no specific restaurant IDs are available.",
-            },
-          },
-          required: ["limit", "restaurantIds"],
-          additionalProperties: false,
-        },
-      },
-
-      {
-        type: "function",
-        name: "generate_outreach",
-        description:
-          "Generate outreach email drafts for restaurant leads using the current outreach template.",
-        strict: true,
-        parameters: {
-          type: "object",
-          properties: {
-            restaurantIds: {
-              type: "array",
-              items: {
-                type: "string",
-              },
-              description:
-                "The IDs of the restaurant leads to create outreach drafts for.",
-            },
-          },
-          required: ["restaurantIds"],
-          additionalProperties: false,
-        },
-      },
-    ],
-
-    input: task,
-  });
-
-  let currentResponse = response;
+  // Keep the entire conversation/tool history ourselves.
+  // This avoids the previous_response_id / call_id issue.
+  const inputItems: OpenAI.Responses.ResponseInputItem[] = [task];
 
   while (true) {
-    const toolCall = currentResponse.output.find(
+    const response = await openai.responses.create({
+      model: "gpt-4.1-mini",
+      instructions,
+      tools,
+      input: inputItems,
+    });
+
+    const toolCalls = response.output.filter(
       (item) => item.type === "function_call",
     );
 
-    if (!toolCall) {
+    // No more tools needed -> final answer.
+    if (toolCalls.length === 0) {
       return NextResponse.json({
-        message: currentResponse.output_text,
+        message: response.output_text,
       });
     }
 
-    let toolOutput: string;
+    // Add the model's tool calls to the conversation history.
+    inputItems.push(...toolCalls);
 
-    if (toolCall.name === "search_restaurants") {
+    // Execute every tool call from this response.
+    for (const toolCall of toolCalls) {
       const toolArguments = JSON.parse(toolCall.arguments);
 
-      const restaurants = await searchAndSaveRestaurants({
-        city: toolArguments.city,
-        area: toolArguments.area ?? undefined,
-        businessType: toolArguments.businessType,
-        cuisine: toolArguments.cuisine ?? undefined,
-        limit: toolArguments.limit,
-      });
+      let toolOutput: unknown;
 
-      toolOutput = JSON.stringify(restaurants);
-    } else if (toolCall.name === "find_emails") {
-      const toolArguments = JSON.parse(toolCall.arguments);
-
-      const targetCount = toolArguments.limit;
-      const allResults = [];
-
-      while (allResults.filter((result) => result.email).length < targetCount) {
-        const remaining =
-          targetCount - allResults.filter((result) => result.email).length;
-
-        const results = await findAndSaveEmails({
-          limit: remaining,
-          restaurantIds: toolArguments.restaurantIds ?? undefined,
+      if (toolCall.name === "search_restaurants") {
+        const restaurants = await searchAndSaveRestaurants({
+          city: toolArguments.city,
+          area: toolArguments.area ?? undefined,
+          businessType: toolArguments.businessType,
+          cuisine: toolArguments.cuisine ?? undefined,
+          limit: toolArguments.limit,
         });
 
-        if (results.length === 0) {
-          break;
-        }
-
-        allResults.push(...results);
+        toolOutput = restaurants;
       }
 
-      const foundResults = allResults.filter((result) => result.email);
+      if (toolCall.name === "find_emails") {
+        const targetCount = toolArguments.limit;
+        const allResults = [];
 
-      toolOutput = JSON.stringify(foundResults);
-    } else if (toolCall.name === "generate_outreach") {
-      const toolArguments = JSON.parse(toolCall.arguments);
+        while (
+          allResults.filter((result) => result.email).length < targetCount
+        ) {
+          const remaining =
+            targetCount -
+            allResults.filter((result) => result.email).length;
 
-      const restaurants = await getRestaurantsForOutreach(
-        toolArguments.restaurantIds,
-      );
+          const results = await findAndSaveEmails({
+            limit: remaining,
+            restaurantIds: toolArguments.restaurantIds ?? undefined,
+          });
 
-      const template = {
-        subject: "A quick idea for {restaurant_name}",
-        body: `Hi {restaurant_name},
+          if (results.length === 0) {
+            break;
+          }
+
+          allResults.push(...results);
+        }
+
+        toolOutput = allResults.filter((result) => result.email);
+      }
+
+      if (toolCall.name === "generate_outreach") {
+        const restaurants = await getRestaurantsForOutreach(
+          toolArguments.restaurantIds,
+        );
+
+        const template = {
+          subject: "A quick idea for {restaurant_name}",
+          body: `Hi {restaurant_name},
 
 I’m building DishBoost, a tool that helps restaurants turn their food photos into social media content.
 
@@ -193,148 +219,22 @@ I’d love to give you a free trial and get your feedback.
 
 Best,
 Jakob`,
-      };
+        };
 
-      toolOutput = JSON.stringify({
-        restaurantCount: restaurants.length,
-        template,
-      });
-    } else {
-      return NextResponse.json({
-        message: "Unknown tool call.",
+        toolOutput = {
+          restaurantCount: restaurants.length,
+          restaurants,
+          template,
+        };
+      }
+
+      // Give the result back to the model using the EXACT call_id
+      // from the corresponding function call.
+      inputItems.push({
+        type: "function_call_output",
+        call_id: toolCall.call_id,
+        output: JSON.stringify(toolOutput),
       });
     }
-
-    currentResponse = await openai.responses.create({
-      model: "gpt-4.1-mini",
-
-      instructions: `
-        You are the LeadFinder agent.
-
-        Continue working on the user's original request using the available tools.
-        If another tool is needed to complete the request, call it.
-        Do not ask the user for information that can be obtained from the previous tool results.
-
-        Only give a final response when the user's request is complete.
-
-        When presenting restaurant search results:
-        - List restaurants clearly and separately.
-        - Include name, address, and website.
-        - Do not use Markdown links.
-
-        When presenting email results:
-        - List each restaurant with its name, address, and email.
-        - Do not include restaurants where no email was found.
-        - If fewer emails were found than requested, say how many were found.
-
-        When presenting outreach:
-        - Clearly separate the outreach preview from explanatory text.
-        - Show the subject and body clearly.
-        - Keep {restaurant_name} as the placeholder.
-        - Explain that the placeholder will be replaced for each restaurant.
-        - Never send emails as part of generate_outreach.
-      `,
-
-      tools: [
-        {
-          type: "function",
-          name: "search_restaurants",
-          description:
-            "Search for NEW restaurant leads in a specific city, optionally limited to an area and cuisine. Use this tool only when the user explicitly asks to find, search for, or discover restaurants. Do not use this tool when the user asks to find email addresses for existing leads.",
-          strict: true,
-          parameters: {
-            type: "object",
-            properties: {
-              city: {
-                type: "string",
-                description: "The city to search in.",
-              },
-              area: {
-                type: ["string", "null"],
-                description:
-                  "The specific area, neighborhood, or district within the city. Use null if no specific area was requested.",
-              },
-              businessType: {
-                type: "string",
-                description:
-                  "The type of business to search for. Use a valid Overture category such as 'restaurant', 'cafe', or 'bar'. Do not include cuisine names like sushi or Italian.",
-              },
-              cuisine: {
-                type: ["string", "null"],
-                description:
-                  "The cuisine requested, such as 'sushi', 'Italian', or 'Mexican'. Use null if no cuisine was requested.",
-              },
-              limit: {
-                type: "number",
-                description: "The maximum number of businesses to find.",
-              },
-            },
-            required: ["city", "area", "businessType", "cuisine", "limit"],
-            additionalProperties: false,
-          },
-        },
-
-        {
-          type: "function",
-          name: "find_emails",
-          description:
-            "Find publicly listed email addresses for restaurant leads already saved in the database. Use this tool when the user asks to find, get, or search for restaurant emails. Do not search for or create new restaurants.",
-          strict: true,
-          parameters: {
-            type: "object",
-            properties: {
-              limit: {
-                type: "number",
-                description:
-                  "The maximum number of restaurant leads to process.",
-              },
-              restaurantIds: {
-                type: ["array", "null"],
-                items: {
-                  type: "string",
-                },
-                description:
-                  "The IDs of specific restaurant leads to process. Use null when no specific restaurant IDs are available.",
-              },
-            },
-            required: ["limit", "restaurantIds"],
-            additionalProperties: false,
-          },
-        },
-
-        {
-          type: "function",
-          name: "generate_outreach",
-          description:
-            "Generate outreach email drafts for restaurant leads using the current outreach template.",
-          strict: true,
-          parameters: {
-            type: "object",
-            properties: {
-              restaurantIds: {
-                type: "array",
-                items: {
-                  type: "string",
-                },
-                description:
-                  "The IDs of the restaurant leads to create outreach drafts for.",
-              },
-            },
-            required: ["restaurantIds"],
-            additionalProperties: false,
-          },
-        },
-      ],
-
-      previous_response_id: currentResponse.id,
-
-      input: [
-        {
-          type: "function_call_output",
-          call_id: toolCall.call_id,
-          output: toolOutput,
-        },
-      ],
-    });
   }
 }
