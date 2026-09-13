@@ -1,13 +1,19 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { google } from "googleapis";
 
-export async function getRestaurantsForOutreach() {
-  const { data: restaurants, error } = await supabaseAdmin
+export async function getRestaurantsForOutreach(restaurantIds?: string[]) {
+  let query = supabaseAdmin
     .from("restaurants")
     .select("id, name, email, city")
     .not("email", "is", null)
     .eq("outreach_sent", false)
     .order("created_at", { ascending: false });
+
+  if (restaurantIds) {
+    query = query.in("id", restaurantIds);
+  }
+
+  const { data: restaurants, error } = await query;
 
   if (error) {
     throw error;
