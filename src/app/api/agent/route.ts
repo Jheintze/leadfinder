@@ -93,8 +93,7 @@ export async function POST(request: Request) {
         properties: {
           limit: {
             type: "number",
-            description:
-              "The maximum number of restaurant leads to process.",
+            description: "The maximum number of restaurant leads to process.",
           },
           restaurantIds: {
             type: ["array", "null"],
@@ -136,7 +135,12 @@ export async function POST(request: Request) {
 
   // Keep the entire conversation/tool history ourselves.
   // This avoids the previous_response_id / call_id issue.
-  const inputItems: OpenAI.Responses.ResponseInputItem[] = [task];
+  const inputItems: OpenAI.Responses.ResponseInputItem[] = [
+    {
+      role: "user",
+      content: task,
+    },
+  ];
 
   while (true) {
     const response = await openai.responses.create({
@@ -186,8 +190,7 @@ export async function POST(request: Request) {
           allResults.filter((result) => result.email).length < targetCount
         ) {
           const remaining =
-            targetCount -
-            allResults.filter((result) => result.email).length;
+            targetCount - allResults.filter((result) => result.email).length;
 
           const results = await findAndSaveEmails({
             limit: remaining,
