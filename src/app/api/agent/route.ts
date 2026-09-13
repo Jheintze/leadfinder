@@ -140,6 +140,7 @@ export async function POST(request: Request) {
 
       currentResponse = await openai.responses.create({
         model: "gpt-4.1-mini",
+        previous_response_id: currentResponse.id,
         instructions: `
         You are the LeadFinder agent.
 
@@ -185,6 +186,7 @@ export async function POST(request: Request) {
 
       currentResponse = await openai.responses.create({
         model: "gpt-4.1-mini",
+        previous_response_id: currentResponse.id,
         instructions: `
         You are the LeadFinder agent.
 
