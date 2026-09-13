@@ -27,7 +27,7 @@ export async function findAndSaveEmails({
 }: FindAndSaveEmailsInput): Promise<SavedEmailResult[]> {
   const query = supabaseAdmin
     .from("restaurants")
-    .select("id, name, website, email")
+    .select("id, name,address, website, email")
     .not("website", "is", null)
     .is("email", null)
     .eq("email_checked", false);

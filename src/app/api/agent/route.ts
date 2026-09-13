@@ -65,7 +65,7 @@ export async function POST(request: Request) {
         type: "function",
         name: "find_emails",
         description:
-          "Find publicly listed email addresses for existing restaurant leads.",
+          "Find publicly listed email addresses for restaurant leads. If restaurant IDs are available from a previous restaurant search, use those IDs so the email search applies to those exact restaurants.",
         strict: true,
         parameters: {
           type: "object",
@@ -74,8 +74,16 @@ export async function POST(request: Request) {
               type: "number",
               description: "The maximum number of restaurant leads to process.",
             },
+            restaurantIds: {
+              type: ["array", "null"],
+              items: {
+                type: "string",
+              },
+              description:
+                "The IDs of specific restaurant leads to process. Use null when no specific restaurant IDs are available.",
+            },
           },
-          required: ["limit"],
+          required: ["limit", "restaurantIds"],
           additionalProperties: false,
         },
       },
@@ -163,6 +171,7 @@ export async function POST(request: Request) {
 
         const results = await findAndSaveEmails({
           limit: remaining,
+          restaurantIds: toolArguments.restaurantIds ?? undefined,
         });
 
         if (results.length === 0) {
