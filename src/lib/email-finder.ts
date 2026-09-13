@@ -6,6 +6,7 @@ export type EmailFinderResult = {
 
 export type FindAndSaveEmailsInput = {
   limit: number;
+  restaurantIds?: string[];
 };
 
 export type SavedEmailResult = {
