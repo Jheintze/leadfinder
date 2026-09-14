@@ -45,6 +45,9 @@ export async function POST(request: Request) {
       for additional matching restaurants when some found restaurants have no email,
       until the requested number of usable email leads is reached or there are no
       more results.
+    - When find_emails returns needs_more: true during a multi-step restaurant search,
+  use search_restaurants to find additional matching restaurants and then try
+  find_emails on those new restaurant IDs.
   `;
 
   const tools = [
@@ -208,7 +211,14 @@ export async function POST(request: Request) {
           allResults.push(...results);
         }
 
-        toolOutput = allResults.filter((result) => result.email);
+        const foundResults = allResults.filter((result) => result.email);
+
+        toolOutput = {
+          requested: targetCount,
+          found: foundResults.length,
+          needs_more: foundResults.length < targetCount,
+          results: foundResults,
+        };
       }
 
       if (toolCall.name === "generate_outreach") {
