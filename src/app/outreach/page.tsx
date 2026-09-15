@@ -73,7 +73,7 @@ Jakob`);
     );
   }
 
-  function generateDrafts() {
+  function prepareOutreach() {
     const selected = restaurants.filter((restaurant) =>
       selectedRestaurants.includes(restaurant.id),
     );
@@ -310,7 +310,7 @@ Jakob`);
             <div className="mt-5 flex justify-end">
               <button
                 type="button"
-                onClick={generateDrafts}
+                onClick={prepareOutreach}
                 disabled={selectedRestaurants.length === 0}
                 className="inline-flex h-10 items-center justify-center rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
               >
