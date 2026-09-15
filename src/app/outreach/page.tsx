@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { AppSidebar } from "../../components/app-sidebar";
 import { MobileHeader } from "../../components/mobile-header";
 
-
 type Restaurant = {
   id: string;
   name: string;
@@ -348,129 +347,53 @@ Jakob`);
             </div>
           </section>
 
-          {/* Email drafts */}
+          {/* Outreach ready */}
           <section id="email-drafts" className="mt-8">
-            <div className="mb-4 flex items-end justify-between gap-4">
-              <div>
-                <h2 className="text-lg font-semibold tracking-tight">
-                  Email drafts
-                </h2>
-
-                <p className="mt-1 text-sm text-slate-500">
-                  Generated emails will appear here for review.
-                </p>
-              </div>
-
-              <div className="flex shrink-0 items-center gap-2">
-                <button
-                  type="button"
-                  disabled={drafts.length === 0}
-                  onClick={() => setDrafts([])}
-                  className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400"
-                >
-                  Remove all ({drafts.length})
-                </button>
-
-                <button
-                  type="button"
-                  onClick={sendAllDrafts}
-                  disabled={
-                    drafts.length === 0 ||
-                    sendingDraftId !== null ||
-                    isSendingAll
-                  }
-                  className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
-                >
-                  {isSendingAll ? "Sending..." : `Send all (${drafts.length})`}
-                </button>
-              </div>
-            </div>
-            {drafts.length === 0 ? (
+            {!outreachPrepared ? (
               <DraftEmptyState />
             ) : (
-              <div className="grid gap-4 xl:grid-cols-2">
-                {drafts.map((draft) => (
-                  <article
-                    key={draft.restaurantId}
-                    className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="min-w-0">
-                        <h3 className="font-medium text-slate-800">
-                          {draft.restaurantName}
-                        </h3>
+              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-blue-600">
+                      Outreach ready
+                    </p>
 
-                        <p className="mt-1 truncate text-xs text-slate-500">
-                          {draft.email}
-                        </p>
-                      </div>
+                    <h2 className="mt-1 text-lg font-semibold tracking-tight">
+                      Ready to send
+                    </h2>
 
-                      <div className="flex shrink-0 items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => sendDraft(draft)}
-                          disabled={sendingDraftId !== null || isSendingAll}
-                          className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
-                        >
-                          {sendingDraftId === draft.restaurantId
-                            ? "Sending..."
-                            : "Send"}
-                        </button>
+                    <p className="mt-1 text-sm leading-6 text-slate-500">
+                      Your outreach template is ready for{" "}
+                      <span className="font-medium text-slate-700">
+                        {preparedRecipientCount}{" "}
+                        {preparedRecipientCount === 1
+                          ? "recipient"
+                          : "recipients"}
+                      </span>
+                      . The restaurant name will be personalized when the emails
+                      are sent.
+                    </p>
+                  </div>
 
-                        <button
-                          type="button"
-                          onClick={() => removeDraft(draft.restaurantId)}
-                          className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setOutreachPrepared(false)}
+                      className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50"
+                    >
+                      Clear
+                    </button>
 
-                    <div className="mt-5 border-t border-slate-100 pt-4">
-                      <label
-                        htmlFor={`subject-${draft.restaurantId}`}
-                        className="text-xs font-medium uppercase tracking-wide text-slate-400"
-                      >
-                        Subject
-                      </label>
-
-                      <input
-                        id={`subject-${draft.restaurantId}`}
-                        type="text"
-                        value={draft.subject}
-                        onChange={(event) =>
-                          updateDraft(
-                            draft.restaurantId,
-                            "subject",
-                            event.target.value,
-                          )
-                        }
-                        className="input mt-1 w-full"
-                      />
-
-                      <label
-                        htmlFor={`body-${draft.restaurantId}`}
-                        className="mt-4 block text-xs font-medium uppercase tracking-wide text-slate-400"
-                      >
-                        Email body
-                      </label>
-
-                      <textarea
-                        id={`body-${draft.restaurantId}`}
-                        value={draft.body}
-                        onChange={(event) =>
-                          updateDraft(
-                            draft.restaurantId,
-                            "body",
-                            event.target.value,
-                          )
-                        }
-                        className="mt-1 min-h-48 w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm leading-6 text-slate-900 outline-none transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                      />
-                    </div>
-                  </article>
-                ))}
+                    <button
+                      type="button"
+                      disabled
+                      className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+                    >
+                      Send all ({preparedRecipientCount})
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </section>
