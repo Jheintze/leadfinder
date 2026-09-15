@@ -22,6 +22,7 @@ export default function OutreachPage() {
   const [error, setError] = useState("");
   const [outreachPrepared, setOutreachPrepared] = useState(false);
   const [isSendingAll, setIsSendingAll] = useState(false);
+  const [sendSuccessMessage, setSendSuccessMessage] = useState("");
   const [preparedRecipients, setPreparedRecipients] = useState<Restaurant[]>(
     [],
   );
@@ -91,7 +92,7 @@ Jakob`);
 
   async function sendAllOutreach() {
     setIsSendingAll(true);
-
+    let successfulSends = 0;
     try {
       for (const restaurant of preparedRecipients) {
         const personalizedSubject = subject.replaceAll(
@@ -128,12 +129,24 @@ Jakob`);
               (currentRestaurant) => currentRestaurant.id !== restaurant.id,
             ),
           );
+          successfulSends++;
         } catch (error) {
           console.error(
             `Failed to send outreach to ${restaurant.name}:`,
             error,
           );
         }
+      }
+      if (successfulSends > 0) {
+        setSendSuccessMessage(
+          `${successfulSends} ${
+            successfulSends === 1 ? "email was" : "emails were"
+          } sent successfully.`,
+        );
+
+        setTimeout(() => {
+          setSendSuccessMessage("");
+        }, 4000);
       }
       setPreparedRecipients([]);
       setOutreachPrepared(false);
