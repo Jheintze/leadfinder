@@ -21,6 +21,7 @@ export default function OutreachPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [outreachPrepared, setOutreachPrepared] = useState(false);
+  const [isSendingAll, setIsSendingAll] = useState(false);
   const [preparedRecipients, setPreparedRecipients] = useState<Restaurant[]>(
     [],
   );
@@ -89,39 +90,48 @@ Jakob`);
   }
 
   async function sendAllOutreach() {
-    for (const restaurant of preparedRecipients) {
-      const personalizedSubject = subject.replaceAll(
-        "{restaurant_name}",
-        restaurant.name,
-      );
+    setIsSendingAll(true);
 
-      const personalizedBody = body.replaceAll(
-        "{restaurant_name}",
-        restaurant.name,
-      );
+    try {
+      for (const restaurant of preparedRecipients) {
+        const personalizedSubject = subject.replaceAll(
+          "{restaurant_name}",
+          restaurant.name,
+        );
 
-      try {
-        const response = await fetch("/api/leads/outreach/send", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            restaurantId: restaurant.id,
-            to: "dr.nick@gmx.net",
-            subject: personalizedSubject,
-            body: personalizedBody,
-          }),
-        });
+        const personalizedBody = body.replaceAll(
+          "{restaurant_name}",
+          restaurant.name,
+        );
 
-        const data = await response.json();
+        try {
+          const response = await fetch("/api/leads/outreach/send", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              restaurantId: restaurant.id,
+              to: "dr.nick@gmx.net",
+              subject: personalizedSubject,
+              body: personalizedBody,
+            }),
+          });
 
-        if (!response.ok) {
-          throw new Error(data.error ?? "Could not send email.");
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error ?? "Could not send email.");
+          }
+        } catch (error) {
+          console.error(
+            `Failed to send outreach to ${restaurant.name}:`,
+            error,
+          );
         }
-      } catch (error) {
-        console.error(`Failed to send outreach to ${restaurant.name}:`, error);
       }
+    } finally {
+      setIsSendingAll(false);
     }
   }
 
@@ -343,10 +353,12 @@ Jakob`);
                     <button
                       type="button"
                       onClick={sendAllOutreach}
-                      disabled={preparedRecipients.length === 0}
+                      disabled={preparedRecipients.length === 0 || isSendingAll}
                       className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
                     >
-                      Send all ({preparedRecipients.length})
+                      {isSendingAll
+                        ? "Sending..."
+                        : `Send all (${preparedRecipients.length})`}
                     </button>
                   </div>
                 </div>
