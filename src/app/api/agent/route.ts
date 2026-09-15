@@ -265,7 +265,6 @@ Jakob`,
 
         toolOutput = {
           restaurantCount: restaurants.length,
-          restaurants,
           template,
         };
       }
