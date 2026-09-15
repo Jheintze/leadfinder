@@ -58,7 +58,7 @@ export async function sendOutreachEmail({
     version: "v1",
     auth: oauth2Client,
   });
-
+  
   const encodedSubject = `=?UTF-8?B?${Buffer.from(subject).toString("base64")}?=`;
 
   const message = [

@@ -11,14 +11,6 @@ type Restaurant = {
   city: string | null;
 };
 
-type Draft = {
-  restaurantId: string;
-  restaurantName: string;
-  email: string;
-  subject: string;
-  body: string;
-};
-
 type OutreachResponse = {
   restaurants: Restaurant[];
 };
@@ -26,11 +18,8 @@ type OutreachResponse = {
 export default function OutreachPage() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [selectedRestaurants, setSelectedRestaurants] = useState<string[]>([]);
-  const [drafts, setDrafts] = useState<Draft[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const [sendingDraftId, setSendingDraftId] = useState<string | null>(null);
-  const [isSendingAll, setIsSendingAll] = useState(false);
   const [outreachPrepared, setOutreachPrepared] = useState(false);
   const [preparedRecipients, setPreparedRecipients] = useState<Restaurant[]>(
     [],
@@ -88,7 +77,7 @@ Jakob`);
       selectedRestaurants.includes(restaurant.id),
     );
 
-    setPreparedRecipientCount(selected.length);
+    setPreparedRecipients(selected);
     setOutreachPrepared(true);
     setSelectedRestaurants([]);
 
@@ -99,76 +88,40 @@ Jakob`);
     }, 0);
   }
 
-  function updateDraft(
-    restaurantId: string,
-    field: "subject" | "body",
-    value: string,
-  ) {
-    setDrafts((currentDrafts) =>
-      currentDrafts.map((draft) =>
-        draft.restaurantId === restaurantId
-          ? { ...draft, [field]: value }
-          : draft,
-      ),
-    );
-  }
-
-  function removeDraft(restaurantId: string) {
-    setDrafts((currentDrafts) =>
-      currentDrafts.filter((draft) => draft.restaurantId !== restaurantId),
-    );
-  }
-
-  async function sendDraft(draft: Draft) {
-    setSendingDraftId(draft.restaurantId);
-
-    try {
-      const response = await fetch("/api/leads/outreach/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          restaurantId: draft.restaurantId,
-          to: "dr.nick@gmx.net",
-          subject: draft.subject,
-          body: draft.body,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error ?? "Could not send email.");
-      }
-
-      setDrafts((currentDrafts) =>
-        currentDrafts.filter(
-          (currentDraft) => currentDraft.restaurantId !== draft.restaurantId,
-        ),
+  async function sendAllOutreach() {
+    for (const restaurant of preparedRecipients) {
+      const personalizedSubject = subject.replaceAll(
+        "{restaurant_name}",
+        restaurant.name,
       );
 
-      setRestaurants((currentRestaurants) =>
-        currentRestaurants.filter(
-          (restaurant) => restaurant.id !== draft.restaurantId,
-        ),
+      const personalizedBody = body.replaceAll(
+        "{restaurant_name}",
+        restaurant.name,
       );
-    } catch (error) {
-      console.error("Failed to send draft:", error);
-    } finally {
-      setSendingDraftId(null);
-    }
-  }
 
-  async function sendAllDrafts() {
-    setIsSendingAll(true);
+      try {
+        const response = await fetch("/api/leads/outreach/send", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            restaurantId: restaurant.id,
+            to: restaurant.email,
+            subject: personalizedSubject,
+            body: personalizedBody,
+          }),
+        });
 
-    try {
-      for (const draft of drafts) {
-        await sendDraft(draft);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error ?? "Could not send email.");
+        }
+      } catch (error) {
+        console.error(`Failed to send outreach to ${restaurant.name}:`, error);
       }
-    } finally {
-      setIsSendingAll(false);
     }
   }
 
