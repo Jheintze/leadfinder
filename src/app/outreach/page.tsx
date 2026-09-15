@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { AppSidebar } from "../../components/app-sidebar";
 import { MobileHeader } from "../../components/mobile-header";
-import { generateOutreachDrafts } from "@/lib/outreach";
+
 
 type Restaurant = {
   id: string;
@@ -32,6 +32,8 @@ export default function OutreachPage() {
   const [error, setError] = useState("");
   const [sendingDraftId, setSendingDraftId] = useState<string | null>(null);
   const [isSendingAll, setIsSendingAll] = useState(false);
+  const [outreachPrepared, setOutreachPrepared] = useState(false);
+  const [preparedRecipientCount, setPreparedRecipientCount] = useState(0);
 
   const [subject, setSubject] = useState("A quick idea for {restaurant_name}");
 
@@ -85,13 +87,10 @@ Jakob`);
       selectedRestaurants.includes(restaurant.id),
     );
 
-    const generatedDrafts = generateOutreachDrafts(selected, {
-      subject,
-      body,
-    });
-
-    setDrafts(generatedDrafts);
+    setPreparedRecipientCount(selected.length);
+    setOutreachPrepared(true);
     setSelectedRestaurants([]);
+
     setTimeout(() => {
       document
         .getElementById("email-drafts")
@@ -344,7 +343,7 @@ Jakob`);
                 disabled={selectedRestaurants.length === 0}
                 className="inline-flex h-10 items-center justify-center rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
               >
-                Generate drafts
+                Prepare outreach
               </button>
             </div>
           </section>
