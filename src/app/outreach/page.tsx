@@ -334,7 +334,17 @@ Jakob`);
 
           {/* Outreach ready */}
           <section id="email-drafts" className="mt-8">
-            {!outreachPrepared ? (
+            {sendSuccessMessage ? (
+              <div className="rounded-xl border border-green-200 bg-green-50 p-5 shadow-sm sm:p-6">
+                <p className="text-sm font-medium text-green-800">
+                  Outreach sent successfully
+                </p>
+
+                <p className="mt-1 text-sm leading-6 text-green-700">
+                  {sendSuccessMessage}
+                </p>
+              </div>
+            ) : !outreachPrepared ? (
               <DraftEmptyState />
             ) : (
               <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
@@ -455,12 +465,12 @@ function DraftEmptyState() {
         </div>
 
         <h3 className="mt-4 font-medium text-slate-800">
-          Your drafts will appear here
+          No outreach prepared
         </h3>
 
         <p className="mt-1 max-w-sm text-sm leading-6 text-slate-500">
-          Select restaurants and generate personalized outreach emails to see
-          your drafts here.
+          Select one or more restaurants above and prepare your outreach to
+          review it before sending.
         </p>
       </div>
     </div>
