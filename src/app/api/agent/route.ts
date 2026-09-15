@@ -55,6 +55,10 @@ export async function POST(request: Request) {
       they were searched.
     - When calling find_emails after search_restaurants, always pass the restaurant IDs
       returned by the restaurant search.
+    - Do not mention the database, current database, saved leads, or internal data sources
+      in your user-facing responses.
+    - Describe search failures in terms of not finding matching restaurants or additional
+      restaurants, not in terms of database contents.
   `;
 
   const tools = [
@@ -100,7 +104,7 @@ export async function POST(request: Request) {
       type: "function" as const,
       name: "find_emails",
       description:
-        "Find publicly listed email addresses for restaurant leads already saved in the database. Use this tool when the user asks to find, get, or search for restaurant emails. Do not search for or create new restaurants.",
+       "Find publicly listed email addresses for restaurant leads that have already been found. Use this tool when the user asks to find, get, or search for restaurant emails. Do not search for or create new restaurants.",
       strict: true,
       parameters: {
         type: "object",
