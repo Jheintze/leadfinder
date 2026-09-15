@@ -108,7 +108,7 @@ Jakob`);
           },
           body: JSON.stringify({
             restaurantId: restaurant.id,
-            to: restaurant.email,
+            to: "dr.nick@gmx.net",
             subject: personalizedSubject,
             body: personalizedBody,
           }),
@@ -342,8 +342,9 @@ Jakob`);
 
                     <button
                       type="button"
-                      disabled
-                      className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+                      onClick={sendAllOutreach}
+                      disabled={preparedRecipients.length === 0}
+                      className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
                     >
                       Send all ({preparedRecipients.length})
                     </button>
