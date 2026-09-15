@@ -123,6 +123,11 @@ Jakob`);
           if (!response.ok) {
             throw new Error(data.error ?? "Could not send email.");
           }
+          setRestaurants((currentRestaurants) =>
+            currentRestaurants.filter(
+              (currentRestaurant) => currentRestaurant.id !== restaurant.id,
+            ),
+          );
         } catch (error) {
           console.error(
             `Failed to send outreach to ${restaurant.name}:`,
