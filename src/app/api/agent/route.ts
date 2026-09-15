@@ -62,6 +62,13 @@ export async function POST(request: Request) {
     - When a restaurant search returns no new matching results, say that you
       could not find any additional matching restaurants. Do not imply that
       no restaurants of that type exist in the location.
+
+    Email result wording:
+    - When the user requests a specific number of restaurants with emails, count only restaurants that actually have an email address.
+    - If fewer were found than requested, say "I found only X [cuisine] restaurants in [city] with email contacts:".
+    - If the requested number was reached, say "I found X [cuisine] restaurants in [city] with email contacts:".
+    - Do not describe restaurants without emails as successful results.
+    - Do not emphasize how many restaurants were searched or checked.
   `;
 
   const tools = [
@@ -107,7 +114,7 @@ export async function POST(request: Request) {
       type: "function" as const,
       name: "find_emails",
       description:
-       "Find publicly listed email addresses for restaurant leads that have already been found. Use this tool when the user asks to find, get, or search for restaurant emails. Do not search for or create new restaurants.",
+        "Find publicly listed email addresses for restaurant leads that have already been found. Use this tool when the user asks to find, get, or search for restaurant emails. Do not search for or create new restaurants.",
       strict: true,
       parameters: {
         type: "object",
@@ -192,6 +199,14 @@ export async function POST(request: Request) {
       let toolOutput: unknown;
 
       if (toolCall.name === "search_restaurants") {
+        console.log(
+          "[AGENT] search_restaurants:",
+          toolArguments.city,
+          toolArguments.cuisine,
+          "limit:",
+          toolArguments.limit,
+        );
+
         const restaurants = await searchAndSaveRestaurants({
           city: toolArguments.city,
           area: toolArguments.area ?? undefined,
@@ -204,6 +219,13 @@ export async function POST(request: Request) {
       }
 
       if (toolCall.name === "find_emails") {
+        console.log(
+          "[AGENT] find_emails:",
+          "limit:",
+          toolArguments.limit,
+          "restaurantIds:",
+          toolArguments.restaurantIds,
+        );
         const results = await findAndSaveEmails({
           limit: toolArguments.limit,
           restaurantIds: toolArguments.restaurantIds ?? undefined,
