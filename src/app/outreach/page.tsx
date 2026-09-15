@@ -32,7 +32,9 @@ export default function OutreachPage() {
   const [sendingDraftId, setSendingDraftId] = useState<string | null>(null);
   const [isSendingAll, setIsSendingAll] = useState(false);
   const [outreachPrepared, setOutreachPrepared] = useState(false);
-  const [preparedRecipientCount, setPreparedRecipientCount] = useState(0);
+  const [preparedRecipients, setPreparedRecipients] = useState<Restaurant[]>(
+    [],
+  );
 
   const [subject, setSubject] = useState("A quick idea for {restaurant_name}");
 
@@ -353,7 +355,7 @@ Jakob`);
               <DraftEmptyState />
             ) : (
               <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <p className="text-sm font-medium text-blue-600">
                       Outreach ready
@@ -364,15 +366,15 @@ Jakob`);
                     </h2>
 
                     <p className="mt-1 text-sm leading-6 text-slate-500">
-                      Your outreach template is ready for{" "}
-                      <span className="font-medium text-slate-700">
-                        {preparedRecipientCount}{" "}
-                        {preparedRecipientCount === 1
-                          ? "recipient"
-                          : "recipients"}
-                      </span>
-                      . The restaurant name will be personalized when the emails
-                      are sent.
+                      {preparedRecipients.length}{" "}
+                      {preparedRecipients.length === 1
+                        ? "recipient"
+                        : "recipients"}{" "}
+                      will receive this outreach.{" "}
+                      <code className="text-xs text-slate-600">
+                        {"{restaurant_name}"}
+                      </code>{" "}
+                      will be personalized when the emails are sent.
                     </p>
                   </div>
 
@@ -390,9 +392,27 @@ Jakob`);
                       disabled
                       className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
                     >
-                      Send all ({preparedRecipientCount})
+                      Send all ({preparedRecipients.length})
                     </button>
                   </div>
+                </div>
+
+                <div className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                    Subject
+                  </p>
+
+                  <p className="mt-1 text-sm font-medium text-slate-800">
+                    {subject}
+                  </p>
+
+                  <p className="mt-4 text-xs font-medium uppercase tracking-wide text-slate-400">
+                    Email body
+                  </p>
+
+                  <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700">
+                    {body}
+                  </p>
                 </div>
               </div>
             )}
