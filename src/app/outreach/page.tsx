@@ -130,6 +130,8 @@ Jakob`);
           );
         }
       }
+      setPreparedRecipients([]);
+      setOutreachPrepared(false);
     } finally {
       setIsSendingAll(false);
     }
