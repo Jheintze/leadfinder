@@ -62,9 +62,14 @@ export async function POST(request: Request) {
     - When a restaurant search returns no new matching results, say that you
       could not find any additional matching restaurants. Do not imply that
       no restaurants of that type exist in the location.
+    - When outreach is requested together with finding emails, do not prepare outreach until the email-search step is complete.
+    - If find_emails reports needs_more=true, continue with the next restaurant-search batch and check those restaurants for emails before generating outreach.
+    - Only generate outreach for restaurants that have email addresses.
 
     Email result wording:
-    - When the user requests a specific number of restaurants with emails, count only restaurants that actually have an email address.
+    - Whenever the user asks for restaurants with emails, including when outreach is also requested,
+      the final result must contain at most the requested number of restaurants with emails.
+    - Never report the total number of restaurants searched as the number of restaurants found.
     - If fewer were found than requested, say "I found only X [cuisine] restaurants in [city] with email contacts:".
     - If the requested number was reached, say "I found X [cuisine] restaurants in [city] with email contacts:".
     - Do not describe restaurants without emails as successful results.
