@@ -59,6 +59,9 @@ export async function POST(request: Request) {
       in your user-facing responses.
     - Describe search failures in terms of not finding matching restaurants or additional
       restaurants, not in terms of database contents.
+    - When a restaurant search returns no new matching results, say that you
+      could not find any additional matching restaurants. Do not imply that
+      no restaurants of that type exist in the location.
   `;
 
   const tools = [
