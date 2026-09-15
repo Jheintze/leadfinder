@@ -190,33 +190,17 @@ export async function POST(request: Request) {
       }
 
       if (toolCall.name === "find_emails") {
-        const targetCount = toolArguments.limit;
-        const allResults = [];
+        const results = await findAndSaveEmails({
+          limit: toolArguments.limit,
+          restaurantIds: toolArguments.restaurantIds ?? undefined,
+        });
 
-        while (
-          allResults.filter((result) => result.email).length < targetCount
-        ) {
-          const remaining =
-            targetCount - allResults.filter((result) => result.email).length;
-
-          const results = await findAndSaveEmails({
-            limit: remaining,
-            restaurantIds: toolArguments.restaurantIds ?? undefined,
-          });
-
-          if (results.length === 0) {
-            break;
-          }
-
-          allResults.push(...results);
-        }
-
-        const foundResults = allResults.filter((result) => result.email);
+        const foundResults = results.filter((result) => result.email);
 
         toolOutput = {
-          requested: targetCount,
+          requested: toolArguments.limit,
           found: foundResults.length,
-          needs_more: foundResults.length < targetCount,
+          needs_more: foundResults.length < toolArguments.limit,
           results: foundResults,
         };
       }
