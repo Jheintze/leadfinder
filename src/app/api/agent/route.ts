@@ -41,13 +41,20 @@ export async function POST(request: Request) {
     - If the user asks for outreach after finding restaurants/emails, use
       generate_outreach with the relevant restaurant IDs.
     - Do not stop after the first tool if the user's request is not complete.
-    - If the user requests a number of restaurants with emails, continue searching
-      for additional matching restaurants when some found restaurants have no email,
-      until the requested number of usable email leads is reached or there are no
-      more results.
-    - When find_emails returns needs_more: true during a multi-step restaurant search,
-  use search_restaurants to find additional matching restaurants and then try
-  find_emails on those new restaurant IDs.
+    - When the user asks for a specific number of restaurants with emails, the final
+      result should contain at most that requested number of restaurants with emails.
+    - First search for the requested number of restaurants and check those exact
+      restaurant IDs for emails.
+    - If there are not enough usable email results, search for another batch of the
+      same size and check those exact new restaurant IDs.
+    - Make at most 3 restaurant-search batches total for this task.
+    - Stop immediately once the requested number of usable email results has been found.
+    - If the requested number cannot be reached after 3 batches, return the usable
+      email results that were found.
+    - Never include extra restaurants without emails in the final results just because
+      they were searched.
+    - When calling find_emails after search_restaurants, always pass the restaurant IDs
+      returned by the restaurant search.
   `;
 
   const tools = [
