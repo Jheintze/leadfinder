@@ -405,6 +405,12 @@ Jakob`);
           </section>
         </section>
       </div>
+      {sendSuccessMessage && (
+        <div className="fixed bottom-6 right-6 z-50 rounded-lg border border-green-200 bg-white px-4 py-3 shadow-lg">
+          <p className="text-sm font-medium text-slate-800">✓ Outreach sent</p>
+          <p className="mt-0.5 text-xs text-slate-500">{sendSuccessMessage}</p>
+        </div>
+      )}
     </main>
   );
 }
