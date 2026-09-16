@@ -23,6 +23,7 @@ export default function OutreachPage() {
   const [outreachPrepared, setOutreachPrepared] = useState(false);
   const [isSendingAll, setIsSendingAll] = useState(false);
   const [sendSuccessMessage, setSendSuccessMessage] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
   const [preparedRecipients, setPreparedRecipients] = useState<Restaurant[]>(
     [],
   );
@@ -155,6 +156,13 @@ Jakob`);
     }
   }
 
+  const cities = Array.from(
+    new Set(
+      restaurants
+        .map((restaurant) => restaurant.city)
+        .filter((city): city is string => Boolean(city)),
+    ),
+  ).sort();
   const allSelected =
     restaurants.length > 0 && selectedRestaurants.length === restaurants.length;
 
