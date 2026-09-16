@@ -334,17 +334,7 @@ Jakob`);
 
           {/* Outreach ready */}
           <section id="email-drafts" className="mt-8">
-            {sendSuccessMessage ? (
-              <div className="rounded-xl border border-green-200 bg-green-50 p-5 shadow-sm sm:p-6">
-                <p className="text-sm font-medium text-green-800">
-                  Outreach sent successfully
-                </p>
-
-                <p className="mt-1 text-sm leading-6 text-green-700">
-                  {sendSuccessMessage}
-                </p>
-              </div>
-            ) : !outreachPrepared ? (
+            {!outreachPrepared ? (
               <DraftEmptyState />
             ) : (
               <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
