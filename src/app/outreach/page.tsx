@@ -273,7 +273,31 @@ Jakob`);
                 </span>
               </div>
             </div>
+            {!isLoading && !error && restaurants.length > 0 && (
+              <div className="mt-5 max-w-sm">
+                <label
+                  htmlFor="city"
+                  className="mb-2 block text-sm font-medium text-slate-700"
+                >
+                  City
+                </label>
 
+                <select
+                  id="city"
+                  value={selectedCity}
+                  onChange={(event) => setSelectedCity(event.target.value)}
+                  className="input w-full"
+                >
+                  <option value="">Select a city...</option>
+
+                  {cities.map((city) => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             {isLoading ? (
               <LoadingState />
             ) : error ? (
@@ -285,47 +309,59 @@ Jakob`);
               </p>
             ) : restaurants.length === 0 ? (
               <EmptyState />
+            ) : !selectedCity ? (
+              <div className="mt-5 rounded-lg border border-dashed border-slate-300 px-6 py-10 text-center">
+                <p className="text-sm font-medium text-slate-700">
+                  Select a city to see restaurants
+                </p>
+
+                <p className="mt-1 text-sm text-slate-500">
+                  Your restaurant list will appear here once you choose a city.
+                </p>
+              </div>
             ) : (
               <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                {restaurants.map((restaurant) => {
-                  const isSelected = selectedRestaurants.includes(
-                    restaurant.id,
-                  );
+                {restaurants
+                  .filter((restaurant) => restaurant.city === selectedCity)
+                  .map((restaurant) => {
+                    const isSelected = selectedRestaurants.includes(
+                      restaurant.id,
+                    );
 
-                  return (
-                    <label
-                      key={restaurant.id}
-                      className={`relative flex cursor-pointer rounded-lg border p-4 transition-colors ${
-                        isSelected
-                          ? "border-blue-300 bg-blue-50/60"
-                          : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleRestaurant(restaurant.id)}
-                        className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                      />
+                    return (
+                      <label
+                        key={restaurant.id}
+                        className={`relative flex cursor-pointer rounded-lg border p-4 transition-colors ${
+                          isSelected
+                            ? "border-blue-300 bg-blue-50/60"
+                            : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleRestaurant(restaurant.id)}
+                          className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        />
 
-                      <div className="ml-3 min-w-0">
-                        <p className="truncate text-sm font-medium text-slate-800">
-                          {restaurant.name}
-                        </p>
-
-                        <p className="mt-1 truncate text-xs text-slate-500">
-                          {restaurant.email}
-                        </p>
-
-                        {restaurant.city && (
-                          <p className="mt-1 text-xs text-slate-400">
-                            {restaurant.city}
+                        <div className="ml-3 min-w-0">
+                          <p className="truncate text-sm font-medium text-slate-800">
+                            {restaurant.name}
                           </p>
-                        )}
-                      </div>
-                    </label>
-                  );
-                })}
+
+                          <p className="mt-1 truncate text-xs text-slate-500">
+                            {restaurant.email}
+                          </p>
+
+                          {restaurant.city && (
+                            <p className="mt-1 text-xs text-slate-400">
+                              {restaurant.city}
+                            </p>
+                          )}
+                        </div>
+                      </label>
+                    );
+                  })}
               </div>
             )}
             <div className="mt-5 flex justify-end">
