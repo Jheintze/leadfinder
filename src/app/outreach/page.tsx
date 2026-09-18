@@ -162,10 +162,11 @@ Jakob`);
         .filter((restaurant) => restaurant.city)
         .map((restaurant) => {
           const city = restaurant.city!.trim();
-          return [city.toLowerCase(), city];
+          return [city.toLowerCase(), formatCity(city)];
         }),
     ).values(),
   ).sort((a, b) => a.localeCompare(b));
+
   const allSelected =
     restaurants.length > 0 && selectedRestaurants.length === restaurants.length;
 
@@ -466,6 +467,15 @@ Jakob`);
   );
 }
 
+function formatCity(city: string | null) {
+  if (!city) return "";
+
+  return city
+    .trim()
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
 /* Loading state */
 
 function LoadingState() {
