@@ -361,9 +361,9 @@ Jakob`);
                             {restaurant.email}
                           </p>
 
-                          {restaurant.city && (
+                          {formatCity(restaurant.city) && (
                             <p className="mt-1 text-xs text-slate-400">
-                              {restaurant.city}
+                              {formatCity(restaurant.city)}
                             </p>
                           )}
                         </div>
