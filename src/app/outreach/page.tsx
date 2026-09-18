@@ -325,7 +325,11 @@ Jakob`);
             ) : (
               <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {restaurants
-                  .filter((restaurant) => restaurant.city === selectedCity)
+                  .filter(
+                    (restaurant) =>
+                      restaurant.city?.trim().toLowerCase() ===
+                      selectedCity.toLowerCase(),
+                  )
                   .map((restaurant) => {
                     const isSelected = selectedRestaurants.includes(
                       restaurant.id,
