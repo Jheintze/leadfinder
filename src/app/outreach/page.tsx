@@ -157,12 +157,15 @@ Jakob`);
   }
 
   const cities = Array.from(
-    new Set(
+    new Map(
       restaurants
-        .map((restaurant) => restaurant.city)
-        .filter((city): city is string => Boolean(city)),
-    ),
-  ).sort();
+        .filter((restaurant) => restaurant.city)
+        .map((restaurant) => {
+          const city = restaurant.city!.trim();
+          return [city.toLowerCase(), city];
+        }),
+    ).values(),
+  ).sort((a, b) => a.localeCompare(b));
   const allSelected =
     restaurants.length > 0 && selectedRestaurants.length === restaurants.length;
 
