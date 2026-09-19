@@ -283,7 +283,14 @@ Jakob`);
                 </label>
 
                 <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
-                  {selectedRestaurants.length} of {restaurants.length} selected
+                  {
+                    selectedRestaurants.filter((id) =>
+                      filteredRestaurants.some(
+                        (restaurant) => restaurant.id === id,
+                      ),
+                    ).length
+                  }{" "}
+                  of {filteredRestaurants.length} selected
                 </span>
               </div>
             </div>
