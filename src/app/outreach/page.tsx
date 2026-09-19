@@ -166,7 +166,14 @@ Jakob`);
         }),
     ).values(),
   ).sort((a, b) => a.localeCompare(b));
-
+  
+  const filteredRestaurants = selectedCity
+  ? restaurants.filter(
+      (restaurant) =>
+        restaurant.city?.trim().toLowerCase() === selectedCity.toLowerCase(),
+    )
+  : [];
+  
   const allSelected =
     restaurants.length > 0 && selectedRestaurants.length === restaurants.length;
 
