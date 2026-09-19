@@ -270,11 +270,23 @@ Jakob`);
                     checked={allSelected}
                     onChange={() => {
                       if (allSelected) {
-                        setSelectedRestaurants([]);
-                      } else {
-                        setSelectedRestaurants(
-                          restaurants.map((restaurant) => restaurant.id),
+                        setSelectedRestaurants((current) =>
+                          current.filter(
+                            (id) =>
+                              !filteredRestaurants.some(
+                                (restaurant) => restaurant.id === id,
+                              ),
+                          ),
                         );
+                      } else {
+                        setSelectedRestaurants((current) => [
+                          ...new Set([
+                            ...current,
+                            ...filteredRestaurants.map(
+                              (restaurant) => restaurant.id,
+                            ),
+                          ]),
+                        ]);
                       }
                     }}
                     className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
