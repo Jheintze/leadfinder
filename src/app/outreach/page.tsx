@@ -354,51 +354,45 @@ Jakob`);
               </div>
             ) : (
               <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                {restaurants
-                  .filter(
-                    (restaurant) =>
-                      restaurant.city?.trim().toLowerCase() ===
-                      selectedCity.toLowerCase(),
-                  )
-                  .map((restaurant) => {
-                    const isSelected = selectedRestaurants.includes(
-                      restaurant.id,
-                    );
+                {filteredRestaurants.map((restaurant) => {
+                  const isSelected = selectedRestaurants.includes(
+                    restaurant.id,
+                  );
 
-                    return (
-                      <label
-                        key={restaurant.id}
-                        className={`relative flex cursor-pointer rounded-lg border p-4 transition-colors ${
-                          isSelected
-                            ? "border-blue-300 bg-blue-50/60"
-                            : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => toggleRestaurant(restaurant.id)}
-                          className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                        />
+                  return (
+                    <label
+                      key={restaurant.id}
+                      className={`relative flex cursor-pointer rounded-lg border p-4 transition-colors ${
+                        isSelected
+                          ? "border-blue-300 bg-blue-50/60"
+                          : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleRestaurant(restaurant.id)}
+                        className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      />
 
-                        <div className="ml-3 min-w-0">
-                          <p className="truncate text-sm font-medium text-slate-800">
-                            {restaurant.name}
+                      <div className="ml-3 min-w-0">
+                        <p className="truncate text-sm font-medium text-slate-800">
+                          {restaurant.name}
+                        </p>
+
+                        <p className="mt-1 truncate text-xs text-slate-500">
+                          {restaurant.email}
+                        </p>
+
+                        {formatCity(restaurant.city) && (
+                          <p className="mt-1 text-xs text-slate-400">
+                            {formatCity(restaurant.city)}
                           </p>
-
-                          <p className="mt-1 truncate text-xs text-slate-500">
-                            {restaurant.email}
-                          </p>
-
-                          {formatCity(restaurant.city) && (
-                            <p className="mt-1 text-xs text-slate-400">
-                              {formatCity(restaurant.city)}
-                            </p>
-                          )}
-                        </div>
-                      </label>
-                    );
-                  })}
+                        )}
+                      </div>
+                    </label>
+                  );
+                })}
               </div>
             )}
             <div className="mt-5 flex justify-end">
