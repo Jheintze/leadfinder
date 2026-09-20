@@ -325,28 +325,61 @@ Jakob`);
               </div>
             </div>
             {!isLoading && !error && restaurants.length > 0 && (
-              <div className="mt-5 max-w-sm">
-                <label
-                  htmlFor="city"
-                  className="mb-2 block text-sm font-medium text-slate-700"
-                >
-                  City
-                </label>
+              <div className="mt-5 flex flex-col gap-4 sm:flex-row">
+                <div className="w-full sm:max-w-sm">
+                  <label
+                    htmlFor="city"
+                    className="mb-2 block text-sm font-medium text-slate-700"
+                  >
+                    City
+                  </label>
 
-                <select
-                  id="city"
-                  value={selectedCity}
-                  onChange={(event) => setSelectedCity(event.target.value)}
-                  className="input w-full"
-                >
-                  <option value="">Select a city...</option>
+                  <select
+                    id="city"
+                    value={selectedCity}
+                    onChange={(event) => {
+                      setSelectedCity(event.target.value);
+                      setSelectedCuisine("");
+                    }}
+                    className="input w-full"
+                  >
+                    <option value="">Select a city...</option>
 
-                  {cities.map((city) => (
-                    <option key={city} value={city}>
-                      {city}
-                    </option>
-                  ))}
-                </select>
+                    {cities.map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {selectedCity && (
+                  <div className="w-full sm:max-w-sm">
+                    <label
+                      htmlFor="cuisine"
+                      className="mb-2 block text-sm font-medium text-slate-700"
+                    >
+                      Cuisine
+                    </label>
+
+                    <select
+                      id="cuisine"
+                      value={selectedCuisine}
+                      onChange={(event) =>
+                        setSelectedCuisine(event.target.value)
+                      }
+                      className="input w-full"
+                    >
+                      <option value="">All cuisines</option>
+
+                      {cuisines.map((cuisine) => (
+                        <option key={cuisine} value={cuisine}>
+                          {cuisine}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
             )}
             {isLoading ? (
