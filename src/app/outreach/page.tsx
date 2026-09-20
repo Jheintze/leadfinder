@@ -9,6 +9,7 @@ type Restaurant = {
   name: string;
   email: string;
   city: string | null;
+  cuisine: string | null;
 };
 
 type OutreachResponse = {
