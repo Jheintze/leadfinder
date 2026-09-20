@@ -25,6 +25,7 @@ export default function OutreachPage() {
   const [isSendingAll, setIsSendingAll] = useState(false);
   const [sendSuccessMessage, setSendSuccessMessage] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
+  const [selectedCuisine, setSelectedCuisine] = useState("");
   const [preparedRecipients, setPreparedRecipients] = useState<Restaurant[]>(
     [],
   );
