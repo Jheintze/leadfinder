@@ -4,7 +4,7 @@ import { google } from "googleapis";
 export async function getRestaurantsForOutreach(restaurantIds?: string[]) {
   let query = supabaseAdmin
     .from("restaurants")
-    .select("id, name, email, city")
+    .select("id, name, email, city, cuisine")
     .not("email", "is", null)
     .eq("outreach_sent", false)
     .order("created_at", { ascending: false });
