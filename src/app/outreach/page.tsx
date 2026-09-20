@@ -169,12 +169,28 @@ Jakob`);
     ).values(),
   ).sort((a, b) => a.localeCompare(b));
 
-  const filteredRestaurants = selectedCity
+  const cityRestaurants = selectedCity
     ? restaurants.filter(
         (restaurant) =>
           restaurant.city?.trim().toLowerCase() === selectedCity.toLowerCase(),
       )
     : [];
+
+  const cuisines = Array.from(
+    new Set(
+      cityRestaurants
+        .map((restaurant) => restaurant.cuisine?.trim())
+        .filter((cuisine): cuisine is string => Boolean(cuisine)),
+    ),
+  ).sort((a, b) => a.localeCompare(b));
+
+  const filteredRestaurants = selectedCuisine
+    ? cityRestaurants.filter(
+        (restaurant) =>
+          restaurant.cuisine?.trim().toLowerCase() ===
+          selectedCuisine.toLowerCase(),
+      )
+    : cityRestaurants;
 
   const allSelected =
     filteredRestaurants.length > 0 &&
