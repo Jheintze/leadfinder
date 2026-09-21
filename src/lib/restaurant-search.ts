@@ -112,7 +112,7 @@ export async function searchAndSaveRestaurants({
           onConflict: "source_id",
           ignoreDuplicates: true,
         })
-        .select("id, source_id, name, address, website, email, city");
+        .select("id, source_id, name, address, website, email, city, cuisine");
 
       if (insertError) {
         throw insertError;
