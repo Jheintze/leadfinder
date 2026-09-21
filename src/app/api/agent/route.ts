@@ -47,6 +47,10 @@ export async function POST(request: Request) {
     - If the user asks for outreach after finding restaurants/emails, use
       generate_outreach with the relevant restaurant IDs.
     - Do not stop after the first tool if the user's request is not complete.
+       - Only apply the email-search workflow below when the user explicitly asks for
+      restaurants with email addresses or asks for an email-dependent task such as outreach.
+    - If the user only asks for a specific number of restaurants, return the restaurants
+      found by search_restaurants and do not search for their emails.
     - When the user asks for a specific number of restaurants with emails, the final
       result should contain at most that requested number of restaurants with emails.
     - First search for the requested number of restaurants and check those exact
