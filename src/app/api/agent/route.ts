@@ -35,6 +35,12 @@ export async function POST(request: Request) {
     - You may call multiple tools sequentially.
     - After a tool returns results, use those results to decide whether another
       tool is needed.
+          - If the user only asks to find/search/discover restaurants, use search_restaurants
+      and do not call find_emails afterward.
+    - Do not infer that the user wants email addresses merely because restaurants
+      have email fields or because the search result contains email information.
+    - Only use find_emails when the user explicitly asks for email addresses, emails,
+      contact information, or outreach that requires email addresses.
     - For example, if the user asks to find restaurants and then get their emails,
       first use search_restaurants, then use the restaurant IDs returned by that
       tool with find_emails.
