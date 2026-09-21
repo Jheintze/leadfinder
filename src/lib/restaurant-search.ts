@@ -103,6 +103,7 @@ export async function searchAndSaveRestaurants({
         website: lead.website,
         email: lead.email,
         city: normalizedCity,
+        cuisine: normalizedCuisine,
       }));
 
       const { data: savedRestaurants, error: insertError } = await supabaseAdmin
