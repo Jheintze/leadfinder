@@ -104,10 +104,61 @@ export default function AgentPage() {
 
                   <button
                     type="button"
-                    disabled
-                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white opacity-60"
+                    disabled={sendingOutreach}
+                    onClick={async () => {
+                      if (!outreach) return;
+
+                      setSendingOutreach(true);
+                      setSendMessage("");
+
+                      let successfulSends = 0;
+
+                      try {
+                        for (const restaurantId of outreach.restaurantIds) {
+                          const response = await fetch(
+                            "/api/leads/outreach/send",
+                            {
+                              method: "POST",
+                              headers: {
+                                "Content-Type": "application/json",
+                              },
+                              body: JSON.stringify({
+                                restaurantId,
+                                subject: outreach.template.subject,
+                                body: outreach.template.body,
+                              }),
+                            },
+                          );
+
+                          const data = await response.json();
+
+                          if (!response.ok) {
+                            throw new Error(
+                              data.error ?? "Could not send email.",
+                            );
+                          }
+
+                          successfulSends++;
+                        }
+
+                        setSendMessage(
+                          `${successfulSends} ${
+                            successfulSends === 1 ? "email was" : "emails were"
+                          } sent successfully.`,
+                        );
+                      } catch (error) {
+                        console.error("Failed to send outreach:", error);
+
+                        setSendMessage(
+                          `${successfulSends} of ${outreach.restaurantCount} emails were sent successfully.`,
+                        );
+                      } finally {
+                        setSendingOutreach(false);
+                      }
+                    }}
+                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    Send outreach
+                    {sendingOutreach ? "Sending..." : "Send outreach"}
                   </button>
                 </div>
 
