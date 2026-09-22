@@ -274,10 +274,12 @@ Best,
 Jakob`,
         };
 
-        toolOutput = {
+        preparedOutreach = {
           restaurantCount: restaurants.length,
           template,
         };
+
+        toolOutput = preparedOutreach;
       }
 
       // Give the result back to the model using the EXACT call_id
