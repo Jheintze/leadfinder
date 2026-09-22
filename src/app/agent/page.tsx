@@ -11,7 +11,10 @@ export default function AgentPage() {
   const [sendingOutreach, setSendingOutreach] = useState(false);
   const [sendMessage, setSendMessage] = useState("");
   const [outreach, setOutreach] = useState<{
-    restaurantIds: string[];
+    restaurants: {
+      id: string;
+      name: string;
+    }[];
     restaurantCount: number;
     template: {
       subject: string;
@@ -114,7 +117,17 @@ export default function AgentPage() {
                       let successfulSends = 0;
 
                       try {
-                        for (const restaurantId of outreach.restaurantIds) {
+                        for (const restaurant of outreach.restaurants) {
+                          const subject = outreach.template.subject.replaceAll(
+                            "{restaurant_name}",
+                            restaurant.name,
+                          );
+
+                          const body = outreach.template.body.replaceAll(
+                            "{restaurant_name}",
+                            restaurant.name,
+                          );
+
                           const response = await fetch(
                             "/api/leads/outreach/send",
                             {
@@ -123,9 +136,10 @@ export default function AgentPage() {
                                 "Content-Type": "application/json",
                               },
                               body: JSON.stringify({
-                                restaurantId,
-                                subject: outreach.template.subject,
-                                body: outreach.template.body,
+                                restaurantId: restaurant.id,
+                                to: "dr.nick@gmx.net",
+                                subject,
+                                body,
                               }),
                             },
                           );
