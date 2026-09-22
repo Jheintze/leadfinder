@@ -202,6 +202,7 @@ export async function POST(request: Request) {
     if (toolCalls.length === 0) {
       return NextResponse.json({
         message: response.output_text,
+        outreach: preparedOutreach,
       });
     }
 
