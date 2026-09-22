@@ -108,7 +108,7 @@ export default function AgentPage() {
                   </button>
                 </div>
 
-                <div className="mt-5 border-t border-slate-100 pt-4">
+                <div className="mt-5 border-t border-slate-300 pt-4">
                   <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
                     Subject
                   </p>
