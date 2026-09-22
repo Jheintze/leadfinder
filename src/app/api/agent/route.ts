@@ -278,7 +278,10 @@ Jakob`,
         };
 
         preparedOutreach = {
-          restaurantIds: restaurants.map((restaurant) => restaurant.id),
+          restaurants: restaurants.map((restaurant) => ({
+            id: restaurant.id,
+            name: restaurant.name,
+          })),
           restaurantCount: restaurants.length,
           template,
         };
