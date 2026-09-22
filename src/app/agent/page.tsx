@@ -9,6 +9,7 @@ export default function AgentPage() {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState("");
   const [outreach, setOutreach] = useState<{
+    restaurantIds: string[];
     restaurantCount: number;
     template: {
       subject: string;
