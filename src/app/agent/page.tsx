@@ -85,6 +85,48 @@ export default function AgentPage() {
                 </div>
               </div>
             )}
+
+            {outreach && (
+              <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-800">
+                      Outreach prepared
+                    </p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {outreach.restaurantCount} recipient
+                      {outreach.restaurantCount === 1 ? "" : "s"}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled
+                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white opacity-60"
+                  >
+                    Send outreach
+                  </button>
+                </div>
+
+                <div className="mt-5 border-t border-slate-100 pt-4">
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                    Subject
+                  </p>
+
+                  <p className="mt-1 text-sm font-medium text-slate-800">
+                    {outreach.template.subject}
+                  </p>
+
+                  <p className="mt-4 text-xs font-medium uppercase tracking-wide text-slate-400">
+                    Message
+                  </p>
+
+                  <div className="mt-1 whitespace-pre-line text-sm leading-6 text-slate-700">
+                    {outreach.template.body}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </section>
       </div>
