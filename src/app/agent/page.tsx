@@ -6,8 +6,15 @@ import { MobileHeader } from "../../components/mobile-header";
 
 export default function AgentPage() {
   const [task, setTask] = useState("");
-  const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
+  const [response, setResponse] = useState("");
+  const [outreach, setOutreach] = useState<{
+    restaurantCount: number;
+    template: {
+      subject: string;
+      body: string;
+    };
+  } | null>(null);
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -63,6 +70,7 @@ export default function AgentPage() {
                 const data = await res.json();
 
                 setResponse(data.message);
+                setOutreach(data.outreach);
                 setLoading(false);
               }}
               disabled={loading}
