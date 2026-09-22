@@ -10,6 +10,7 @@ const openai = new OpenAI({
 
 export async function POST(request: Request) {
   const { task } = await request.json();
+  let preparedOutreach = null;
 
   const instructions = `
     You are the LeadFinder agent.
