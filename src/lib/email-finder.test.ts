@@ -1,4 +1,4 @@
-import { isValidEmail } from "./email-finder";
+import { isValidEmail } from "./email-validation";
 
 describe("isValidEmail", () => {
   it("accepts a normal restaurant email", () => {
