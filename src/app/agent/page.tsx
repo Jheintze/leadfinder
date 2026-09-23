@@ -160,6 +160,7 @@ export default function AgentPage() {
                             successfulSends === 1 ? "email was" : "emails were"
                           } sent successfully.`,
                         );
+                        setOutreach(null);
                       } catch (error) {
                         console.error("Failed to send outreach:", error);
 
