@@ -20,7 +20,15 @@ export type SavedEmailResult = {
 
 const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 
-const CONTACT_PATHS = ["/contact", "/kontakt", "/impressum"];
+const CONTACT_PATHS = [
+  "/contact",
+  "/contact-us",
+  "/contacto",
+  "/contactanos",
+  "/kontakt",
+  "/impressum",
+  "/aviso-legal",
+];
 
 export async function findAndSaveEmails({
   limit,
@@ -102,7 +110,6 @@ export async function findEmailFromWebsite(
 
   return { email: null };
 }
-
 
 async function findEmailFromPage(url: string): Promise<string | null> {
   const controller = new AbortController();
