@@ -101,7 +101,7 @@ export async function findEmailFromWebsite(
 
   return { email: null };
 }
-function isValidEmail(email: string): boolean {
+export function isValidEmail(email: string): boolean {
   const normalizedEmail = email.toLowerCase().trim();
 
   if (
