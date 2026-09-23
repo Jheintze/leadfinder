@@ -33,10 +33,13 @@ export async function POST(request: Request) {
 
     Multi-step tasks:
     - If the user asks for multiple operations, complete all of them.
+    - When outreach is prepared, keep the response brief and do not repeat the
+      subject or email body. Simply mention that {restaurant_name} will be replaced
+      with each restaurant's actual name when the emails are sent.
     - You may call multiple tools sequentially.
     - After a tool returns results, use those results to decide whether another
       tool is needed.
-          - If the user only asks to find/search/discover restaurants, use search_restaurants
+    - If the user only asks to find/search/discover restaurants, use search_restaurants
       and do not call find_emails afterward.
     - Do not infer that the user wants email addresses merely because restaurants
       have email fields or because the search result contains email information.
