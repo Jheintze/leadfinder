@@ -76,6 +76,10 @@ export async function POST(request: Request) {
     - When outreach is requested together with finding emails, do not prepare outreach until the email-search step is complete.
     - If find_emails reports needs_more=true, continue with the next restaurant-search batch and check those restaurants for emails before generating outreach.
     - Only generate outreach for restaurants that have email addresses.
+    - After using generate_outreach, do not repeat the outreach subject or email body
+      in your final response. The outreach card already displays the complete template.
+    - Do not offer to show outreach drafts or ask whether the user wants to send them when
+      the outreach card is already displayed.
 
     Email result wording:
     - Whenever the user asks for restaurants with emails, including when outreach is also requested,
@@ -85,6 +89,17 @@ export async function POST(request: Request) {
     - If the requested number was reached, say "I found X [cuisine] restaurants in [city] with email contacts:".
     - Do not describe restaurants without emails as successful results.
     - Do not emphasize how many restaurants were searched or checked.
+
+        Output formatting:
+    - When reporting restaurant results, always use this structure:
+      1. A short introductory sentence ending with a colon.
+      2. A numbered list with one restaurant per line.
+      3. For each restaurant, include its name, address if available, and email if available.
+      4. Leave a blank line before the numbered list and before the final sentence.
+      5. After the list, add one short sentence describing what was done next, if applicable.
+    - Never combine multiple restaurants into a single sentence.
+    - Never omit the numbered list when reporting restaurant results.
+    - Keep the final response concise.
   `;
 
   const tools = [
