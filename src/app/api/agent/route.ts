@@ -33,9 +33,6 @@ export async function POST(request: Request) {
 
     Multi-step tasks:
     - If the user asks for multiple operations, complete all of them.
-    - When outreach is prepared, keep the response brief and do not repeat the
-      subject or email body. Simply mention that {restaurant_name} will be replaced
-      with each restaurant's actual name when the emails are sent.
     - You may call multiple tools sequentially.
     - After a tool returns results, use those results to decide whether another
       tool is needed.
