@@ -4,9 +4,9 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 const CITY = "Munich";
 const BUSINESS_TYPE = "restaurant";
-const TARGET_EMAILS = 50;
-const SEARCH_BATCH_SIZE = 50;
-const MAX_RESTAURANTS = 300;
+const TARGET_EMAILS = 5;
+const SEARCH_BATCH_SIZE = 25;
+const MAX_RESTAURANTS = 500;
 
 export async function prepareAutomationBatch() {
   const { data: batch, error: batchError } = await supabaseAdmin
