@@ -88,6 +88,7 @@ export async function prepareAutomationBatch() {
         emails_found: selectedRestaurantIds.length,
         restaurant_ids: selectedRestaurantIds,
         city_exhausted: cityExhausted,
+        restaurants_processed: restaurantsProcessed,
       })
       .eq("id", batch.id)
       .select()
