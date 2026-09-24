@@ -27,6 +27,8 @@ const CONTACT_PATHS = [
   "/contactanos",
   "/kontakt",
   "/impressum",
+  "/legal",
+  "/legal-notice",
   "/aviso-legal",
 ];
 
@@ -111,7 +113,7 @@ export async function findEmailFromWebsite(
   return { email: null };
 }
 
-async function findEmailFromPage(url: string): Promise<string | null> {
+export async function findEmailFromPage(url: string): Promise<string | null> {
   const controller = new AbortController();
 
   const timeout = setTimeout(() => {
@@ -132,6 +134,7 @@ async function findEmailFromPage(url: string): Promise<string | null> {
     }
 
     const html = await response.text();
+    
     const matches = html.match(EMAIL_REGEX);
 
     if (!matches) {

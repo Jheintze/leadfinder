@@ -4,7 +4,9 @@ export function isValidEmail(email: string): boolean {
   if (
     normalizedEmail.includes("example.com") ||
     normalizedEmail.includes("domain.com") ||
+    normalizedEmail.includes("ejemplo.com") ||
     normalizedEmail.includes("sentry")
+    
   ) {
     return false;
   }
