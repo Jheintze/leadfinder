@@ -66,32 +66,30 @@ export default function AutomationPage() {
       setSendingBatchId(null);
     }
   }
+  async function loadBatches() {
+    try {
+      const response = await fetch("/api/automation/batches");
 
-  useEffect(() => {
-    async function loadBatches() {
-      try {
-        const response = await fetch("/api/automation/batches");
+      const data = (await response.json()) as AutomationResponse & {
+        error?: string;
+      };
 
-        const data = (await response.json()) as AutomationResponse & {
-          error?: string;
-        };
-
-        if (!response.ok) {
-          throw new Error(data.error || "Could not load automation batches.");
-        }
-
-        setBatches(data.batches);
-      } catch (caughtError) {
-        setError(
-          caughtError instanceof Error
-            ? caughtError.message
-            : "Something went wrong while loading automation batches.",
-        );
-      } finally {
-        setIsLoading(false);
+      if (!response.ok) {
+        throw new Error(data.error || "Could not load automation batches.");
       }
-    }
 
+      setBatches(data.batches);
+    } catch (caughtError) {
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Something went wrong while loading automation batches.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }
+  useEffect(() => {
     loadBatches();
   }, []);
 
