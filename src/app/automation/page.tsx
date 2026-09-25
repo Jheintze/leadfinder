@@ -38,9 +38,34 @@ export default function AutomationPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [sendingBatchId, setSendingBatchId] = useState<string | null>(null);
-  const [reviewingBatchId, setReviewingBatchId] = useState<string | null>(
-    null,
-  );
+  const [reviewingBatchId, setReviewingBatchId] = useState<string | null>(null);
+
+  async function handleSendAll(batchId: string) {
+    setSendingBatchId(batchId);
+
+    try {
+      const response = await fetch("/api/automation/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ batchId }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Could not send batch.");
+      }
+
+      await loadBatches();
+    } catch (error) {
+      console.error(error);
+      alert(error instanceof Error ? error.message : "Could not send batch.");
+    } finally {
+      setSendingBatchId(null);
+    }
+  }
 
   useEffect(() => {
     async function loadBatches() {
@@ -71,8 +96,7 @@ export default function AutomationPage() {
   }, []);
 
   const pendingBatches = batches.filter(
-    (batch) =>
-      batch.status === "ready" || batch.status === "preparing",
+    (batch) => batch.status === "ready" || batch.status === "preparing",
   );
 
   const completedBatches = batches.filter(
@@ -218,8 +242,8 @@ function BatchCard({
           </p>
 
           <p className="mt-1 text-sm leading-6 text-slate-500">
-            {batch.emails_found} emails found from{" "}
-            {batch.restaurants_processed} restaurants
+            {batch.emails_found} emails found from {batch.restaurants_processed}{" "}
+            restaurants
             {batch.city ? ` · ${formatCity(batch.city)}` : ""}
           </p>
 
@@ -287,11 +311,7 @@ function BatchCard({
   );
 }
 
-function StatusBadge({
-  status,
-}: {
-  status: AutomationBatch["status"];
-}) {
+function StatusBadge({ status }: { status: AutomationBatch["status"] }) {
   const labels = {
     preparing: "Preparing",
     ready: "Ready",
@@ -327,10 +347,7 @@ function formatCity(city: string) {
   return city
     .trim()
     .split(/\s+/)
-    .map(
-      (word) =>
-        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-    )
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(" ");
 }
 
@@ -358,10 +375,7 @@ function LoadingState() {
   return (
     <div className="max-w-4xl space-y-4">
       {Array.from({ length: 3 }).map((_, index) => (
-        <div
-          key={index}
-          className="h-40 animate-pulse rounded-xl bg-white"
-        />
+        <div key={index} className="h-40 animate-pulse rounded-xl bg-white" />
       ))}
     </div>
   );
