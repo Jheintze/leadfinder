@@ -218,10 +218,14 @@ function BatchCard({
   batch,
   isReviewing,
   onToggleReview,
+  onSendAll,
+  isSending,
 }: {
   batch: AutomationBatch;
   isReviewing: boolean;
   onToggleReview: () => void;
+  onSendAll: () => void;
+  isSending: boolean;
 }) {
   const isReady = batch.status === "ready";
   const isPreparing = batch.status === "preparing";
@@ -269,10 +273,12 @@ function BatchCard({
             </button>
 
             <button
-              onClick={() => handleSendAll(batch.id)}
-              disabled={sendingBatchId === batch.id}
+              type="button"
+              onClick={onSendAll}
+              disabled={isSending}
+              className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {sendingBatchId === batch.id ? "Sending..." : "Send all"}
+              {isSending ? "Sending..." : "Send all"}
             </button>
           </div>
         )}
