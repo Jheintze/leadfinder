@@ -37,6 +37,7 @@ export default function AutomationPage() {
   const [batches, setBatches] = useState<AutomationBatch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [sendingBatchId, setSendingBatchId] = useState<string | null>(null);
   const [reviewingBatchId, setReviewingBatchId] = useState<string | null>(
     null,
   );
