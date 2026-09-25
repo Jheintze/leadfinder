@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import { prepareAutomationBatch } from "@/lib/automation";
+import { requireUser } from "@/lib/auth";
 
 export async function POST() {
+  
   try {
+    await requireUser();
     const batch = await prepareAutomationBatch();
 
     return NextResponse.json({
