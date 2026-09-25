@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-
 import { prepareAutomationBatch } from "@/lib/automation";
 
 export async function POST() {
