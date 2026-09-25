@@ -5,8 +5,9 @@ export async function proxy(request: NextRequest) {
   const { user, response } = await updateSession(request);
 
   const isLoginPage = request.nextUrl.pathname === "/login";
+  const isApiRoute = request.nextUrl.pathname.startsWith("/api/");
 
-  if (!user && !isLoginPage) {
+  if (!user && !isLoginPage && !isApiRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
 
