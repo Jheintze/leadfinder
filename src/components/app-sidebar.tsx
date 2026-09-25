@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 type AppSidebarProps = {
-  activePage: "dashboard" | "restaurant-search" | "email-finder" | "outreach" | "agent";
+  activePage: "dashboard" | "restaurant-search" | "email-finder" | "outreach" | "agent" | "automation";
 };
 
  export const navigationItems = [
