@@ -265,12 +265,10 @@ function BatchCard({
             </button>
 
             <button
-              type="button"
-              disabled
-              title="Sending will be connected after the review flow is finalized."
-              className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white opacity-50"
+              onClick={() => handleSendAll(batch.id)}
+              disabled={sendingBatchId === batch.id}
             >
-              Send all
+              {sendingBatchId === batch.id ? "Sending..." : "Send all"}
             </button>
           </div>
         )}
