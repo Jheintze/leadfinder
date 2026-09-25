@@ -163,6 +163,8 @@ export default function AutomationPage() {
                             current === batch.id ? null : batch.id,
                           )
                         }
+                        onSendAll={() => handleSendAll(batch.id)}
+                        isSending={sendingBatchId === batch.id}
                       />
                     ))}
                   </div>
@@ -197,6 +199,8 @@ export default function AutomationPage() {
                             current === batch.id ? null : batch.id,
                           )
                         }
+                        onSendAll={() => handleSendAll(batch.id)}
+                        isSending={sendingBatchId === batch.id}
                       />
                     ))}
                   </div>
