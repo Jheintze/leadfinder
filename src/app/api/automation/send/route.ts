@@ -6,27 +6,14 @@ import {
   sendOutreachEmail,
 } from "@/lib/outreach-server";
 import { withAuth } from "@/lib/auth";
-
-const EMAIL_SUBJECT = "A quick idea for {restaurant_name}";
-
-const EMAIL_BODY = `Hi {restaurant_name},
-
-I’m building DishBoost, a tool that helps restaurants turn their food photos into social media content.
-
-I’d love to give you a free trial and get your feedback.
-
-Best,
-Jakob`;
+import { OUTREACH_SUBJECT, OUTREACH_BODY } from "@/lib/outreach-template";
 
 export const POST = withAuth(async (request) => {
   try {
     const { batchId } = await request.json();
 
     if (!batchId) {
-      return NextResponse.json(
-        { error: "Missing batchId." },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Missing batchId." }, { status: 400 });
     }
 
     const { data: batch, error: batchError } = await supabaseAdmin
@@ -49,8 +36,8 @@ export const POST = withAuth(async (request) => {
     const restaurants = await getRestaurantsForOutreach(batch.restaurant_ids);
 
     const drafts = generateOutreachDrafts(restaurants, {
-      subject: EMAIL_SUBJECT,
-      body: EMAIL_BODY,
+      subject: OUTREACH_SUBJECT,
+      body: OUTREACH_BODY,
     });
 
     for (const draft of drafts) {

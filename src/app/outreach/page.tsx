@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AppSidebar } from "../../components/app-sidebar";
 import { MobileHeader } from "../../components/mobile-header";
+import { OUTREACH_SUBJECT, OUTREACH_BODY } from "@/lib/outreach-template";
 
 type Restaurant = {
   id: string;
@@ -30,16 +31,8 @@ export default function OutreachPage() {
     [],
   );
 
-  const [subject, setSubject] = useState("A quick idea for {restaurant_name}");
-
-  const [body, setBody] = useState(`Hi {restaurant_name},
-
-I’m building DishBoost, a tool that helps restaurants turn their food photos into social media content.
-
-I’d love to give you a free trial and get your feedback.
-
-Best,
-Jakob`);
+  const [subject, setSubject] = useState(OUTREACH_SUBJECT);
+  const [body, setBody] = useState(OUTREACH_BODY);
 
   useEffect(() => {
     async function loadRestaurants() {

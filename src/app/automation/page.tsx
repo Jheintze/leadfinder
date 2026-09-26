@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import { AppSidebar } from "../../components/app-sidebar";
 import { MobileHeader } from "../../components/mobile-header";
+import {
+  OUTREACH_SUBJECT,
+  OUTREACH_BODY,
+} from "@/lib/outreach-template";
 
 type AutomationBatch = {
   id: string;
@@ -21,17 +25,6 @@ type AutomationBatch = {
 type AutomationResponse = {
   batches: AutomationBatch[];
 };
-
-const EMAIL_SUBJECT = "A quick idea for {restaurant_name}";
-
-const EMAIL_BODY = `Hi {restaurant_name},
-
-I’m building DishBoost, a tool that helps restaurants turn their food photos into social media content.
-
-I’d love to give you a free trial and get your feedback.
-
-Best,
-Jakob`;
 
 export default function AutomationPage() {
   const [batches, setBatches] = useState<AutomationBatch[]>([]);
@@ -289,7 +282,7 @@ function BatchCard({
           </p>
 
           <p className="mt-1 text-sm font-medium text-slate-800">
-            {EMAIL_SUBJECT}
+            {OUTREACH_SUBJECT}
           </p>
 
           <p className="mt-4 text-xs font-medium uppercase tracking-wide text-slate-400">
@@ -297,7 +290,7 @@ function BatchCard({
           </p>
 
           <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700">
-            {EMAIL_BODY}
+            {OUTREACH_BODY}
           </p>
         </div>
       )}
