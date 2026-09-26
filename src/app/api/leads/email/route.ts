@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import { withAuth } from "@/lib/auth";
 import { findAndSaveEmails } from "@/lib/email-finder";
 
-export async function POST(request: Request) {
+export const POST = withAuth(async (request) => {
   let body: { limit?: unknown };
 
   try {
@@ -39,4 +40,4 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ error: message }, { status: 502 });
   }
-}
+});
