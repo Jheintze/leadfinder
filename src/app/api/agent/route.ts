@@ -3,12 +3,13 @@ import { NextResponse } from "next/server";
 import { searchAndSaveRestaurants } from "@/lib/restaurant-search";
 import { findAndSaveEmails } from "@/lib/email-finder";
 import { getRestaurantsForOutreach } from "@/lib/outreach-server";
+import { withAuth } from "@/lib/auth";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function POST(request: Request) {
+export const POST = withAuth(async (request) => {
   const { task } = await request.json();
   let preparedOutreach = null;
 
@@ -311,4 +312,4 @@ Jakob`,
       });
     }
   }
-}
+});
