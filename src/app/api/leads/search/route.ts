@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { withAuth } from "@/lib/auth";
 import { searchAndSaveRestaurants } from "@/lib/restaurant-search";
 
 type SearchRequest = {
@@ -7,7 +8,7 @@ type SearchRequest = {
   limit?: unknown;
 };
 
-export async function POST(request: Request) {
+export const POST = withAuth(async (request) => {
   let body: SearchRequest;
 
   try {
@@ -65,4 +66,4 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ error: message }, { status: 502 });
   }
-}
+});
