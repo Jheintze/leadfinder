@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-
 import { createClient } from "@/lib/supabase/server";
 
 export class UnauthorizedError extends Error {
@@ -24,13 +23,13 @@ export async function requireUser() {
 }
 
 export function withAuth(
-  handler: () => Promise<NextResponse>,
+  handler: (request: Request) => Promise<NextResponse>,
 ) {
-  return async () => {
+  return async (request: Request) => {
     try {
       await requireUser();
 
-      return await handler();
+      return await handler(request);
     } catch (error) {
       if (error instanceof UnauthorizedError) {
         return NextResponse.json(
