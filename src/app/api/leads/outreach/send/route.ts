@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import { withAuth } from "@/lib/auth";
 import { sendOutreachEmail } from "@/lib/outreach-server";
 
-export async function POST(request: Request) {
+export const POST = withAuth(async (request) => {
   try {
     const { restaurantId, to, subject, body } = await request.json();
 
@@ -30,4 +31,4 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ error: message }, { status: 500 });
   }
-}
+});

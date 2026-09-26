@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
+
+import { withAuth } from "@/lib/auth";
 import { getRestaurantsForOutreach } from "@/lib/outreach-server";
 
-export async function GET() {
+export const GET = withAuth(async () => {
   try {
     const restaurants = await getRestaurantsForOutreach();
 
@@ -18,4 +20,4 @@ export async function GET() {
 
     return NextResponse.json({ error: message }, { status: 500 });
   }
-}
+});
