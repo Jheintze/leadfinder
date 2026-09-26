@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { withAuth } from "@/lib/auth";
-import { getRestaurantsForOutreach } from "@/lib/outreach-server";
+import { getRestaurantsForOutreach } from "@/lib/outreach/outreach-server";
 
 export const GET = withAuth(async () => {
   try {

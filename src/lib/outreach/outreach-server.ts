@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { supabaseAdmin } from "@/lib/supabase/supabaseAdmin";
 import { google } from "googleapis";
 
 export async function getRestaurantsForOutreach(restaurantIds?: string[]) {
@@ -33,7 +33,6 @@ export async function sendOutreachEmail({
   subject: string;
   body: string;
 }) {
- 
   const { data: connection, error: connectionError } = await supabaseAdmin
     .from("gmail_connections")
     .select("email, refresh_token")
@@ -58,7 +57,7 @@ export async function sendOutreachEmail({
     version: "v1",
     auth: oauth2Client,
   });
-  
+
   const encodedSubject = `=?UTF-8?B?${Buffer.from(subject).toString("base64")}?=`;
 
   const message = [

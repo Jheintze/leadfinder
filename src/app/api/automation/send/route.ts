@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { generateOutreachDrafts } from "@/lib/outreach";
+import { supabaseAdmin } from "@/lib/supabase/supabaseAdmin";
+import { generateOutreachDrafts } from "@/lib/outreach/outreach";
 import {
   getRestaurantsForOutreach,
   sendOutreachEmail,
-} from "@/lib/outreach-server";
+} from "@/lib/outreach/outreach-server";
 import { withAuth } from "@/lib/auth";
-import { OUTREACH_SUBJECT, OUTREACH_BODY } from "@/lib/outreach-template";
+import {
+  OUTREACH_SUBJECT,
+  OUTREACH_BODY,
+} from "@/lib/outreach/outreach-template";
 
 export const POST = withAuth(async (request) => {
   try {

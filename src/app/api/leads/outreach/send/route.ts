@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth";
-import { sendOutreachEmail } from "@/lib/outreach-server";
+import { sendOutreachEmail } from "@/lib/outreach/outreach-server";
 
 export const POST = withAuth(async (request) => {
   try {

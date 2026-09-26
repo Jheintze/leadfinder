@@ -1,10 +1,13 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
-import { searchAndSaveRestaurants } from "@/lib/restaurant-search";
-import { findAndSaveEmails } from "@/lib/email-finder";
-import { getRestaurantsForOutreach } from "@/lib/outreach-server";
+import { searchAndSaveRestaurants } from "@/lib/restaurant-search/restaurant-search";
+import { findAndSaveEmails } from "@/lib/email-search/email-finder";
+import { getRestaurantsForOutreach } from "@/lib/outreach/outreach-server";
 import { withAuth } from "@/lib/auth";
-import { OUTREACH_SUBJECT, OUTREACH_BODY } from "@/lib/outreach-template";
+import {
+  OUTREACH_SUBJECT,
+  OUTREACH_BODY,
+} from "@/lib/outreach/outreach-template";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,

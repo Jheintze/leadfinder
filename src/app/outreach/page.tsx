@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import { AppSidebar } from "../../components/app-sidebar";
 import { MobileHeader } from "../../components/mobile-header";
-import { OUTREACH_SUBJECT, OUTREACH_BODY } from "@/lib/outreach-template";
+import {
+  OUTREACH_SUBJECT,
+  OUTREACH_BODY,
+} from "@/lib/outreach/outreach-template";
 
 type Restaurant = {
   id: string;

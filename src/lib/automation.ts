@@ -1,6 +1,6 @@
-import { findAndSaveEmails } from "@/lib/email-finder";
-import { searchAndSaveRestaurants } from "@/lib/restaurant-search";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { findAndSaveEmails } from "@/lib/email-search/email-finder";
+import { searchAndSaveRestaurants } from "@/lib/restaurant-search/restaurant-search";
+import { supabaseAdmin } from "@/lib/supabase/supabaseAdmin";
 
 const CITY = "Munich";
 const BUSINESS_TYPE = "restaurant";
@@ -37,10 +37,7 @@ export async function prepareAutomationBatch() {
     ) {
       const remainingRestaurants = MAX_RESTAURANTS - restaurantsProcessed;
 
-      const searchLimit = Math.min(
-        SEARCH_BATCH_SIZE,
-        remainingRestaurants,
-      );
+      const searchLimit = Math.min(SEARCH_BATCH_SIZE, remainingRestaurants);
 
       const restaurants = await searchAndSaveRestaurants({
         city: CITY,

@@ -1,5 +1,5 @@
-import { searchLeads } from "@/lib/lead-search";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { searchLeads } from "@/lib/restaurant-search/lead-search";
+import { supabaseAdmin } from "@/lib/supabase/supabaseAdmin";
 
 type SearchAndSaveInput = {
   city: string;

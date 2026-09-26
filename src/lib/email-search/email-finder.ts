@@ -1,5 +1,5 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { isValidEmail } from "@/lib/email-validation";
+import { supabaseAdmin } from "@/lib/supabase/supabaseAdmin";
+import { isValidEmail } from "@/lib/email-search/email-validation";
 
 export type EmailFinderResult = {
   email: string | null;
@@ -134,7 +134,7 @@ export async function findEmailFromPage(url: string): Promise<string | null> {
     }
 
     const html = await response.text();
-    
+
     const matches = html.match(EMAIL_REGEX);
 
     if (!matches) {

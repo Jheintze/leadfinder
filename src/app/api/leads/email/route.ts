@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth";
-import { findAndSaveEmails } from "@/lib/email-finder";
+import { findAndSaveEmails } from "@/lib/email-search/email-finder";
 
 export const POST = withAuth(async (request) => {
   let body: { limit?: unknown };

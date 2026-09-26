@@ -6,7 +6,7 @@ import { MobileHeader } from "../../components/mobile-header";
 import {
   OUTREACH_SUBJECT,
   OUTREACH_BODY,
-} from "@/lib/outreach-template";
+} from "@/lib/outreach/outreach-template";
 
 type AutomationBatch = {
   id: string;

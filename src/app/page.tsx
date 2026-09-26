@@ -1,6 +1,6 @@
 import { AppSidebar } from "../components/app-sidebar";
 import { MobileHeader } from "../components/mobile-header";
-import { supabase } from "../lib/supabase";
+import { supabase } from "../lib/supabase/supabase";
 
 export default async function DashboardPage() {
   const { data: restaurants, error } = await supabase

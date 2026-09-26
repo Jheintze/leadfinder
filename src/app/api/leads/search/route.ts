@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth";
-import { searchAndSaveRestaurants } from "@/lib/restaurant-search";
+import { searchAndSaveRestaurants } from "@/lib/restaurant-search/restaurant-search";
 
 type SearchRequest = {
   city?: unknown;
