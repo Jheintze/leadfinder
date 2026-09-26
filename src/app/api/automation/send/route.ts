@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { generateOutreachDrafts } from "@/lib/outreach";
 import {
   getRestaurantsForOutreach,
   sendOutreachEmail,
 } from "@/lib/outreach-server";
+import { withAuth } from "@/lib/auth";
 
 const EMAIL_SUBJECT = "A quick idea for {restaurant_name}";
 
@@ -18,7 +18,7 @@ I’d love to give you a free trial and get your feedback.
 Best,
 Jakob`;
 
-export async function POST(request: Request) {
+export const POST = withAuth(async (request) => {
   try {
     const { batchId } = await request.json();
 
@@ -91,4 +91,4 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   }
-}
+});
