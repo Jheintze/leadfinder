@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import { prepareAutomationBatch } from "@/lib/automation";
-import { requireUser } from "@/lib/auth";
+import { withAuth } from "@/lib/auth";
 
-export async function POST() {
+export const POST = withAuth(async () => {
   try {
-    await requireUser();
     const batch = await prepareAutomationBatch();
 
     return NextResponse.json({
@@ -13,10 +12,6 @@ export async function POST() {
     });
   } catch (error) {
     console.error("[AUTOMATION RUN]", error);
-
-    if (error instanceof Error && error.message === "Unauthorized") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
 
     return NextResponse.json(
       {
@@ -28,4 +23,4 @@ export async function POST() {
       { status: 500 },
     );
   }
-}
+});
