@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import { withAuth } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
-export async function GET() {
+export const GET = withAuth(async () => {
   try {
     const { data: batches, error } = await supabaseAdmin
       .from("automation_batches")
@@ -28,4 +29,4 @@ export async function GET() {
       { status: 500 },
     );
   }
-}
+});
