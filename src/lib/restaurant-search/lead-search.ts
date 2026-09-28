@@ -298,12 +298,21 @@ export async function searchLeads({
   if (trimmedCuisine) {
     params.set("q", trimmedCuisine);
   }
-  const response = await fetch(`${OPEN_PLACES_ENDPOINT}?${params.toString()}`, {
-    headers: {
-      Authorization: `Bearer ${OPEN_PLACES_API_KEY}`,
-    },
-    cache: "no-store",
-  });
+
+  let response: Response;
+
+  try {
+    response = await fetch(`${OPEN_PLACES_ENDPOINT}?${params.toString()}`, {
+      headers: {
+        Authorization: `Bearer ${OPEN_PLACES_API_KEY}`,
+      },
+      cache: "no-store",
+    });
+  } catch {
+    throw new Error(
+      "Could not reach the restaurant search service. Please try again.",
+    );
+  }
 
   if (!response.ok) {
     const errorText = await response.text();
