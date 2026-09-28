@@ -236,13 +236,6 @@ export const POST = withAuth(async (request) => {
       let toolOutput: unknown;
 
       if (toolCall.name === "search_restaurants") {
-        console.log(
-          "[AGENT] search_restaurants:",
-          toolArguments.city,
-          toolArguments.cuisine,
-          "limit:",
-          toolArguments.limit,
-        );
 
         const restaurants = await searchAndSaveRestaurants({
           city: toolArguments.city,
@@ -256,13 +249,7 @@ export const POST = withAuth(async (request) => {
       }
 
       if (toolCall.name === "find_emails") {
-        console.log(
-          "[AGENT] find_emails:",
-          "limit:",
-          toolArguments.limit,
-          "restaurantIds:",
-          toolArguments.restaurantIds,
-        );
+       
         const results = await findAndSaveEmails({
           limit: toolArguments.limit,
           restaurantIds: toolArguments.restaurantIds ?? undefined,
