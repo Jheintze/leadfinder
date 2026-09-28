@@ -266,7 +266,7 @@ export default function OutreachPage() {
 
           {/* Restaurant selection */}
           <section className="mt-8 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            <div className="flex items-end justify-between gap-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
               <div>
                 <h2 className="text-lg font-semibold tracking-tight">
                   Select restaurants
@@ -277,7 +277,7 @@ export default function OutreachPage() {
                   email.
                 </p>
               </div>
-              <div className="flex shrink-0 items-center gap-3">
+              <div className="flex items-center gap-3">
                 <label className="flex cursor-pointer items-center gap-2 text-xs font-medium text-slate-600">
                   <input
                     type="checkbox"
