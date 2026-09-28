@@ -115,12 +115,18 @@ async function getLocationCoordinates(
     polygon_geojson: "1",
   });
 
-  const response = await fetch(`${NOMINATIM_ENDPOINT}?${params.toString()}`, {
-    headers: {
-      "User-Agent": "LeadFinder/1.0 (restaurant lead generation MVP)",
-    },
-    cache: "no-store",
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(`${NOMINATIM_ENDPOINT}?${params.toString()}`, {
+      headers: {
+        "User-Agent": "LeadFinder/1.0 (restaurant lead generation MVP)",
+      },
+      cache: "no-store",
+    });
+  } catch {
+    throw new Error("Could not reach the location service. Please try again.");
+  }
 
   if (!response.ok) {
     const errorText = await response.text();
