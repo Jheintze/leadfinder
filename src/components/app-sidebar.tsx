@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoutButton } from "./logout-button";
 
 type AppSidebarProps = {
   activePage:
@@ -68,11 +69,14 @@ export function AppSidebar({ activePage }: AppSidebarProps) {
           </Link>
         ))}
       </nav>
-      <p className="mt-auto px-2 text-xs leading-5 text-slate-400">
-        DishBoost internal tools
-        <br />
-        Lead research workspace
-      </p>
+      <div className="mt-auto">
+        <p className="px-2 text-xs leading-5 text-slate-400">
+          DishBoost internal tools
+          <br />
+          Lead research workspace
+        </p>
+        <LogoutButton />
+      </div>
     </aside>
   );
 }
