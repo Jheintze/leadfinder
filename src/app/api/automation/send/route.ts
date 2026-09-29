@@ -43,30 +43,47 @@ export const POST = withAuth(async (request) => {
       body: OUTREACH_BODY,
     });
 
+    const failed: string[] = [];
+    let sent = 0;
+
     for (const draft of drafts) {
-      await sendOutreachEmail({
-        restaurantId: draft.restaurantId,
-        to: "dr.nick@gmx.net",
-        subject: draft.subject,
-        body: draft.body,
-      });
+      try {
+        await sendOutreachEmail({
+          restaurantId: draft.restaurantId,
+          to: "dr.nick@gmx.net",
+          subject: draft.subject,
+          body: draft.body,
+        });
+
+        sent++;
+      } catch (error) {
+        console.error(
+          `[AUTOMATION SEND] Failed to send to ${draft.restaurantId}:`,
+          error,
+        );
+
+        failed.push(draft.restaurantId);
+      }
     }
 
-    const { error: updateError } = await supabaseAdmin
-      .from("automation_batches")
-      .update({
-        status: "sent",
-        sent_at: new Date().toISOString(),
-      })
-      .eq("id", batchId);
+    if (failed.length === 0) {
+      const { error: updateError } = await supabaseAdmin
+        .from("automation_batches")
+        .update({
+          status: "sent",
+          sent_at: new Date().toISOString(),
+        })
+        .eq("id", batchId);
 
-    if (updateError) {
-      throw updateError;
+      if (updateError) {
+        throw updateError;
+      }
     }
 
     return NextResponse.json({
-      success: true,
-      sent: drafts.length,
+      success: failed.length === 0,
+      sent,
+      failed: failed.length,
     });
   } catch (error) {
     console.error("[AUTOMATION SEND]", error);
