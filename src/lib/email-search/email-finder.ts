@@ -53,35 +53,51 @@ export async function findAndSaveEmails({
     throw fetchError;
   }
 
-  const results = await Promise.all(
-    (restaurants ?? [])
-      .filter((restaurant) => restaurant.website)
-      .map(async (restaurant) => {
-        const { email } = await findEmailFromWebsite(restaurant.website!);
+  const results = (
+    await Promise.all(
+      (restaurants ?? [])
+        .filter((restaurant) => restaurant.website)
+        .map(async (restaurant) => {
+          try {
+            const { email } = await findEmailFromWebsite(restaurant.website!);
 
-        const updateData = {
-          email,
-          email_checked: true,
-        };
+            const updateData = {
+              email,
+              email_checked: true,
+            };
 
-        const { error: updateError } = await supabaseAdmin
-          .from("restaurants")
-          .update(updateData)
-          .eq("id", restaurant.id);
+            const { error: updateError } = await supabaseAdmin
+              .from("restaurants")
+              .update(updateData)
+              .eq("id", restaurant.id);
 
-        if (updateError) {
-          throw updateError;
-        }
+            if (updateError) {
+              console.error(
+                `Failed to save email result for restaurant ${restaurant.id}:`,
+                updateError,
+              );
+              return null;
+            }
 
-        return {
-          id: restaurant.id,
-          name: restaurant.name,
-          address: restaurant.address,
-          website: restaurant.website!,
-          email,
-        };
-      }),
-  );
+            return {
+              id: restaurant.id,
+              name: restaurant.name,
+              address: restaurant.address,
+              website: restaurant.website!,
+              email,
+            };
+          } catch (error) {
+            console.error(
+              `Email finder failed for restaurant ${restaurant.id}:`,
+              error,
+            );
+            return null;
+          }
+        }),
+    )
+  ).filter((result): result is SavedEmailResult => result !== null);
+
+  return results;
 
   return results;
 }
