@@ -207,18 +207,30 @@ export const POST = withAuth(async (request) => {
   ];
 
   while (true) {
-    const response = await openai.responses.create({
-      model: "gpt-4.1-mini",
-      instructions,
-      tools,
-      input: inputItems,
-    });
+    let response: OpenAI.Responses.Response;
+
+    try {
+      response = await openai.responses.create({
+        model: "gpt-4.1-mini",
+        instructions,
+        tools,
+        input: inputItems,
+      });
+    } catch (error) {
+      console.error("[AGENT] OpenAI request failed:", error);
+
+      const message =
+        error instanceof Error
+          ? error.message
+          : "The AI agent is temporarily unavailable.";
+
+      return NextResponse.json({ error: message }, { status: 502 });
+    }
 
     const toolCalls = response.output.filter(
       (item) => item.type === "function_call",
     );
 
-    // No more tools needed -> final answer.
     if (toolCalls.length === 0) {
       return NextResponse.json({
         message: response.output_text,
@@ -226,69 +238,70 @@ export const POST = withAuth(async (request) => {
       });
     }
 
-    // Add the model's tool calls to the conversation history.
     inputItems.push(...toolCalls);
 
-    // Execute every tool call from this response.
     for (const toolCall of toolCalls) {
-      const toolArguments = JSON.parse(toolCall.arguments);
-
       let toolOutput: unknown;
 
-      if (toolCall.name === "search_restaurants") {
+      try {
+        const toolArguments = JSON.parse(toolCall.arguments);
 
-        const restaurants = await searchAndSaveRestaurants({
-          city: toolArguments.city,
-          area: toolArguments.area ?? undefined,
-          businessType: toolArguments.businessType,
-          cuisine: toolArguments.cuisine ?? undefined,
-          limit: toolArguments.limit,
-        });
+        if (toolCall.name === "search_restaurants") {
+          const restaurants = await searchAndSaveRestaurants({
+            city: toolArguments.city,
+            area: toolArguments.area ?? undefined,
+            businessType: toolArguments.businessType,
+            cuisine: toolArguments.cuisine ?? undefined,
+            limit: toolArguments.limit,
+          });
 
-        toolOutput = restaurants;
-      }
+          toolOutput = restaurants;
+        } else if (toolCall.name === "find_emails") {
+          const results = await findAndSaveEmails({
+            limit: toolArguments.limit,
+            restaurantIds: toolArguments.restaurantIds ?? undefined,
+          });
 
-      if (toolCall.name === "find_emails") {
-       
-        const results = await findAndSaveEmails({
-          limit: toolArguments.limit,
-          restaurantIds: toolArguments.restaurantIds ?? undefined,
-        });
+          const foundResults = results.filter((result) => result.email);
 
-        const foundResults = results.filter((result) => result.email);
+          toolOutput = {
+            requested: toolArguments.limit,
+            found: foundResults.length,
+            needs_more: foundResults.length < toolArguments.limit,
+            results: foundResults,
+          };
+        } else if (toolCall.name === "generate_outreach") {
+          const restaurants = await getRestaurantsForOutreach(
+            toolArguments.restaurantIds,
+          );
+
+          const template = {
+            subject: OUTREACH_SUBJECT,
+            body: OUTREACH_BODY,
+          };
+
+          preparedOutreach = {
+            restaurants: restaurants.map((restaurant) => ({
+              id: restaurant.id,
+              name: restaurant.name,
+            })),
+            restaurantCount: restaurants.length,
+            template,
+          };
+
+          toolOutput = preparedOutreach;
+        } else {
+          throw new Error(`Unknown tool: ${toolCall.name}`);
+        }
+      } catch (error) {
+        console.error(`[AGENT] Tool "${toolCall.name}" failed:`, error);
 
         toolOutput = {
-          requested: toolArguments.limit,
-          found: foundResults.length,
-          needs_more: foundResults.length < toolArguments.limit,
-          results: foundResults,
+          error:
+            error instanceof Error ? error.message : "Tool execution failed.",
         };
       }
 
-      if (toolCall.name === "generate_outreach") {
-        const restaurants = await getRestaurantsForOutreach(
-          toolArguments.restaurantIds,
-        );
-
-        const template = {
-          subject: OUTREACH_SUBJECT,
-          body: OUTREACH_BODY,
-        };
-
-        preparedOutreach = {
-          restaurants: restaurants.map((restaurant) => ({
-            id: restaurant.id,
-            name: restaurant.name,
-          })),
-          restaurantCount: restaurants.length,
-          template,
-        };
-
-        toolOutput = preparedOutreach;
-      }
-
-      // Give the result back to the model using the EXACT call_id
-      // from the corresponding function call.
       inputItems.push({
         type: "function_call_output",
         call_id: toolCall.call_id,
