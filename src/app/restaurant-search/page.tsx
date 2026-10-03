@@ -7,10 +7,13 @@ import { MobileHeader } from "../../components/mobile-header";
 
 type Lead = {
   id: string;
-  businessName: string;
+  source_id: string;
+  name: string;
+  address: string | null;
   website: string | null;
   email: string | null;
-  location: string;
+  city: string;
+  cuisine: string;
 };
 
 type SearchResponse = {
@@ -227,7 +230,7 @@ function ResultsTable({ leads }: { leads: Lead[] }) {
             {leads.map((lead) => (
               <tr key={lead.id} className="hover:bg-slate-50/70">
                 <td className="px-5 py-4 font-medium text-slate-800">
-                  {lead.businessName}
+                  {lead.name}
                 </td>
                 <td className="px-5 py-4">
                   {lead.website ? (
@@ -255,7 +258,9 @@ function ResultsTable({ leads }: { leads: Lead[] }) {
                     <span className="text-slate-400">Not available</span>
                   )}
                 </td>
-                <td className="px-5 py-4 text-slate-600">{lead.location}</td>
+                <td className="px-5 py-4 text-slate-600">
+                  {lead.address || "Not available"}
+                </td>
                 <td
                   className="max-w-44 truncate px-5 py-4 font-mono text-xs text-slate-500"
                   title={lead.id}
