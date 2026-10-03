@@ -1,6 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase/supabaseAdmin";
 
-export type LeadStatus = "Website found" | "Website missing";
+
 
 export type Lead = {
   id: string;
@@ -8,7 +8,6 @@ export type Lead = {
   website: string | null;
   email: string | null;
   location: string;
-  status: LeadStatus;
 };
 
 export type LeadSearchInput = {
@@ -343,7 +342,6 @@ export async function searchLeads({
       website,
       email: null,
       location: formatAddress(place.address) || trimmedCity,
-      status: website ? "Website found" : "Website missing",
     });
   }
 
