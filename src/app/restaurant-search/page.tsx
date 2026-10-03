@@ -216,14 +216,13 @@ function ResultsTable({ leads }: { leads: Lead[] }) {
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-190 text-left text-sm">
+        <table className="w-full text-left text-sm">
           <thead className="border-b border-slate-200 bg-slate-50 text-xs font-medium uppercase tracking-wide text-slate-500">
             <tr>
               <th className="px-5 py-3.5">Business</th>
               <th className="px-5 py-3.5">Website</th>
               <th className="px-5 py-3.5">Email</th>
               <th className="px-5 py-3.5">Location</th>
-              <th className="px-5 py-3.5">Place ID</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -260,12 +259,6 @@ function ResultsTable({ leads }: { leads: Lead[] }) {
                 </td>
                 <td className="px-5 py-4 text-slate-600">
                   {lead.address || "Not available"}
-                </td>
-                <td
-                  className="max-w-44 truncate px-5 py-4 font-mono text-xs text-slate-500"
-                  title={lead.id}
-                >
-                  {lead.id}
                 </td>
               </tr>
             ))}
