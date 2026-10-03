@@ -11,7 +11,6 @@ type Lead = {
   website: string | null;
   email: string | null;
   location: string;
-  status: "Website found" | "Website missing";
 };
 
 type SearchResponse = {
@@ -214,7 +213,7 @@ function ResultsTable({ leads }: { leads: Lead[] }) {
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[760px] text-left text-sm">
+        <table className="w-full min-w-190 text-left text-sm">
           <thead className="border-b border-slate-200 bg-slate-50 text-xs font-medium uppercase tracking-wide text-slate-500">
             <tr>
               <th className="px-5 py-3.5">Business</th>
@@ -222,7 +221,6 @@ function ResultsTable({ leads }: { leads: Lead[] }) {
               <th className="px-5 py-3.5">Email</th>
               <th className="px-5 py-3.5">Location</th>
               <th className="px-5 py-3.5">Place ID</th>
-              <th className="px-5 py-3.5">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -263,15 +261,6 @@ function ResultsTable({ leads }: { leads: Lead[] }) {
                   title={lead.id}
                 >
                   {lead.id}
-                </td>
-                <td className="px-5 py-4">
-                  <span
-                    className={
-                      lead.status === "Website found" ? "status-ready" : "status-review"
-                    }
-                  >
-                    {lead.status}
-                  </span>
                 </td>
               </tr>
             ))}
