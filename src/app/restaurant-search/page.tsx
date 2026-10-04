@@ -30,6 +30,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
+  const [showAllMobile, setShowAllMobile] = useState(false);
   const [lastQuery, setLastQuery] = useState<SearchResponse["query"] | null>(
     null,
   );
@@ -60,7 +61,8 @@ export default function Home() {
       if (!response.ok) {
         throw new Error(data.error || "We could not find leads right now.");
       }
-
+      
+      setShowAllMobile(false);
       setLeads(data.leads);
       setLastQuery(data.query);
     } catch (caughtError) {
