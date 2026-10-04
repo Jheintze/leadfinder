@@ -30,7 +30,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
-  const [showAllMobile, setShowAllMobile] = useState(false);
+  const [showAllResults, setShowAllResults] = useState(false);
   const [lastQuery, setLastQuery] = useState<SearchResponse["query"] | null>(
     null,
   );
@@ -62,7 +62,7 @@ export default function Home() {
         throw new Error(data.error || "We could not find leads right now.");
       }
 
-      setShowAllMobile(false);
+      setShowAllResults(false);
       setLeads(data.leads);
       setLastQuery(data.query);
     } catch (caughtError) {
@@ -181,29 +181,29 @@ export default function Home() {
               <LoadingState count={limit} />
             ) : leads.length > 0 ? (
               <>
-                {/* Desktop */}
                 <div className="hidden sm:block">
-                  <ResultsTable leads={leads} />
+                  <ResultsTable
+                    leads={showAllResults ? leads : leads.slice(0, 10)}
+                  />
                 </div>
 
-                {/* Mobile */}
                 <div className="sm:hidden">
                   <ResultsMobileList
-                    leads={showAllMobile ? leads : leads.slice(0, 10)}
+                    leads={showAllResults ? leads : leads.slice(0, 10)}
                   />
-
-                  {leads.length > 10 && (
-                    <button
-                      type="button"
-                      onClick={() => setShowAllMobile((value) => !value)}
-                      className="mt-3 w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                    >
-                      {showAllMobile
-                        ? "Show fewer"
-                        : `Show all ${leads.length} results`}
-                    </button>
-                  )}
                 </div>
+
+                {leads.length > 10 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllResults((value) => !value)}
+                    className="mt-3 w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                  >
+                    {showAllResults
+                      ? "Show fewer"
+                      : `Show all ${leads.length} results`}
+                  </button>
+                )}
               </>
             ) : (
               <EmptyState hasSearched={hasSearched} />
