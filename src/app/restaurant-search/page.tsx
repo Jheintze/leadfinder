@@ -220,7 +220,7 @@ function ResultsTable({ leads }: { leads: Lead[] }) {
             <tr>
               <th className="px-5 py-3.5">Business</th>
               <th className="px-5 py-3.5">Website</th>
-              <th className="px-5 py-3.5">Location</th>
+              <th className="px-5 py-3.5">Address</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
