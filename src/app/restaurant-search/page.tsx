@@ -279,6 +279,37 @@ function ResultsTable({ leads }: { leads: Lead[] }) {
   );
 }
 
+function ResultsMobileList({ leads }: { leads: Lead[] }) {
+  return (
+    <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white shadow-sm">
+      {leads.map((lead) => (
+        <div key={lead.id} className="px-4 py-4">
+          <p className="font-medium text-slate-900">{lead.name}</p>
+
+          <p className="mt-1 text-sm text-slate-500">
+            {lead.address || "Address not available"}
+          </p>
+
+          {lead.website ? (
+            <a
+              href={lead.website}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-2 block truncate text-sm text-blue-600 hover:underline"
+            >
+              {lead.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+            </a>
+          ) : (
+            <span className="mt-2 block text-sm text-slate-400">
+              Website not available
+            </span>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function LoadingState({ count }: { count: number }) {
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
