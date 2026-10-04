@@ -61,7 +61,7 @@ export default function Home() {
       if (!response.ok) {
         throw new Error(data.error || "We could not find leads right now.");
       }
-      
+
       setShowAllMobile(false);
       setLeads(data.leads);
       setLastQuery(data.query);
@@ -82,9 +82,7 @@ export default function Home() {
       <div className="mx-auto flex min-h-screen max-w-[1600px]">
         <AppSidebar activePage="restaurant-search" />
 
-        <section
-          className="min-w-0 flex-1 px-5 py-6 sm:px-8 lg:px-12 lg:py-10"
-        >
+        <section className="min-w-0 flex-1 px-5 py-6 sm:px-8 lg:px-12 lg:py-10">
           <MobileHeader />
           <div className="mb-8 mt-8 sm:mt-0">
             <p className="text-sm font-medium text-blue-600">Lead research</p>
@@ -182,7 +180,31 @@ export default function Home() {
             {isLoading ? (
               <LoadingState count={limit} />
             ) : leads.length > 0 ? (
-              <ResultsTable leads={leads} />
+              <>
+                {/* Desktop */}
+                <div className="hidden sm:block">
+                  <ResultsTable leads={leads} />
+                </div>
+
+                {/* Mobile */}
+                <div className="sm:hidden">
+                  <ResultsMobileList
+                    leads={showAllMobile ? leads : leads.slice(0, 10)}
+                  />
+
+                  {leads.length > 10 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAllMobile((value) => !value)}
+                      className="mt-3 w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                    >
+                      {showAllMobile
+                        ? "Show fewer"
+                        : `Show all ${leads.length} results`}
+                    </button>
+                  )}
+                </div>
+              </>
             ) : (
               <EmptyState hasSearched={hasSearched} />
             )}
