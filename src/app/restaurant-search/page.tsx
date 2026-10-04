@@ -11,7 +11,6 @@ type Lead = {
   name: string;
   address: string | null;
   website: string | null;
-  email: string | null;
   city: string;
   cuisine: string;
 };
@@ -221,7 +220,6 @@ function ResultsTable({ leads }: { leads: Lead[] }) {
             <tr>
               <th className="px-5 py-3.5">Business</th>
               <th className="px-5 py-3.5">Website</th>
-              <th className="px-5 py-3.5">Email</th>
               <th className="px-5 py-3.5">Location</th>
             </tr>
           </thead>
@@ -240,18 +238,6 @@ function ResultsTable({ leads }: { leads: Lead[] }) {
                       rel="noreferrer"
                     >
                       {lead.website.replace(/^https?:\/\//, "")}
-                    </a>
-                  ) : (
-                    <span className="text-slate-400">Not available</span>
-                  )}
-                </td>
-                <td className="px-5 py-4">
-                  {lead.email ? (
-                    <a
-                      className="text-blue-600 hover:text-blue-700 hover:underline"
-                      href={`mailto:${lead.email}`}
-                    >
-                      {lead.email}
                     </a>
                   ) : (
                     <span className="text-slate-400">Not available</span>
