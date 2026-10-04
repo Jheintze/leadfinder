@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { SubmitEvent } from "react";
 import { AppSidebar } from "../../components/app-sidebar";
 import { MobileHeader } from "../../components/mobile-header";
@@ -34,6 +34,7 @@ export default function Home() {
   const [lastQuery, setLastQuery] = useState<SearchResponse["query"] | null>(
     null,
   );
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -65,6 +66,12 @@ export default function Home() {
       setShowAllResults(false);
       setLeads(data.leads);
       setLastQuery(data.query);
+      requestAnimationFrame(() => {
+        resultsRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      });
     } catch (caughtError) {
       setLeads([]);
       setError(
@@ -176,38 +183,39 @@ export default function Home() {
                 </span>
               )}
             </div>
+            <div ref={resultsRef}>
+              {isLoading ? (
+                <LoadingState count={limit} />
+              ) : leads.length > 0 ? (
+                <>
+                  <div className="hidden sm:block">
+                    <ResultsTable
+                      leads={showAllResults ? leads : leads.slice(0, 10)}
+                    />
+                  </div>
 
-            {isLoading ? (
-              <LoadingState count={limit} />
-            ) : leads.length > 0 ? (
-              <>
-                <div className="hidden sm:block">
-                  <ResultsTable
-                    leads={showAllResults ? leads : leads.slice(0, 10)}
-                  />
-                </div>
+                  <div className="sm:hidden">
+                    <ResultsMobileList
+                      leads={showAllResults ? leads : leads.slice(0, 10)}
+                    />
+                  </div>
 
-                <div className="sm:hidden">
-                  <ResultsMobileList
-                    leads={showAllResults ? leads : leads.slice(0, 10)}
-                  />
-                </div>
-
-                {leads.length > 10 && (
-                  <button
-                    type="button"
-                    onClick={() => setShowAllResults((value) => !value)}
-                    className="mt-3 w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                  >
-                    {showAllResults
-                      ? "Show fewer"
-                      : `Show all ${leads.length} results`}
-                  </button>
-                )}
-              </>
-            ) : (
-              <EmptyState hasSearched={hasSearched} />
-            )}
+                  {leads.length > 10 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAllResults((value) => !value)}
+                      className="mt-3 w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                    >
+                      {showAllResults
+                        ? "Show fewer"
+                        : `Show all ${leads.length} results`}
+                    </button>
+                  )}
+                </>
+              ) : (
+                <EmptyState hasSearched={hasSearched} />
+              )}
+            </div>
           </section>
         </section>
       </div>
