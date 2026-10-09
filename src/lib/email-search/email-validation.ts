@@ -1,13 +1,25 @@
+
 export function isValidEmail(email: string): boolean {
   const normalizedEmail = email.toLowerCase().trim();
 
+  const invalidPatterns = [
+    "example.com",
+    "example.org",
+    "domain.com",
+    "ejemplo.com",
+    "beispielpostfach.de",
+    "sentry",
+  ];
+
   if (
-    normalizedEmail.includes("example.com") ||
-    normalizedEmail.includes("domain.com") ||
-    normalizedEmail.includes("ejemplo.com") ||
-    normalizedEmail.includes("sentry")
-    
+    invalidPatterns.some((pattern) =>
+      normalizedEmail.includes(pattern)
+    )
   ) {
+    return false;
+  }
+
+  if (normalizedEmail.length > 254) {
     return false;
   }
 
@@ -31,3 +43,4 @@ export function isValidEmail(email: string): boolean {
 
   return true;
 }
+
