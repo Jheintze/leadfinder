@@ -21,42 +21,36 @@ export default function AgentPage() {
       body: string;
     };
   } | null>(null);
-  
 
-async function handleRunAgent() {
-  setLoading(true);
-  setResponse("");
-  setOutreach(null);
+  async function handleRunAgent() {
+    setLoading(true);
+    setResponse("");
+    setOutreach(null);
 
-  try {
-    const res = await fetch("/api/agent", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ task }),
-    });
+    try {
+      const res = await fetch("/api/agent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ task }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      throw new Error(data.error ?? "Failed to run agent.");
+      if (!res.ok) {
+        throw new Error(data.error ?? "Failed to run agent.");
+      }
+
+      setResponse(data.message);
+      setOutreach(data.outreach);
+    } catch (error) {
+      console.error("Failed to run agent:", error);
+      setResponse("Could not connect to the server. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    setResponse(data.message);
-    setOutreach(data.outreach);
-  } catch (error) {
-    console.error("Failed to run agent:", error);
-
-    setResponse(
-      error instanceof Error
-        ? error.message
-        : "Something went wrong while running the agent.",
-    );
-  } finally {
-    setLoading(false);
   }
-}
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
