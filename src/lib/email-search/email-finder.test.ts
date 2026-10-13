@@ -28,4 +28,7 @@ describe("isValidEmail", () => {
   it("rejects Sentry addresses", () => {
     expect(isValidEmail("error@sentry.io")).toBe(false);
   });
+  it("rejects Sentry addresses", () => {
+    expect(isValidEmail("beispiel@beispielpostfach.de")).toBe(false);
+  });
 });
