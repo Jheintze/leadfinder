@@ -21,6 +21,42 @@ export default function AgentPage() {
       body: string;
     };
   } | null>(null);
+  
+
+async function handleRunAgent() {
+  setLoading(true);
+  setResponse("");
+  setOutreach(null);
+
+  try {
+    const res = await fetch("/api/agent", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ task }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error ?? "Failed to run agent.");
+    }
+
+    setResponse(data.message);
+    setOutreach(data.outreach);
+  } catch (error) {
+    console.error("Failed to run agent:", error);
+
+    setResponse(
+      error instanceof Error
+        ? error.message
+        : "Something went wrong while running the agent.",
+    );
+  } finally {
+    setLoading(false);
+  }
+}
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -62,23 +98,7 @@ export default function AgentPage() {
 
             <button
               type="button"
-              onClick={async () => {
-                setLoading(true);
-
-                const res = await fetch("/api/agent", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({ task }),
-                });
-
-                const data = await res.json();
-
-                setResponse(data.message);
-                setOutreach(data.outreach);
-                setLoading(false);
-              }}
+              onClick={handleRunAgent}
               disabled={loading}
               className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
