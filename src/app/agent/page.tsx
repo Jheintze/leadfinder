@@ -26,6 +26,7 @@ export default function AgentPage() {
     setLoading(true);
     setResponse("");
     setOutreach(null);
+    setSendMessage("");
 
     try {
       const res = await fetch("/api/agent", {
@@ -51,6 +52,118 @@ export default function AgentPage() {
       setLoading(false);
     }
   }
+
+  async function handleSendOutreach() {
+    if (!outreach) return;
+
+    setSendingOutreach(true);
+    setSendMessage("");
+
+    let successfulSends = 0;
+    let failedRestaurant: string | null = null;
+    let errorMessage = "";
+
+    // Capture the current batch so state changes don't affect this loop.
+    const batch = outreach;
+
+    try {
+      for (const restaurant of batch.restaurants) {
+        const subject = batch.template.subject.replaceAll(
+          "{restaurant_name}",
+          restaurant.name,
+        );
+
+        const body = batch.template.body.replaceAll(
+          "{restaurant_name}",
+          restaurant.name,
+        );
+
+        try {
+          const res = await fetch("/api/leads/outreach/send", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              restaurantId: restaurant.id,
+              to: "dr.nick@gmx.net",
+              subject,
+              body,
+            }),
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(data.error ?? "Could not send email.");
+          }
+
+          successfulSends++;
+        } catch (error) {
+          console.error(
+            `Failed to send outreach to ${restaurant.name}:`,
+            error,
+          );
+
+          failedRestaurant = restaurant.name;
+          errorMessage =
+            error instanceof Error
+              ? error.message
+              : "An unexpected error occurred.";
+
+          break;
+        }
+      }
+
+      if (successfulSends === batch.restaurants.length) {
+        setSendMessage(
+          `success:${successfulSends} ${
+            successfulSends === 1 ? "email was" : "emails were"
+          } sent successfully.`,
+        );
+        setOutreach(null);
+      } else if (successfulSends > 0) {
+        setSendMessage(
+          `partial:${successfulSends} of ${batch.restaurantCount} emails sent. Failed at ${failedRestaurant}. Remaining emails were not attempted. Error: ${errorMessage}`,
+        );
+
+        // Remove confirmed successes so they aren't retried from this preview.
+        const sentIds = new Set(
+          batch.restaurants
+            .slice(0, successfulSends)
+            .map((restaurant) => restaurant.id),
+        );
+
+        setOutreach((current) =>
+          current
+            ? {
+                ...current,
+                restaurants: current.restaurants.filter(
+                  (restaurant) => !sentIds.has(restaurant.id),
+                ),
+                restaurantCount: Math.max(
+                  0,
+                  current.restaurantCount - successfulSends,
+                ),
+              }
+            : null,
+        );
+      } else {
+        setSendMessage(
+          `error:No emails were confirmed sent. Failed at ${
+            failedRestaurant ?? "the first recipient"
+          }. Error: ${errorMessage}`,
+        );
+      }
+    } finally {
+      setSendingOutreach(false);
+    }
+  }
+
+  const notificationType = sendMessage.split(":")[0];
+  const notificationText = sendMessage.includes(":")
+    ? sendMessage.slice(sendMessage.indexOf(":") + 1)
+    : sendMessage;
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -93,11 +206,12 @@ export default function AgentPage() {
             <button
               type="button"
               onClick={handleRunAgent}
-              disabled={loading}
+              disabled={loading || !task.trim()}
               className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? "Running..." : "Run Agent"}
             </button>
+
             {response && (
               <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
                 <div className="whitespace-pre-line text-sm leading-6 text-slate-700">
@@ -108,84 +222,24 @@ export default function AgentPage() {
 
             {outreach && (
               <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-4">
                   <div>
                     <p className="text-sm font-semibold text-slate-800">
                       Outreach prepared
                     </p>
                     <p className="mt-1 text-xs text-slate-500">
                       {outreach.restaurantCount} recipient
-                      {outreach.restaurantCount === 1 ? "" : "s"}
+                      {outreach.restaurantCount === 1 ? "" : "s"} remaining
                     </p>
                   </div>
 
                   <button
                     type="button"
-                    disabled={sendingOutreach}
-                    onClick={async () => {
-                      if (!outreach) return;
-
-                      setSendingOutreach(true);
-                      setSendMessage("");
-
-                      let successfulSends = 0;
-
-                      try {
-                        for (const restaurant of outreach.restaurants) {
-                          const subject = outreach.template.subject.replaceAll(
-                            "{restaurant_name}",
-                            restaurant.name,
-                          );
-
-                          const body = outreach.template.body.replaceAll(
-                            "{restaurant_name}",
-                            restaurant.name,
-                          );
-
-                          const response = await fetch(
-                            "/api/leads/outreach/send",
-                            {
-                              method: "POST",
-                              headers: {
-                                "Content-Type": "application/json",
-                              },
-                              body: JSON.stringify({
-                                restaurantId: restaurant.id,
-                                to: "dr.nick@gmx.net",
-                                subject,
-                                body,
-                              }),
-                            },
-                          );
-
-                          const data = await response.json();
-
-                          if (!response.ok) {
-                            throw new Error(
-                              data.error ?? "Could not send email.",
-                            );
-                          }
-
-                          successfulSends++;
-                        }
-
-                        setSendMessage(
-                          `${successfulSends} ${
-                            successfulSends === 1 ? "email was" : "emails were"
-                          } sent successfully.`,
-                        );
-                        setOutreach(null);
-                      } catch (error) {
-                        console.error("Failed to send outreach:", error);
-
-                        setSendMessage(
-                          `${successfulSends} of ${outreach.restaurantCount} emails were sent successfully.`,
-                        );
-                      } finally {
-                        setSendingOutreach(false);
-                      }
-                    }}
-                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={
+                      sendingOutreach || outreach.restaurants.length === 0
+                    }
+                    onClick={handleSendOutreach}
+                    className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {sendingOutreach ? "Sending..." : "Send outreach"}
                   </button>
@@ -210,12 +264,29 @@ export default function AgentPage() {
                 </div>
               </div>
             )}
+
             {sendMessage && (
-              <div className="fixed bottom-6 right-6 z-50 rounded-lg border border-green-200 bg-white px-4 py-3 shadow-lg">
+              <div
+                role="status"
+                aria-live="polite"
+                className={`fixed bottom-6 right-6 z-50 max-w-md rounded-lg border bg-white px-4 py-3 shadow-lg ${
+                  notificationType === "success"
+                    ? "border-green-200"
+                    : notificationType === "partial"
+                      ? "border-amber-200"
+                      : "border-red-200"
+                }`}
+              >
                 <p className="text-sm font-medium text-slate-800">
-                  ✓ Outreach sent
+                  {notificationType === "success"
+                    ? "✓ Outreach sent"
+                    : notificationType === "partial"
+                      ? "⚠ Outreach partially sent"
+                      : "✕ Outreach failed"}
                 </p>
-                <p className="mt-0.5 text-xs text-slate-500">{sendMessage}</p>
+                <p className="mt-1 text-xs leading-5 text-slate-600">
+                  {notificationText}
+                </p>
               </div>
             )}
           </div>
