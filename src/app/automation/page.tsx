@@ -32,6 +32,10 @@ export default function AutomationPage() {
   const [error, setError] = useState("");
   const [sendingBatchId, setSendingBatchId] = useState<string | null>(null);
   const [reviewingBatchId, setReviewingBatchId] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<"success" | "partial" | "error">(
+    "success",
+  );
 
   async function handleSendAll(batchId: string) {
     setSendingBatchId(batchId);
@@ -52,9 +56,27 @@ export default function AutomationPage() {
       }
 
       await loadBatches();
+
+      if (data.success) {
+        setToastType("success");
+        setToastMessage(`Batch sent successfully. ${data.sent} emails sent.`);
+      } else if (data.sent > 0) {
+        setToastType("partial");
+        setToastMessage(
+          `Batch partially sent: ${data.sent} sent, ${data.failed} failed.`,
+        );
+      } else {
+        setToastType("error");
+        setToastMessage(
+          `Sending failed: 0 emails sent, ${data.failed} failed.`,
+        );
+      }
     } catch (error) {
       console.error(error);
-      alert(error instanceof Error ? error.message : "Could not send batch.");
+      setToastType("error");
+      setToastMessage(
+        error instanceof Error ? error.message : "Could not send batch.",
+      );
     } finally {
       setSendingBatchId(null);
     }
@@ -85,6 +107,16 @@ export default function AutomationPage() {
   useEffect(() => {
     loadBatches();
   }, []);
+
+  useEffect(() => {
+    if (!toastMessage) return;
+
+    const timer = setTimeout(() => {
+      setToastMessage("");
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [toastMessage]);
 
   const pendingBatches = batches.filter(
     (batch) => batch.status === "ready" || batch.status === "preparing",
@@ -201,6 +233,21 @@ export default function AutomationPage() {
           )}
         </section>
       </div>
+
+      {toastMessage && (
+        <div
+          role="status"
+          className={`fixed bottom-6 right-6 z-50 rounded-lg border bg-white px-4 py-3 text-sm shadow-lg ${
+            toastType === "success"
+              ? "border-green-200 text-green-700"
+              : toastType === "partial"
+                ? "border-amber-200 text-amber-700"
+                : "border-red-200 text-red-700"
+          }`}
+        >
+          {toastMessage}
+        </div>
+      )}
     </main>
   );
 }
