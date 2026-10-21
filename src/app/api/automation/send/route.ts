@@ -43,6 +43,13 @@ export const POST = withAuth(async (request) => {
       body: OUTREACH_BODY,
     });
 
+    if (drafts.length === 0) {
+      return NextResponse.json(
+        { error: "This batch contains no restaurants eligible for outreach." },
+        { status: 400 },
+      );
+    }
+
     const failed: string[] = [];
     let sent = 0;
 

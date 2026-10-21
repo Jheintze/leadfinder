@@ -34,6 +34,13 @@ export const POST = withAuth(async (request) => {
     return NextResponse.json({ error: "City is required." }, { status: 400 });
   }
 
+  if (city.length > 100) {
+    return NextResponse.json(
+      { error: "City name must be 100 characters or fewer." },
+      { status: 400 },
+    );
+  }
+
   if (!Number.isInteger(limit) || limit < 1 || limit > 50) {
     return NextResponse.json(
       { error: "Number of leads must be between 1 and 50." },
