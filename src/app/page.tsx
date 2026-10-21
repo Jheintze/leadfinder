@@ -11,9 +11,9 @@ export default async function DashboardPage() {
   const emailsFound =
     restaurants?.filter((restaurant) => restaurant.email).length ?? 0;
   const emailCoverage =
-  totalRestaurants > 0
-    ? Math.round((emailsFound / totalRestaurants) * 100)
-    : 0;
+    totalRestaurants > 0
+      ? Math.round((emailsFound / totalRestaurants) * 100)
+      : 0;
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -41,20 +41,11 @@ export default async function DashboardPage() {
             </div>
           ) : (
             <div className="grid gap-5 sm:grid-cols-3">
-              <StatCard
-                label="Total restaurants"
-                value={totalRestaurants}
-              />
+              <StatCard label="Total restaurants" value={totalRestaurants} />
 
-              <StatCard
-                label="Emails found"
-                value={emailsFound}
-              />
+              <StatCard label="Emails found" value={emailsFound} />
 
-              <StatCard
-  label="Email coverage"
-  value={`${emailCoverage}%`}
-/>
+              <StatCard label="Email coverage" value={`${emailCoverage}%`} />
             </div>
           )}
         </section>
@@ -63,13 +54,7 @@ export default async function DashboardPage() {
   );
 }
 
-function StatCard({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | number;
-}) {
+function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
       <p className="text-sm font-medium text-slate-500">{label}</p>
@@ -80,4 +65,3 @@ function StatCard({
     </div>
   );
 }
-
