@@ -28,6 +28,9 @@ export default function OutreachPage() {
   const [outreachPrepared, setOutreachPrepared] = useState(false);
   const [isSendingAll, setIsSendingAll] = useState(false);
   const [sendSuccessMessage, setSendSuccessMessage] = useState("");
+  const [sendMessageType, setSendMessageType] = useState<
+    "success" | "partial" | "error"
+  >("success");
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedCuisine, setSelectedCuisine] = useState("");
   const [preparedRecipients, setPreparedRecipients] = useState<Restaurant[]>(
@@ -91,7 +94,11 @@ export default function OutreachPage() {
 
   async function sendAllOutreach() {
     setIsSendingAll(true);
+    setSendSuccessMessage("");
+
     let successfulSends = 0;
+    const failedRecipients: Restaurant[] = [];
+
     try {
       for (const restaurant of preparedRecipients) {
         const personalizedSubject = subject.replaceAll(
@@ -123,32 +130,58 @@ export default function OutreachPage() {
           if (!response.ok) {
             throw new Error(data.error ?? "Could not send email.");
           }
+
+          successfulSends++;
+
           setRestaurants((currentRestaurants) =>
             currentRestaurants.filter(
               (currentRestaurant) => currentRestaurant.id !== restaurant.id,
             ),
           );
-          successfulSends++;
+
+          setSelectedRestaurants((current) =>
+            current.filter((id) => id !== restaurant.id),
+          );
         } catch (error) {
           console.error(
             `Failed to send outreach to ${restaurant.name}:`,
             error,
           );
+
+          failedRecipients.push(restaurant);
         }
       }
-      if (successfulSends > 0) {
+
+      setPreparedRecipients(failedRecipients);
+      setOutreachPrepared(failedRecipients.length > 0);
+
+      if (failedRecipients.length > 0) {
+        setSendMessageType(successfulSends > 0 ? "partial" : "error");
+
+        setSendSuccessMessage(
+          `${successfulSends} sent, ${failedRecipients.length} failed. Failed recipients remain ready to retry.`,
+        );
+      } else if (successfulSends > 0) {
+        setSendMessageType("success");
+
         setSendSuccessMessage(
           `${successfulSends} ${
             successfulSends === 1 ? "email was" : "emails were"
           } sent successfully.`,
         );
+      }
 
+      if (successfulSends > 0 || failedRecipients.length > 0) {
         setTimeout(() => {
           setSendSuccessMessage("");
-        }, 4000);
+        }, 5000);
       }
-      setPreparedRecipients([]);
-      setOutreachPrepared(false);
+    } catch (error) {
+      console.error("Unexpected outreach error:", error);
+      setSendMessageType("error");
+      setSendSuccessMessage(
+        "Something went wrong while sending outreach emails.",
+      );
     } finally {
       setIsSendingAll(false);
     }
@@ -242,6 +275,7 @@ export default function OutreachPage() {
                   type="text"
                   value={subject}
                   onChange={(event) => setSubject(event.target.value)}
+                  disabled={isSendingAll}
                   className="input w-full"
                 />{" "}
               </div>
@@ -258,6 +292,7 @@ export default function OutreachPage() {
                   id="body"
                   value={body}
                   onChange={(event) => setBody(event.target.value)}
+                  disabled={isSendingAll}
                   className="min-h-48 w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm leading-6 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </div>
@@ -527,10 +562,34 @@ export default function OutreachPage() {
           </section>
         </section>
       </div>
+
       {sendSuccessMessage && (
-        <div className="fixed bottom-6 right-6 z-50 rounded-lg border border-green-200 bg-white px-4 py-3 shadow-lg">
-          <p className="text-sm font-medium text-slate-800">✓ Outreach sent</p>
-          <p className="mt-0.5 text-xs text-slate-500">{sendSuccessMessage}</p>
+        <div
+          role="status"
+          className={`fixed bottom-6 right-6 z-50 max-w-sm rounded-lg border bg-white px-4 py-3 shadow-lg ${
+            sendMessageType === "success"
+              ? "border-green-200"
+              : sendMessageType === "partial"
+                ? "border-amber-200"
+                : "border-red-200"
+          }`}
+        >
+          <p
+            className={`text-sm font-medium ${
+              sendMessageType === "success"
+                ? "text-green-700"
+                : sendMessageType === "partial"
+                  ? "text-amber-700"
+                  : "text-red-700"
+            }`}
+          >
+            {sendMessageType === "success"
+              ? "Outreach sent"
+              : sendMessageType === "partial"
+                ? "Outreach partially sent"
+                : "Outreach sending failed"}
+          </p>
+          <p className="mt-0.5 text-xs text-slate-600">{sendSuccessMessage}</p>
         </div>
       )}
     </main>

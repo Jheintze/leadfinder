@@ -14,37 +14,37 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   async function handleLogin(event: React.SyntheticEvent<HTMLFormElement>) {
-  event.preventDefault();
+    event.preventDefault();
 
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      setError(error.message);
+      if (error) {
+        setError(error.message);
+        return;
+      }
+
+      router.push("/");
+      router.refresh();
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    router.push("/");
-    router.refresh();
   }
 
   return (
     <main className="flex min-h-screen items-center justify-center px-6">
-      <form
-        onSubmit={handleLogin}
-        className="w-full max-w-sm space-y-5"
-      >
+      <form onSubmit={handleLogin} className="w-full max-w-sm space-y-5">
         <div>
           <h1 className="text-2xl font-semibold">LeadFinder</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Sign in to continue.
-          </p>
+          <p className="mt-1 text-sm text-gray-500">Sign in to continue.</p>
         </div>
 
         <div className="space-y-3">
@@ -67,11 +67,7 @@ export default function LoginPage() {
           />
         </div>
 
-        {error && (
-          <p className="text-sm text-red-600">
-            {error}
-          </p>
-        )}
+        {error && <p className="text-sm text-red-600">{error}</p>}
 
         <button
           type="submit"
