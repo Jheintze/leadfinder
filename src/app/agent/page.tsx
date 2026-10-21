@@ -124,7 +124,7 @@ export default function AgentPage() {
         setOutreach(null);
       } else if (successfulSends > 0) {
         setSendMessage(
-          `partial:${successfulSends} of ${batch.restaurantCount} emails sent. Failed at ${failedRestaurant}. Remaining emails were not attempted. Error: ${errorMessage}`,
+          `partial:${successfulSends} of ${batch.restaurants.length} emails sent. Failed at ${failedRestaurant}. Remaining emails were not attempted. Error: ${errorMessage}`,
         );
 
         // Remove confirmed successes so they aren't retried from this preview.
@@ -269,7 +269,7 @@ export default function AgentPage() {
               <div
                 role="status"
                 aria-live="polite"
-                className={`fixed bottom-6 right-6 z-50 max-w-md rounded-lg border bg-white px-4 py-3 shadow-lg ${
+                className={`fixed bottom-4 left-4 right-4 z-50 rounded-lg border bg-white px-4 py-3 shadow-lg sm:bottom-6 sm:left-auto sm:right-6 sm:max-w-md ${
                   notificationType === "success"
                     ? "border-green-200"
                     : notificationType === "partial"

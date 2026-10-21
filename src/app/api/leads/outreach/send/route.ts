@@ -6,7 +6,16 @@ export const POST = withAuth(async (request) => {
   try {
     const { restaurantId, to, subject, body } = await request.json();
 
-    if (!restaurantId || !to || !subject || !body) {
+    if (
+      typeof restaurantId !== "string" ||
+      typeof to !== "string" ||
+      typeof subject !== "string" ||
+      typeof body !== "string" ||
+      !restaurantId.trim() ||
+      !to.trim() ||
+      !subject.trim() ||
+      !body.trim()
+    ) {
       return NextResponse.json(
         { error: "Missing email data." },
         { status: 400 },

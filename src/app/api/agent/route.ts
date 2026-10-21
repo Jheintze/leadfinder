@@ -14,7 +14,25 @@ const openai = new OpenAI({
 });
 
 export const POST = withAuth(async (request) => {
-  const { task } = await request.json();
+  let task: unknown;
+
+  try {
+    const body = await request.json();
+    task = body?.task;
+  } catch {
+    return NextResponse.json(
+      { error: "Invalid request body." },
+      { status: 400 },
+    );
+  }
+
+  if (typeof task !== "string" || !task.trim()) {
+    return NextResponse.json(
+      { error: "Please provide a task." },
+      { status: 400 },
+    );
+  }
+
   let preparedOutreach = null;
 
   const instructions = `
@@ -206,7 +224,11 @@ export const POST = withAuth(async (request) => {
     },
   ];
 
-  while (true) {
+  let iterations = 0;
+  const MAX_ITERATIONS = 10;
+
+  while (iterations < MAX_ITERATIONS) {
+    iterations++;
     let response: OpenAI.Responses.Response;
 
     try {
@@ -309,4 +331,11 @@ export const POST = withAuth(async (request) => {
       });
     }
   }
+  return NextResponse.json(
+    {
+      error:
+        "The agent reached its maximum number of steps. Please try a simpler task.",
+    },
+    { status: 502 },
+  );
 });
