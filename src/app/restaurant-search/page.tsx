@@ -74,6 +74,7 @@ export default function Home() {
       });
     } catch (caughtError) {
       setLeads([]);
+      setLastQuery(null);
       setError(
         caughtError instanceof Error
           ? caughtError.message
@@ -172,8 +173,9 @@ export default function Home() {
                 </h2>
                 {lastQuery && !isLoading && (
                   <p className="mt-1 text-sm text-slate-500">
-                    {leads.length} leads found in {lastQuery.city} for{" "}
-                    {lastQuery.businessType.toLowerCase()}s.
+                    {leads.length} {leads.length === 1 ? "lead" : "leads"} found
+                    in {lastQuery.city} for{" "}
+                    {lastQuery.businessType.toLowerCase()}.
                   </p>
                 )}
               </div>
