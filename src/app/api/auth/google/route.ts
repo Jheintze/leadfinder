@@ -20,12 +20,7 @@ export async function GET() {
     console.error("[GOOGLE AUTH]", error);
 
     return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Could not start Google authentication.",
-      },
+      { error: "Could not start Google authentication." },
       { status: 500 },
     );
   }

@@ -96,12 +96,7 @@ export const POST = withAuth(async (request) => {
     console.error("[AUTOMATION SEND]", error);
 
     return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Could not send automation batch.",
-      },
+      { error: "Could not send automation batch." },
       { status: 500 },
     );
   }

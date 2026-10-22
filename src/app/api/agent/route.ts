@@ -241,12 +241,10 @@ export const POST = withAuth(async (request) => {
     } catch (error) {
       console.error("[AGENT] OpenAI request failed:", error);
 
-      const message =
-        error instanceof Error
-          ? error.message
-          : "The AI agent is temporarily unavailable.";
-
-      return NextResponse.json({ error: message }, { status: 502 });
+      return NextResponse.json(
+        { error: "The AI agent is temporarily unavailable. Please try again." },
+        { status: 502 },
+      );
     }
 
     const toolCalls = response.output.filter(

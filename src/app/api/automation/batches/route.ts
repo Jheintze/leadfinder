@@ -20,12 +20,7 @@ export const GET = withAuth(async () => {
     console.error("[AUTOMATION BATCHES]", error);
 
     return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Could not load automation batches.",
-      },
+      { error: "Could not load automation batches." },
       { status: 500 },
     );
   }

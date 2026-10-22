@@ -15,12 +15,7 @@ export const POST = withAuth(async () => {
     console.error("[AUTOMATION RUN]", error);
 
     return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Could not prepare automation batch.",
-      },
+      { error: "Could not prepare automation batch." },
       { status: 500 },
     );
   }

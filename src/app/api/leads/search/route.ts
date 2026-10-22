@@ -68,9 +68,9 @@ export const POST = withAuth(async (request) => {
   } catch (error) {
     console.error("Lead search failed", error);
 
-    const message =
-      error instanceof Error ? error.message : "Restaurant search failed.";
-
-    return NextResponse.json({ error: message }, { status: 502 });
+    return NextResponse.json(
+      { error: "Restaurant search failed. Please try again." },
+      { status: 502 },
+    );
   }
 });
