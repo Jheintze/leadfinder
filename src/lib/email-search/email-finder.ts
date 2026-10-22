@@ -98,8 +98,6 @@ export async function findAndSaveEmails({
   ).filter((result): result is SavedEmailResult => result !== null);
 
   return results;
-
-  return results;
 }
 
 export async function findEmailFromWebsite(

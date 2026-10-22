@@ -1,7 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase/supabaseAdmin";
 
-
-
 export type Lead = {
   id: string;
   businessName: string;
@@ -22,15 +20,12 @@ export type LeadSearchInput = {
 type LocationCoordinates = {
   latitude: number;
   longitude: number;
-  boundary: unknown;
   boundingbox: [string, string, string, string];
 };
 
 type NominatimResult = {
   lat: string;
   lon: string;
-  display_name?: string;
-  geojson?: unknown;
   boundingbox?: [string, string, string, string];
 };
 
@@ -78,7 +73,7 @@ async function getLocationCoordinates(
 
   let cacheQuery = supabaseAdmin
     .from("location_coordinates")
-    .select("latitude, longitude, boundary, boundingbox")
+    .select("latitude, longitude, boundingbox")
     .eq("city", normalizedCity);
 
   if (normalizedArea) {
@@ -100,7 +95,6 @@ async function getLocationCoordinates(
     return {
       latitude: cachedLocation.latitude,
       longitude: cachedLocation.longitude,
-      boundary: cachedLocation.boundary,
       boundingbox: cachedLocation.boundingbox,
     };
   }
@@ -111,7 +105,6 @@ async function getLocationCoordinates(
     q: location.trim(),
     format: "jsonv2",
     limit: "1",
-    polygon_geojson: "1",
   });
 
   let response: Response;
@@ -149,10 +142,6 @@ async function getLocationCoordinates(
     throw new Error(`Invalid coordinates returned for: ${location.trim()}`);
   }
 
-  if (!result.geojson) {
-    throw new Error(`No boundary returned for: ${location.trim()}`);
-  }
-
   if (!result.boundingbox || result.boundingbox.length !== 4) {
     throw new Error(`No bounding box returned for: ${location.trim()}`);
   }
@@ -162,7 +151,6 @@ async function getLocationCoordinates(
     .insert({
       city: normalizedCity,
       area: normalizedArea,
-      boundary: result.geojson,
       boundingbox: result.boundingbox,
       latitude,
       longitude,
@@ -177,7 +165,6 @@ async function getLocationCoordinates(
   return {
     latitude,
     longitude,
-    boundary: result.geojson,
     boundingbox: result.boundingbox,
   };
 }
