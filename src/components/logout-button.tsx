@@ -14,11 +14,20 @@ export function LogoutButton() {
 
     setIsLoggingOut(true);
 
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signOut();
 
-    router.push("/login");
-    router.refresh();
+      if (error) {
+        console.error("Logout failed:", error.message);
+        return;
+      }
+
+      router.push("/login");
+      router.refresh();
+    } finally {
+      setIsLoggingOut(false);
+    }
   }
 
   return (
@@ -26,7 +35,7 @@ export function LogoutButton() {
       type="button"
       onClick={handleLogout}
       disabled={isLoggingOut}
-     className="mt-4 w-full rounded-lg border border-slate-200 px-3 py-2 text-left text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+      className="mt-4 w-full rounded-lg border border-slate-200 px-3 py-2 text-left text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
     >
       {isLoggingOut ? "Logging out..." : "Log out"}
     </button>

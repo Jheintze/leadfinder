@@ -23,6 +23,7 @@ export function MobileHeader() {
           onClick={() => setMenuOpen(!menuOpen)}
           className="rounded-lg p-2 text-slate-600 hover:bg-slate-100"
           aria-label="Toggle navigation menu"
+          aria-expanded={menuOpen}
         >
           ☰
         </button>

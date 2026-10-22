@@ -168,6 +168,7 @@ function AgentIcon() {
     </svg>
   );
 }
+
 function AutomationIcon() {
   return (
     <svg
