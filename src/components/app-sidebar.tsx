@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { LogoutButton } from "./logout-button";
 
 type AppSidebarProps = {
@@ -46,6 +50,24 @@ export const navigationItems = [
 ] as const;
 
 export function AppSidebar({ activePage }: AppSidebarProps) {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setIsLoggedIn(!!user);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session?.user);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   return (
     <aside className="hidden w-60 shrink-0 border-r border-slate-200 bg-white px-5 py-6 md:flex md:flex-col">
       <div className="flex items-center gap-3 px-2">
@@ -54,6 +76,7 @@ export function AppSidebar({ activePage }: AppSidebarProps) {
         </div>
         <span className="text-lg font-semibold tracking-tight">LeadFinder</span>
       </div>
+
       <nav className="mt-10">
         {navigationItems.map(({ href, label, page, icon: Icon }) => (
           <Link
@@ -69,13 +92,24 @@ export function AppSidebar({ activePage }: AppSidebarProps) {
           </Link>
         ))}
       </nav>
+
       <div className="mt-auto">
         <p className="px-2 text-xs leading-5 text-slate-400">
           DishBoost internal tools
           <br />
           Lead research workspace
         </p>
-        <LogoutButton />
+
+        {isLoggedIn === true && <LogoutButton />}
+
+        {isLoggedIn === false && (
+          <Link
+            href="/login"
+            className="mt-4 block w-full rounded-lg border border-slate-200 px-3 py-2 text-left text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
+          >
+            Log in
+          </Link>
+        )}
       </div>
     </aside>
   );

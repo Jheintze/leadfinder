@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { withAuth } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 import { searchAndSaveRestaurants } from "@/lib/restaurant-search/restaurant-search";
 
 type SearchRequest = {
@@ -8,7 +8,14 @@ type SearchRequest = {
   limit?: unknown;
 };
 
-export const POST = withAuth(async (request) => {
+export async function POST(request: Request) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const isDemo = !user;
+
   let body: SearchRequest;
 
   try {
@@ -27,7 +34,7 @@ export const POST = withAuth(async (request) => {
       ? body.businessType.trim()
       : "Restaurant";
 
-  const limit =
+  const requestedLimit =
     typeof body.limit === "number" ? body.limit : Number(body.limit);
 
   if (!city) {
@@ -41,12 +48,25 @@ export const POST = withAuth(async (request) => {
     );
   }
 
-  if (!Number.isInteger(limit) || limit < 1 || limit > 50) {
+  if (
+    !Number.isInteger(requestedLimit) ||
+    requestedLimit < 1 ||
+    requestedLimit > 50
+  ) {
     return NextResponse.json(
       { error: "Number of leads must be between 1 and 50." },
       { status: 400 },
     );
   }
+
+  const limit = isDemo ? Math.min(requestedLimit, 5) : requestedLimit;
+
+  console.log({
+    userIsLoggedIn: !!user,
+    requestedLimit,
+    isDemo,
+    finalLimit: limit,
+  });
 
   const query = {
     city,
@@ -73,4 +93,4 @@ export const POST = withAuth(async (request) => {
       { status: 502 },
     );
   }
-});
+}
