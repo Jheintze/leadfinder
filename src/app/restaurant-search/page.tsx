@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import type { SubmitEvent } from "react";
 import { AppSidebar } from "../../components/app-sidebar";
 import { MobileHeader } from "../../components/mobile-header";
+import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 
 type Lead = {
   id: string;
@@ -31,10 +33,28 @@ export default function Home() {
   const [error, setError] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
   const [showAllResults, setShowAllResults] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+
   const [lastQuery, setLastQuery] = useState<SearchResponse["query"] | null>(
     null,
   );
   const resultsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setIsLoggedIn(!!user);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session?.user);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -117,6 +137,7 @@ export default function Home() {
                   className="input"
                 />
               </Field>
+
               <Field label="Business type" htmlFor="businessType">
                 <input
                   id="businessType"
@@ -125,6 +146,7 @@ export default function Home() {
                   className="input"
                 />
               </Field>
+
               <Field label="Number of leads" htmlFor="limit">
                 <select
                   id="limit"
@@ -133,12 +155,20 @@ export default function Home() {
                   className="input"
                 >
                   {leadOptions.map((option) => (
-                    <option key={option} value={option}>
+                    <option
+                      key={option}
+                      value={option}
+                      disabled={isLoggedIn === false && option > 5}
+                    >
                       {option} leads
+                      {isLoggedIn === false && option > 5
+                        ? " (login required)"
+                        : ""}
                     </option>
                   ))}
                 </select>
               </Field>
+
               <button
                 type="submit"
                 disabled={isLoading}
@@ -155,6 +185,24 @@ export default function Home() {
                 )}
               </button>
             </div>
+
+            {isLoggedIn === false && (
+              <div className="mt-4 flex items-center gap-2 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2.5 text-sm text-blue-800">
+                
+                <p>
+                  <span className="font-medium">Demo mode:</span> Up to 5
+                  results per search.{" "}
+                  <Link
+                    href="/login"
+                    className="font-semibold underline underline-offset-2 hover:text-blue-950"
+                  >
+                    Log in
+                  </Link>{" "}
+                  for more.
+                </p>
+              </div>
+            )}
+
             {error && (
               <p
                 role="alert"

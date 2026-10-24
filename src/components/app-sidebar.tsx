@@ -100,16 +100,17 @@ export function AppSidebar({ activePage }: AppSidebarProps) {
           Lead research workspace
         </p>
 
-        {isLoggedIn === true && <LogoutButton />}
-
-        {isLoggedIn === false && (
-          <Link
-            href="/login"
-            className="mt-4 block w-full rounded-lg border border-slate-200 px-3 py-2 text-left text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
-          >
-            Log in
-          </Link>
-        )}
+        {isLoggedIn !== null &&
+          (isLoggedIn ? (
+            <LogoutButton />
+          ) : (
+            <Link
+              href="/login"
+              className="mt-4 block w-full rounded-lg border border-slate-200 px-3 py-2 text-left text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
+            >
+              Log in
+            </Link>
+          ))}
       </div>
     </aside>
   );
