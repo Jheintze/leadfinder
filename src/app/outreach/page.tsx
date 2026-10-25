@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { AppSidebar } from "../../components/app-sidebar";
 import { MobileHeader } from "../../components/mobile-header";
+import Link from "next/link";
+import { useAuthStatus } from "@/hooks/use-auth-status";
 import {
   OUTREACH_SUBJECT,
   OUTREACH_BODY,
@@ -36,7 +38,9 @@ export default function OutreachPage() {
   const [preparedRecipients, setPreparedRecipients] = useState<Restaurant[]>(
     [],
   );
-
+  
+  const restaurantSectionRef = useRef<HTMLElement>(null);
+  const isLoggedIn = useAuthStatus();
   const [subject, setSubject] = useState(OUTREACH_SUBJECT);
   const [body, setBody] = useState(OUTREACH_BODY);
 
@@ -67,6 +71,15 @@ export default function OutreachPage() {
 
     loadRestaurants();
   }, []);
+  
+ useEffect(() => {
+   if (!selectedCity) return;
+
+   restaurantSectionRef.current?.scrollIntoView({
+     behavior: "instant",
+     block: "start",
+   });
+ }, [selectedCity]);
 
   function toggleRestaurant(id: string) {
     setSelectedRestaurants((current) =>
@@ -300,7 +313,10 @@ export default function OutreachPage() {
           </section>
 
           {/* Restaurant selection */}
-          <section className="mt-8 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <section
+            ref={restaurantSectionRef}
+            className="mt-8 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+          >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
               <div>
                 <h2 className="text-lg font-semibold tracking-tight">
@@ -518,25 +534,46 @@ export default function OutreachPage() {
                     </p>
                   </div>
 
-                  <div className="flex shrink-0 items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setOutreachPrepared(false)}
-                      className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50"
-                    >
-                      Clear
-                    </button>
+                  <div className="flex shrink-0 flex-col gap-3 sm:w-80 lg:w-96">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setOutreachPrepared(false)}
+                        className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50"
+                      >
+                        Clear
+                      </button>
 
-                    <button
-                      type="button"
-                      onClick={sendAllOutreach}
-                      disabled={preparedRecipients.length === 0 || isSendingAll}
-                      className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
-                    >
-                      {isSendingAll
-                        ? "Sending..."
-                        : `Send all (${preparedRecipients.length})`}
-                    </button>
+                      <button
+                        type="button"
+                        onClick={sendAllOutreach}
+                        disabled={
+                          isLoggedIn !== true ||
+                          preparedRecipients.length === 0 ||
+                          isSendingAll
+                        }
+                        className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+                      >
+                        {isSendingAll
+                          ? "Sending..."
+                          : `Send all (${preparedRecipients.length})`}
+                      </button>
+                    </div>
+
+                    {isLoggedIn === false && (
+                      <div className="rounded-lg border border-blue-100 bg-blue-50 px-3 py-2.5 text-sm text-blue-800">
+                        <p>
+                          <span className="font-medium">Demo mode:</span>{" "}
+                          Prepare and preview outreach, log in to send emails.{" "}
+                          <Link
+                            href="/login"
+                            className="font-semibold underline underline-offset-2 hover:text-blue-950"
+                          >
+                            Log in
+                          </Link>
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
