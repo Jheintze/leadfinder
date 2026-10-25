@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { getRequestAuth } from "@/lib/auth/get-request-auth";
 import { searchAndSaveRestaurants } from "@/lib/restaurant-search/restaurant-search";
 
 type SearchRequest = {
@@ -10,12 +10,7 @@ type SearchRequest = {
 
 export async function POST(request: Request) {
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const isDemo = !user;
+ const { isDemo } = await getRequestAuth();
 
   let body: SearchRequest;
 

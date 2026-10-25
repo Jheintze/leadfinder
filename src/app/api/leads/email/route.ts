@@ -1,15 +1,10 @@
 import { NextResponse } from "next/server";
 import { findAndSaveEmails } from "@/lib/email-search/email-finder";
-import { createClient } from "@/lib/supabase/server";
+import { getRequestAuth } from "@/lib/auth/get-request-auth";
 
 export async function POST(request: Request) {
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const isDemo = !user;
+  const { isDemo } = await getRequestAuth();
 
   let body: { limit?: unknown };
 
