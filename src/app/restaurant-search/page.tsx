@@ -27,7 +27,7 @@ const leadOptions = [5, 10, 20, 50];
 export default function Home() {
   const [city, setCity] = useState("");
   const [businessType, setBusinessType] = useState("Restaurant");
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(5);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");

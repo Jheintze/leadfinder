@@ -8,7 +8,7 @@ export async function getRequestAuth() {
     error,
   } = await supabase.auth.getUser();
 
-  if (error) {
+  if (error && error.name !== "AuthSessionMissingError") {
     throw error;
   }
 

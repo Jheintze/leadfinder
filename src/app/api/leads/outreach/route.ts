@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
-
-import { withAuth } from "@/lib/auth";
+import { getRequestAuth } from "@/lib/auth/get-request-auth";
 import { getRestaurantsForOutreach } from "@/lib/outreach/outreach-server";
 
-export const GET = withAuth(async () => {
+export async function GET() {
   try {
+    const { isDemo } = await getRequestAuth();
     const restaurants = await getRestaurantsForOutreach();
 
     return NextResponse.json({
       restaurants,
+      isDemo,
     });
   } catch (error) {
     console.error("Outreach restaurant fetch failed", error);
@@ -20,4 +21,4 @@ export const GET = withAuth(async () => {
 
     return NextResponse.json({ error: message }, { status: 500 });
   }
-});
+}
