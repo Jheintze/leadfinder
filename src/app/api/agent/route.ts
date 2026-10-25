@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { searchAndSaveRestaurants } from "@/lib/restaurant-search/restaurant-search";
 import { findAndSaveEmails } from "@/lib/email-search/email-finder";
 import { getRestaurantsForOutreach } from "@/lib/outreach/outreach-server";
-import { withAuth } from "@/lib/auth";
+import { getRequestAuth } from "@/lib/auth/get-request-auth";
 import {
   OUTREACH_SUBJECT,
   OUTREACH_BODY,
@@ -13,8 +13,10 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export const POST = withAuth(async (request) => {
+export async function POST(request: Request) {
   let task: unknown;
+
+  const { isDemo } = await getRequestAuth();
 
   try {
     const body = await request.json();
@@ -267,27 +269,33 @@ export const POST = withAuth(async (request) => {
         const toolArguments = JSON.parse(toolCall.arguments);
 
         if (toolCall.name === "search_restaurants") {
+          const requestedLimit = toolArguments.limit;
+          const limit = isDemo ? Math.min(requestedLimit, 5) : requestedLimit;
+
           const restaurants = await searchAndSaveRestaurants({
             city: toolArguments.city,
             area: toolArguments.area ?? undefined,
             businessType: toolArguments.businessType,
             cuisine: toolArguments.cuisine ?? undefined,
-            limit: toolArguments.limit,
+            limit: limit,
           });
 
           toolOutput = restaurants;
         } else if (toolCall.name === "find_emails") {
+          const requestedLimit = toolArguments.limit;
+          const limit = isDemo ? Math.min(requestedLimit, 5) : requestedLimit;
+
           const results = await findAndSaveEmails({
-            limit: toolArguments.limit,
+            limit: limit,
             restaurantIds: toolArguments.restaurantIds ?? undefined,
           });
 
           const foundResults = results.filter((result) => result.email);
 
           toolOutput = {
-            requested: toolArguments.limit,
+            requested: limit,
             found: foundResults.length,
-            needs_more: foundResults.length < toolArguments.limit,
+            needs_more: foundResults.length < limit,
             results: foundResults,
           };
         } else if (toolCall.name === "generate_outreach") {
@@ -336,4 +344,4 @@ export const POST = withAuth(async (request) => {
     },
     { status: 502 },
   );
-});
+}
