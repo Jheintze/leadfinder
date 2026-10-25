@@ -1,11 +1,11 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState} from "react";
 import type { SubmitEvent } from "react";
 import { AppSidebar } from "../../components/app-sidebar";
 import { MobileHeader } from "../../components/mobile-header";
-import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import { useAuthStatus } from "@/hooks/use-auth-status";
 
 type Lead = {
   id: string;
@@ -33,28 +33,13 @@ export default function Home() {
   const [error, setError] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
   const [showAllResults, setShowAllResults] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
-
+  
   const [lastQuery, setLastQuery] = useState<SearchResponse["query"] | null>(
     null,
   );
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const supabase = createClient();
-
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setIsLoggedIn(!!user);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsLoggedIn(!!session?.user);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  const isLoggedIn = useAuthStatus();
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
