@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { SubmitEvent } from "react";
 import { AppSidebar } from "../../components/app-sidebar";
 import { MobileHeader } from "../../components/mobile-header";
+import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 
 type EmailResult = {
   id: string;
@@ -26,10 +28,27 @@ export default function EmailFinderPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [summary, setSummary] = useState<{
     processed: number;
     found: number;
   } | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setIsLoggedIn(!!user);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session?.user);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -110,8 +129,15 @@ export default function EmailFinderPage() {
                   className="input w-full sm:w-48"
                 >
                   {batchOptions.map((option) => (
-                    <option key={option} value={option}>
+                    <option
+                      key={option}
+                      value={option}
+                      disabled={isLoggedIn === false && option > 5}
+                    >
                       {option} restaurants
+                      {isLoggedIn === false && option > 5
+                        ? " (login required)"
+                        : ""}
                     </option>
                   ))}
                 </select>
@@ -133,6 +159,22 @@ export default function EmailFinderPage() {
                 )}
               </button>
             </div>
+
+            {isLoggedIn === false && (
+              <div className="mt-4 flex items-center gap-2 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2.5 text-sm text-blue-800">
+                <p>
+                  <span className="font-medium">Demo mode:</span> Up to 5
+                  results per search.{" "}
+                  <Link
+                    href="/login"
+                    className="font-semibold underline underline-offset-2 hover:text-blue-950"
+                  >
+                    Log in
+                  </Link>{" "}
+                  for more.
+                </p>
+              </div>
+            )}
 
             {error && (
               <p
@@ -314,7 +356,6 @@ function EmptyState({ hasSearched }: { hasSearched: boolean }) {
     </div>
   );
 }
-
 
 /* Icons */
 

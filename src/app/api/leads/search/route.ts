@@ -9,6 +9,7 @@ type SearchRequest = {
 };
 
 export async function POST(request: Request) {
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -60,13 +61,6 @@ export async function POST(request: Request) {
   }
 
   const limit = isDemo ? Math.min(requestedLimit, 5) : requestedLimit;
-
-  console.log({
-    userIsLoggedIn: !!user,
-    requestedLimit,
-    isDemo,
-    finalLimit: limit,
-  });
 
   const query = {
     city,

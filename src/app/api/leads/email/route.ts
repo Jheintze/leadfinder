@@ -1,8 +1,16 @@
 import { NextResponse } from "next/server";
-import { withAuth } from "@/lib/auth";
 import { findAndSaveEmails } from "@/lib/email-search/email-finder";
+import { createClient } from "@/lib/supabase/server";
 
-export const POST = withAuth(async (request) => {
+export async function POST(request: Request) {
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const isDemo = !user;
+
   let body: { limit?: unknown };
 
   try {
@@ -14,15 +22,20 @@ export const POST = withAuth(async (request) => {
     );
   }
 
-  const limit =
+  const requestedLimit =
     typeof body.limit === "number" ? body.limit : Number(body.limit);
 
-  if (!Number.isInteger(limit) || limit < 1 || limit > 50) {
+  if (
+    !Number.isInteger(requestedLimit) ||
+    requestedLimit < 1 ||
+    requestedLimit > 50
+  ) {
     return NextResponse.json(
       { error: "Number to process must be between 1 and 50." },
       { status: 400 },
     );
   }
+  const limit = isDemo ? Math.min(requestedLimit, 5) : requestedLimit;
 
   try {
     const results = await findAndSaveEmails({ limit });
@@ -40,4 +53,4 @@ export const POST = withAuth(async (request) => {
 
     return NextResponse.json({ error: message }, { status: 502 });
   }
-});
+};
