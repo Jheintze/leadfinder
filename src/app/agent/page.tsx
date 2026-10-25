@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AppSidebar } from "../../components/app-sidebar";
 import { MobileHeader } from "../../components/mobile-header";
+import { useAuthStatus } from "@/hooks/use-auth-status";
 
 export default function AgentPage() {
   const [task, setTask] = useState("");
@@ -21,6 +22,8 @@ export default function AgentPage() {
       body: string;
     };
   } | null>(null);
+
+  const isLoggedIn = useAuthStatus();
 
   async function handleRunAgent() {
     setLoading(true);
@@ -193,7 +196,6 @@ export default function AgentPage() {
             >
               What should the agent do?
             </label>
-
             <textarea
               id="agent-task"
               rows={5}
@@ -202,7 +204,6 @@ export default function AgentPage() {
               placeholder="e.g. Find 20 suitable restaurants in Berlin and prepare personalized outreach..."
               className="mt-3 w-full rounded-lg border border-slate-300 p-3 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             />
-
             <button
               type="button"
               onClick={handleRunAgent}
@@ -211,7 +212,6 @@ export default function AgentPage() {
             >
               {loading ? "Running..." : "Run Agent"}
             </button>
-
             {response && (
               <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
                 <div className="whitespace-pre-line text-sm leading-6 text-slate-700">
@@ -219,7 +219,7 @@ export default function AgentPage() {
                 </div>
               </div>
             )}
-
+            
             {outreach && (
               <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="flex items-center justify-between gap-4">
@@ -236,7 +236,9 @@ export default function AgentPage() {
                   <button
                     type="button"
                     disabled={
-                      sendingOutreach || outreach.restaurants.length === 0
+                      isLoggedIn !== true ||
+                      sendingOutreach ||
+                      outreach.restaurants.length === 0
                     }
                     onClick={handleSendOutreach}
                     className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
@@ -244,6 +246,22 @@ export default function AgentPage() {
                     {sendingOutreach ? "Sending..." : "Send outreach"}
                   </button>
                 </div>
+
+                {isLoggedIn === false && (
+                  <div className="mt-4 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
+                    <p>
+                      <span className="font-semibold">Demo mode:</span> You can
+                      search for restaurants and prepare outreach drafts.
+                      Sending emails requires you to log in.{" "}
+                      <a
+                        href="/login"
+                        className="font-semibold underline underline-offset-2 hover:text-blue-950"
+                      >
+                        Log in
+                      </a>
+                    </p>
+                  </div>
+                )}
 
                 <div className="mt-5 border-t border-slate-300 pt-4">
                   <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
@@ -264,7 +282,7 @@ export default function AgentPage() {
                 </div>
               </div>
             )}
-
+            
             {sendMessage && (
               <div
                 role="status"
