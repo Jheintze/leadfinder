@@ -83,6 +83,39 @@ export default function AutomationPage() {
       setSendingBatchId(null);
     }
   }
+
+  
+async function handleRemoveBatch(batchId: string) {
+  if (!window.confirm("Remove this batch? This cannot be undone.")) {
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/automation/batches", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ batchId }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Could not remove batch.");
+    }
+
+    setBatches((current) => current.filter((batch) => batch.id !== batchId));
+    setToastType("success");
+    setToastMessage("Batch removed.");
+  } catch (error) {
+    setToastType("error");
+    setToastMessage(
+      error instanceof Error ? error.message : "Could not remove batch.",
+    );
+  }
+}
+
   async function loadBatches() {
     try {
       const response = await fetch("/api/automation/batches");
@@ -201,6 +234,7 @@ export default function AutomationPage() {
                         batch={batch}
                         isLoggedIn={isLoggedIn}
                         isReviewing={reviewingBatchId === batch.id}
+                        onRemove={() => handleRemoveBatch(batch.id)}
                         onToggleReview={() =>
                           setReviewingBatchId((current) =>
                             current === batch.id ? null : batch.id,
@@ -237,6 +271,7 @@ export default function AutomationPage() {
                         batch={batch}
                         isLoggedIn={isLoggedIn}
                         isReviewing={reviewingBatchId === batch.id}
+                        onRemove={() => handleRemoveBatch(batch.id)}
                         onToggleReview={() =>
                           setReviewingBatchId((current) =>
                             current === batch.id ? null : batch.id,
@@ -279,6 +314,7 @@ function BatchCard({
   onSendAll,
   isSending,
   isLoggedIn,
+  onRemove,
 }: {
   batch: AutomationBatch;
   isReviewing: boolean;
@@ -286,7 +322,9 @@ function BatchCard({
   onSendAll: () => void;
   isSending: boolean;
   isLoggedIn: boolean | null;
+  onRemove: () => void;
 }) {
+
   const isReady = batch.status === "ready";
   const isPreparing = batch.status === "preparing";
   const isSent = batch.status === "sent";
@@ -322,6 +360,17 @@ function BatchCard({
 
         {isReady && (
           <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={onRemove}
+              disabled={isLoggedIn !== true}
+              title={
+                isLoggedIn === true ? undefined : "Log in to remove batches"
+              }
+              className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Remove
+            </button>
             <button
               type="button"
               onClick={onToggleReview}
