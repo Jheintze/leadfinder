@@ -310,9 +310,7 @@ function BatchCard({
           </p>
 
           <p className="mt-1 text-sm leading-6 text-slate-500">
-            {batch.emails_found} emails found from {batch.restaurants_processed}{" "}
-            restaurants
-            {batch.city ? ` · ${formatCity(batch.city)}` : ""}
+            {batch.city ? `  ${formatCity(batch.city)}` : ""}
           </p>
 
           {isFailed && batch.error && (
@@ -341,7 +339,7 @@ function BatchCard({
               }
               className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isSending ? "Sending..." : "Send all"}
+              {isSending ? "Sending..." : "Send"}
             </button>
           </div>
         )}
