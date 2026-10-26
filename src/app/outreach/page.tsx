@@ -564,7 +564,7 @@ export default function OutreachPage() {
                       <div className="rounded-lg border border-blue-100 bg-blue-50 px-3 py-2.5 text-sm text-blue-800">
                         <p>
                           <span className="font-medium">Demo mode:</span>{" "}
-                          Prepare and preview outreach, log in to send emails.{" "}
+                          Prepare and preview outreach, to send emails{" "}
                           <Link
                             href="/login"
                             className="font-semibold underline underline-offset-2 hover:text-blue-950"

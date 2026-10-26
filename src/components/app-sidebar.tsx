@@ -182,7 +182,7 @@ function OutreachIcon() {
   );
 }
 
-function AgentIcon() {
+export function AgentIcon() {
   return (
     <svg
       aria-hidden="true"
