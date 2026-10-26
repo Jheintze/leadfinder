@@ -203,7 +203,7 @@ export default function AgentPage() {
                 rows={5}
                 value={task}
                 onChange={(event) => setTask(event.target.value)}
-                placeholder="e.g. Find 20 suitable restaurants in Berlin and prepare personalized outreach..."
+                placeholder="e.g. Find 20 restaurants in Berlin and prepare personalized outreach..."
                 className="mt-3 w-full rounded-lg border border-slate-300 p-3 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
               <button

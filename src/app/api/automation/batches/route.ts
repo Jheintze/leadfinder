@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
-import { withAuth } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/supabaseAdmin";
 
-export const GET = withAuth(async () => {
+export async function GET() {
   try {
     const { data: batches, error } = await supabaseAdmin
       .from("automation_batches")
       .select(
-        "id, created_at, status, target_emails, emails_found, restaurants_processed, restaurant_ids, error, city, city_exhausted, sent_at",
+        "id, created_at, status, target_emails, emails_found, restaurants_processed, error, city, city_exhausted, sent_at",
       )
       .order("created_at", { ascending: false });
 
@@ -24,4 +23,4 @@ export const GET = withAuth(async () => {
       { status: 500 },
     );
   }
-});
+}

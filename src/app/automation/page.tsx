@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AppSidebar } from "../../components/app-sidebar";
 import { MobileHeader } from "../../components/mobile-header";
+import { useAuthStatus } from "@/hooks/use-auth-status";
 import {
   OUTREACH_SUBJECT,
   OUTREACH_BODY,
@@ -33,6 +34,7 @@ export default function AutomationPage() {
   const [sendingBatchId, setSendingBatchId] = useState<string | null>(null);
   const [reviewingBatchId, setReviewingBatchId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState("");
+  const isLoggedIn = useAuthStatus();
   const [toastType, setToastType] = useState<"success" | "partial" | "error">(
     "success",
   );
@@ -158,6 +160,23 @@ export default function AutomationPage() {
             </p>
           ) : (
             <div className="max-w-4xl space-y-8">
+              {isLoggedIn !== true && (
+                <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+                  <p className="font-medium">Demo mode</p>
+                  <p className="mt-1">
+                    You can review automation batches, but sending emails
+                    requires an existing account and{" "}
+                    <a
+                      href="/login"
+                      className="font-medium underline underline-offset-2 hover:text-blue-900"
+                    >
+                      login
+                    </a>
+                    . New registrations are currently unavailable.
+                  </p>
+                </div>
+              )}
+
               <section>
                 <div className="mb-4">
                   <h2 className="text-lg font-semibold tracking-tight">
@@ -180,6 +199,7 @@ export default function AutomationPage() {
                       <BatchCard
                         key={batch.id}
                         batch={batch}
+                        isLoggedIn={isLoggedIn}
                         isReviewing={reviewingBatchId === batch.id}
                         onToggleReview={() =>
                           setReviewingBatchId((current) =>
@@ -193,7 +213,6 @@ export default function AutomationPage() {
                   </div>
                 )}
               </section>
-
               <section>
                 <div className="mb-4">
                   <h2 className="text-lg font-semibold tracking-tight">
@@ -216,6 +235,7 @@ export default function AutomationPage() {
                       <BatchCard
                         key={batch.id}
                         batch={batch}
+                        isLoggedIn={isLoggedIn}
                         isReviewing={reviewingBatchId === batch.id}
                         onToggleReview={() =>
                           setReviewingBatchId((current) =>
@@ -258,12 +278,14 @@ function BatchCard({
   onToggleReview,
   onSendAll,
   isSending,
+  isLoggedIn,
 }: {
   batch: AutomationBatch;
   isReviewing: boolean;
   onToggleReview: () => void;
   onSendAll: () => void;
   isSending: boolean;
+  isLoggedIn: boolean | null;
 }) {
   const isReady = batch.status === "ready";
   const isPreparing = batch.status === "preparing";
@@ -313,7 +335,10 @@ function BatchCard({
             <button
               type="button"
               onClick={onSendAll}
-              disabled={isSending}
+              disabled={isLoggedIn !== true || isSending}
+              title={
+                isLoggedIn === true ? undefined : "Log in to send outreach"
+              }
               className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSending ? "Sending..." : "Send all"}
