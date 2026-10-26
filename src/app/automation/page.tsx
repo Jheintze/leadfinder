@@ -116,6 +116,48 @@ async function handleRemoveBatch(batchId: string) {
   }
 }
 
+async function handleClearHistory() {
+  if (
+    !window.confirm(
+      "Clear all completed and failed batch history? This cannot be undone.",
+    )
+  ) {
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/automation/batches", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ clearHistory: true }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Could not clear batch history.");
+    }
+
+    setBatches((current) =>
+      current.filter(
+        (batch) => batch.status !== "sent" && batch.status !== "failed",
+      ),
+    );
+
+    setToastType("success");
+    setToastMessage(`Batch history cleared. ${data.deleted} batches removed.`);
+  } catch (error) {
+    setToastType("error");
+    setToastMessage(
+      error instanceof Error
+        ? error.message
+        : "Could not clear batch history.",
+    );
+  }
+}
+
   async function loadBatches() {
     try {
       const response = await fetch("/api/automation/batches");
@@ -160,7 +202,11 @@ async function handleRemoveBatch(batchId: string) {
   const completedBatches = batches.filter(
     (batch) => batch.status === "sent" || batch.status === "failed",
   );
-
+  console.log({
+    isLoggedIn,
+    batches: batches.map((batch) => batch.status),
+    completedCount: completedBatches.length,
+  });
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto flex min-h-screen max-w-[1600px]">
@@ -248,14 +294,32 @@ async function handleRemoveBatch(batchId: string) {
                 )}
               </section>
               <section>
-                <div className="mb-4">
-                  <h2 className="text-lg font-semibold tracking-tight">
-                    Batch history
-                  </h2>
+                <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold tracking-tight">
+                      Batch history
+                    </h2>
 
-                  <p className="mt-1 text-sm text-slate-500">
-                    Previously processed automated outreach batches.
-                  </p>
+                    <p className="mt-1 text-sm text-slate-500">
+                      Previously processed automated outreach batches.
+                    </p>
+                  </div>
+
+                  {completedBatches.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={handleClearHistory}
+                      disabled={isLoggedIn !== true}
+                      title={
+                        isLoggedIn === true
+                          ? undefined
+                          : "Log in to clear history"
+                      }
+                      className="self-start rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
+                    >
+                      Clear history
+                    </button>
+                  )}
                 </div>
 
                 {completedBatches.length === 0 ? (
