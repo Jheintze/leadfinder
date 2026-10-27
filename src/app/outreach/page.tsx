@@ -241,7 +241,7 @@ export default function OutreachPage() {
     );
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
+    <main className="min-h-screen bg-app-bg text-slate-900">
       <div className="mx-auto flex min-h-screen max-w-[1600px]">
         <AppSidebar activePage="outreach" />
 
@@ -250,7 +250,7 @@ export default function OutreachPage() {
 
           {/* Page heading */}
           <div className="mb-8 mt-8 sm:mt-0">
-            <p className="text-sm font-medium text-blue-600">Outreach</p>
+            <p className="text-sm font-medium text-terracotta">Outreach</p>
 
             <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
               Create restaurant outreach
@@ -263,7 +263,7 @@ export default function OutreachPage() {
           </div>
 
           {/* Email template */}
-          <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <section className="rounded-xl border border-neutral-border bg-white p-5 shadow-sm sm:p-6">
             <div>
               <h2 className="text-lg font-semibold tracking-tight">
                 Email template
@@ -306,7 +306,7 @@ export default function OutreachPage() {
                   value={body}
                   onChange={(event) => setBody(event.target.value)}
                   disabled={isSendingAll}
-                  className="min-h-48 w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm leading-6 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="min-h-48 w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm leading-6 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-terracotta focus:ring-2 focus:ring-terracotta/20"
                 />
               </div>
             </div>
@@ -315,7 +315,7 @@ export default function OutreachPage() {
           {/* Restaurant selection */}
           <section
             ref={restaurantSectionRef}
-            className="mt-8 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+            className="mt-8 rounded-xl border border-neutral-border bg-white p-5 shadow-sm sm:p-6"
           >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
               <div>
@@ -354,7 +354,7 @@ export default function OutreachPage() {
                         ]);
                       }
                     }}
-                    className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    className="h-4 w-4 rounded border-slate-300 accent-terracotta text-terracotta focus:ring-terracotta"
                   />
                   Select all
                 </label>
@@ -462,7 +462,7 @@ export default function OutreachPage() {
                       key={restaurant.id}
                       className={`relative flex cursor-pointer rounded-lg border p-4 transition-colors ${
                         isSelected
-                          ? "border-blue-300 bg-blue-50/60"
+                          ? "border-demo-border bg-demo-bg/60"
                           : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
                       }`}
                     >
@@ -470,7 +470,7 @@ export default function OutreachPage() {
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => toggleRestaurant(restaurant.id)}
-                        className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        className="mt-0.5 h-4 w-4 rounded border-slate-300 accent-terracotta text-terracotta focus:ring-terracotta"
                       />
 
                       <div className="ml-3 min-w-0">
@@ -498,7 +498,7 @@ export default function OutreachPage() {
                 type="button"
                 onClick={prepareOutreach}
                 disabled={selectedRestaurants.length === 0}
-                className="inline-flex h-10 items-center justify-center rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
+                className="inline-flex h-10 items-center justify-center rounded-lg bg-terracotta px-4 text-sm font-medium text-white transition-colors hover:bg-terracotta-hover disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Prepare outreach
               </button>
@@ -510,10 +510,10 @@ export default function OutreachPage() {
             {!outreachPrepared ? (
               <DraftEmptyState />
             ) : (
-              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <div className="rounded-xl border border-neutral-border bg-white p-5 shadow-sm sm:p-6">
                 <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <p className="text-sm font-medium text-blue-600">
+                    <p className="text-sm font-medium text-terracotta">
                       Outreach ready
                     </p>
 
@@ -552,7 +552,7 @@ export default function OutreachPage() {
                           preparedRecipients.length === 0 ||
                           isSendingAll
                         }
-                        className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+                        className="rounded-lg bg-terracotta px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-terracotta-hover disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
                       >
                         {isSendingAll
                           ? "Sending..."
@@ -561,7 +561,7 @@ export default function OutreachPage() {
                     </div>
 
                     {isLoggedIn === false && (
-                      <div className="rounded-lg border border-blue-100 bg-blue-50 px-3 py-2.5 text-sm text-blue-800">
+                      <div className="rounded-lg border border-demo-border bg-demo-bg px-3.5 py-2.5 text-sm text-demo-text">
                         <p>
                           <span className="font-bold">
                             Portfolio demo mode:
@@ -575,7 +575,7 @@ export default function OutreachPage() {
                   </div>
                 </div>
 
-                <div className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <div className="mt-5 rounded-lg border border-neutral-border bg-slate-50 p-4">
                   <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
                     Subject
                   </p>
@@ -679,9 +679,9 @@ function EmptyState() {
 
 function DraftEmptyState() {
   return (
-    <div className="grid min-h-60 place-items-center rounded-xl border border-dashed border-slate-300 bg-white px-6 text-center">
+    <div className="grid min-h-60 place-items-center rounded-xl border border-dashed border-neutral-border bg-white px-6 text-center">
       <div>
-        <div className="mx-auto grid h-11 w-11 place-items-center rounded-full bg-blue-50 text-blue-600">
+        <div className="mx-auto grid h-11 w-11 place-items-center rounded-full bg-demo-bg text-terracotta">
           <SendIcon />
         </div>
 

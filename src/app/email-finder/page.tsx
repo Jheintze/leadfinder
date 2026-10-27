@@ -79,7 +79,7 @@ export default function EmailFinderPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
+    <main className="min-h-screen bg-app-bg text-slate-900">
       <div className="mx-auto flex min-h-screen max-w-[1600px]">
         <AppSidebar activePage="email-finder" />
 
@@ -88,7 +88,7 @@ export default function EmailFinderPage() {
 
           {/* Page heading */}
           <div className="mb-8 mt-8 sm:mt-0">
-            <p className="text-sm font-medium text-blue-600">Lead research</p>
+            <p className="text-sm font-medium text-terracotta">Lead research</p>
 
             <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
               Find restaurant emails
@@ -103,7 +103,7 @@ export default function EmailFinderPage() {
           {/* Email finder form */}
           <form
             onSubmit={handleSubmit}
-            className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+            className="rounded-xl border border-neutral-border bg-white p-5 shadow-sm sm:p-6"
           >
             <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
               <Field label="Number to process" htmlFor="limit">
@@ -131,7 +131,7 @@ export default function EmailFinderPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-400"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-terracotta px-4 text-sm font-medium text-white transition-colors hover:bg-terracotta-hover disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isLoading ? (
                   <>
@@ -146,7 +146,7 @@ export default function EmailFinderPage() {
             </div>
 
             {isLoggedIn === false && (
-              <div className="mt-4 flex items-center gap-2 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2.5 text-sm text-blue-800">
+              <div className="mt-4 flex items-center gap-2 rounded-lg border border-demo-border bg-demo-bg px-3.5 py-2.5 text-sm text-demo-text">
                 <p>
                   <span className="font-bold">Portfolio demo mode:</span> Up
                   to 5 results per search. More require login.
@@ -228,10 +228,10 @@ function Field({
 
 function ResultsTable({ results }: { results: EmailResult[] }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-xl border border-neutral-border bg-white shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full min-w-175 text-left text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50 text-xs font-medium uppercase tracking-wide text-slate-500">
+          <thead className="border-b border-neutral-border bg-slate-50 text-xs font-medium uppercase tracking-wide text-slate-500">
             <tr>
               <th className="px-5 py-3.5">Restaurant</th>
               <th className="px-5 py-3.5">Website</th>
@@ -249,7 +249,7 @@ function ResultsTable({ results }: { results: EmailResult[] }) {
 
                 <td className="px-5 py-4">
                   <a
-                    className="text-blue-600 hover:text-blue-700 hover:underline"
+                    className="text-terracotta hover:text-terracotta-hover hover:underline"
                     href={restaurant.website}
                     target="_blank"
                     rel="noreferrer"
@@ -261,7 +261,7 @@ function ResultsTable({ results }: { results: EmailResult[] }) {
                 <td className="px-5 py-4">
                   {restaurant.email ? (
                     <a
-                      className="text-blue-600 hover:text-blue-700 hover:underline"
+                      className="text-terracotta hover:text-terracotta-hover hover:underline"
                       href={`mailto:${restaurant.email}`}
                     >
                       {restaurant.email}
@@ -293,7 +293,7 @@ function ResultsTable({ results }: { results: EmailResult[] }) {
 
 function LoadingState({ count }: { count: number }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-xl border border-neutral-border bg-white p-5 shadow-sm">
       <div className="mb-5 flex items-center gap-3 text-sm text-slate-600">
         <Spinner />
         <span>Searching {count} restaurant websites for email addresses…</span>
@@ -314,9 +314,9 @@ function LoadingState({ count }: { count: number }) {
 
 function EmptyState({ hasSearched }: { hasSearched: boolean }) {
   return (
-    <div className="grid min-h-60 place-items-center rounded-xl border border-dashed border-slate-300 bg-white px-6 text-center">
+    <div className="grid min-h-60 place-items-center rounded-xl border border-dashed border-neutral-border bg-white px-6 text-center">
       <div>
-        <div className="mx-auto grid h-11 w-11 place-items-center rounded-full bg-blue-50 text-blue-600">
+        <div className="mx-auto grid h-11 w-11 place-items-center rounded-full bg-demo-bg text-terracotta">
           <EmailIcon />
         </div>
 

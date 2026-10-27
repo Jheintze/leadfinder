@@ -91,14 +91,14 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
+    <main className="min-h-screen bg-app-bg text-slate-900">
       <div className="mx-auto flex min-h-screen max-w-[1600px]">
         <AppSidebar activePage="restaurant-search" />
 
         <section className="min-w-0 flex-1 px-5 py-6 sm:px-8 lg:px-12 lg:py-10">
           <MobileHeader />
           <div className="mb-8 mt-8 sm:mt-0">
-            <p className="text-sm font-medium text-blue-600">Lead research</p>
+            <p className="text-sm font-medium text-terracotta">Lead research</p>
             <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
               Find your next restaurant leads
             </h1>
@@ -110,7 +110,7 @@ export default function Home() {
 
           <form
             onSubmit={handleSubmit}
-            className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+            className="rounded-xl border border-neutral-border bg-white p-5 shadow-sm sm:p-6"
           >
             <div className="grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_160px_auto] lg:items-end">
               <Field label="City" htmlFor="city">
@@ -157,7 +157,7 @@ export default function Home() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-400"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-terracotta px-4 text-sm font-medium text-white transition-colors hover:bg-terracotta-hover disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isLoading ? (
                   <>
@@ -172,7 +172,7 @@ export default function Home() {
             </div>
 
             {isLoggedIn === false && (
-              <div className="mt-4 flex items-center gap-2 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2.5 text-sm text-blue-800">
+              <div className="mt-4 flex items-center gap-2 rounded-lg border border-demo-border bg-demo-bg px-3.5 py-2.5 text-sm text-demo-text">
                 <p>
                   <span className="font-bold">Portfolio demo mode:</span> Up to
                   5 results per search. More require login. New account
@@ -273,10 +273,10 @@ function Field({
 
 function ResultsTable({ leads }: { leads: Lead[] }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-xl border border-neutral-border bg-white shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50 text-xs font-medium uppercase tracking-wide text-slate-500">
+          <thead className="border-b border-neutral-border bg-slate-50 text-xs font-medium uppercase tracking-wide text-slate-500">
             <tr>
               <th className="px-5 py-3.5">Business</th>
               <th className="px-5 py-3.5">Website</th>
@@ -292,7 +292,7 @@ function ResultsTable({ leads }: { leads: Lead[] }) {
                 <td className="px-5 py-4">
                   {lead.website ? (
                     <a
-                      className="text-blue-600 hover:text-blue-700 hover:underline"
+                      className="text-terracotta hover:text-terracotta-hover hover:underline"
                       href={lead.website}
                       target="_blank"
                       rel="noreferrer"
@@ -317,7 +317,7 @@ function ResultsTable({ leads }: { leads: Lead[] }) {
 
 function ResultsMobileList({ leads }: { leads: Lead[] }) {
   return (
-    <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div className="divide-y divide-neutral-border rounded-xl border border-neutral-border bg-white shadow-sm">
       {leads.map((lead) => (
         <div key={lead.id} className="px-4 py-4">
           <p className="font-medium text-slate-900">{lead.name}</p>
@@ -331,7 +331,7 @@ function ResultsMobileList({ leads }: { leads: Lead[] }) {
               href={lead.website}
               target="_blank"
               rel="noreferrer"
-              className="mt-2 block truncate text-sm text-blue-600 hover:underline"
+              className="mt-2 block truncate text-sm text-terracotta hover:underline"
             >
               {lead.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
             </a>
@@ -348,7 +348,7 @@ function ResultsMobileList({ leads }: { leads: Lead[] }) {
 
 function LoadingState({ count }: { count: number }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-xl border border-neutral-border bg-white p-5 shadow-sm">
       <div className="mb-5 flex items-center gap-3 text-sm text-slate-600">
         <Spinner />
         <span>Looking for {count} businesses that match your search…</span>
@@ -365,9 +365,9 @@ function LoadingState({ count }: { count: number }) {
 }
 function EmptyState({ hasSearched }: { hasSearched: boolean }) {
   return (
-    <div className="grid min-h-60 place-items-center rounded-xl border border-dashed border-slate-300 bg-white px-6 text-center">
+    <div className="grid min-h-60 place-items-center rounded-xl border border-dashed border-neutral-border bg-white px-6 text-center">
       <div>
-        <div className="mx-auto grid h-11 w-11 place-items-center rounded-full bg-blue-50 text-blue-600">
+        <div className="mx-auto grid h-11 w-11 place-items-center rounded-full bg-demo-bg text-terracotta">
           <SearchIcon />
         </div>
         <h3 className="mt-4 font-medium text-slate-800">
