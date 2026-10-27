@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { AppSidebar } from "../../components/app-sidebar";
 import { MobileHeader } from "../../components/mobile-header";
-import Link from "next/link";
+
 import { useAuthStatus } from "@/hooks/use-auth-status";
 import {
   OUTREACH_SUBJECT,
@@ -563,14 +563,12 @@ export default function OutreachPage() {
                     {isLoggedIn === false && (
                       <div className="rounded-lg border border-blue-100 bg-blue-50 px-3 py-2.5 text-sm text-blue-800">
                         <p>
-                          <span className="font-medium">Demo mode:</span>{" "}
-                          Prepare and preview outreach, to send emails{" "}
-                          <Link
-                            href="/login"
-                            className="font-semibold underline underline-offset-2 hover:text-blue-950"
-                          >
-                            Log in
-                          </Link>
+                          <span className="font-bold">
+                            Portfolio demo mode:
+                          </span>{" "}
+                          You can explore the available features without an
+                          account, but some actions like sending require login. New account
+                          registration is currently unavailable.
                         </p>
                       </div>
                     )}

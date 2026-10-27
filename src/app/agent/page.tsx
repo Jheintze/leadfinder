@@ -252,15 +252,12 @@ export default function AgentPage() {
                   {isLoggedIn === false && (
                     <div className="mt-4 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
                       <p>
-                        <span className="font-semibold">Demo mode:</span> You
-                        can search for restaurants and prepare outreach drafts.
-                        Sending emails requires you to{" "}
-                        <a
-                          href="/login"
-                          className="font-semibold underline underline-offset-2 hover:text-blue-950"
-                        >
-                          Log in
-                        </a>
+                        <span className="text-md font-bold text-blue-900">
+                          Portfolio demo mode:
+                        </span>{" "}
+                        You can explore the available features without an
+                        account, but some actions like sending require login.
+                        New account registration is currently unavailable.
                       </p>
                     </div>
                   )}
@@ -360,8 +357,8 @@ export default function AgentPage() {
 
               {isLoggedIn === false && (
                 <div className="mt-6 rounded-lg border border-blue-100 bg-blue-50 p-4">
-                  <p className="text-sm font-semibold text-blue-900">
-                    Demo mode
+                  <p className="text-md font-bold text-blue-900">
+                    Portfolio demo mode
                   </p>
 
                   <ul className="mt-3 space-y-2 text-sm leading-5 text-blue-900">
@@ -376,14 +373,9 @@ export default function AgentPage() {
                   <div className="my-4 border-t border-blue-200" />
 
                   <p className="text-sm leading-6 text-blue-800">
-                    Existing users can{" "}
-                    <a
-                      href="/login"
-                      className="font-semibold underline underline-offset-2"
-                    >
-                      log in
-                    </a>
-                    . New account registration is currently unavailable.
+                    You can explore the available features without an account,
+                    but some actions require login. New account registration is
+                    currently unavailable.
                   </p>
                 </div>
               )}

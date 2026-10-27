@@ -4,7 +4,7 @@ import { useRef, useState} from "react";
 import type { SubmitEvent } from "react";
 import { AppSidebar } from "../../components/app-sidebar";
 import { MobileHeader } from "../../components/mobile-header";
-import Link from "next/link";
+
 import { useAuthStatus } from "@/hooks/use-auth-status";
 
 type Lead = {
@@ -173,17 +173,10 @@ export default function Home() {
 
             {isLoggedIn === false && (
               <div className="mt-4 flex items-center gap-2 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2.5 text-sm text-blue-800">
-                
                 <p>
-                  <span className="font-medium">Demo mode:</span> Up to 5
-                  results per search.{" "}
-                  <Link
-                    href="/login"
-                    className="font-semibold underline underline-offset-2 hover:text-blue-950"
-                  >
-                    Log in
-                  </Link>{" "}
-                  for more.
+                  <span className="font-bold">Portfolio demo mode:</span> Up to
+                  5 results per search. More require login. New account
+                  registration is currently unavailable.
                 </p>
               </div>
             )}
