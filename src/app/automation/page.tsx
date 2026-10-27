@@ -235,7 +235,7 @@ async function handleClearHistory() {
               {error}
             </p>
           ) : (
-            <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
+            <div className="grid grid-cols-1 items-start gap-20 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)] xl:gap-6">
               <div className="min-w-0 w-full max-w-3xl justify-self-start space-y-8">
                 <section>
                   <div className="mb-4">
@@ -397,8 +397,8 @@ async function handleClearHistory() {
 
                     <p className="text-sm leading-6 text-demo-text">
                       You can explore the available features without an account,
-                      but some actions like sending require login. New account registration
-                      is currently unavailable.
+                      but some actions like sending require login. New account
+                      registration is currently unavailable.
                     </p>
                   </div>
                 )}
