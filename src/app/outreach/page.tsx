@@ -328,7 +328,7 @@ export default function OutreachPage() {
                   email.
                 </p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-3 sm:justify-end">
                 <label className="flex cursor-pointer items-center gap-2 text-xs font-medium text-slate-600">
                   <input
                     type="checkbox"
@@ -511,7 +511,7 @@ export default function OutreachPage() {
               <DraftEmptyState />
             ) : (
               <div className="rounded-xl border border-neutral-border bg-white p-5 shadow-sm sm:p-6">
-                <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+                <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
                   <div>
                     <p className="text-sm font-medium text-terracotta">
                       Outreach ready
@@ -534,7 +534,7 @@ export default function OutreachPage() {
                     </p>
                   </div>
 
-                  <div className="flex shrink-0 flex-col gap-3 sm:w-80 lg:w-96">
+                  <div className="flex min-w-0 flex-col gap-3">
                     <div className="flex items-center justify-end gap-2">
                       <button
                         type="button"
@@ -567,8 +567,8 @@ export default function OutreachPage() {
                             Portfolio demo mode:
                           </span>{" "}
                           You can explore the available features without an
-                          account, but some actions like sending require login. New account
-                          registration is currently unavailable.
+                          account, but some actions like sending require login.
+                          New account registration is currently unavailable.
                         </p>
                       </div>
                     )}
