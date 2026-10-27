@@ -205,7 +205,7 @@ async function handleClearHistory() {
   );
  
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
+    <main className="min-h-screen bg-app-bg text-slate-900">
       <div className="mx-auto flex min-h-screen max-w-[1600px]">
         <AppSidebar activePage="automation" />
 
@@ -213,7 +213,7 @@ async function handleClearHistory() {
           <MobileHeader />
 
           <div className="mb-8 mt-8 sm:mt-0">
-            <p className="text-sm font-medium text-blue-600">Automation</p>
+            <p className="text-sm font-medium text-terracotta">Automation</p>
 
             <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
               Daily outreach
@@ -331,9 +331,9 @@ async function handleClearHistory() {
                 </section>
               </div>
 
-              <aside className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm xl:sticky xl:top-8">
+              <aside className="rounded-xl border border-neutral-border bg-white p-5 shadow-sm xl:sticky xl:top-8">
                 <div className="flex items-center gap-2">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-sm font-semibold text-blue-600">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-demo-bg text-sm font-semibold text-terracotta">
                     <AutomationIcon />
                   </span>
                   <div>
@@ -379,12 +379,12 @@ async function handleClearHistory() {
                 </div>
 
                 {isLoggedIn === false && (
-                  <div className="mt-6 rounded-lg border border-blue-100 bg-blue-50 p-4">
-                    <p className="text-md font-bold text-blue-900">
+                  <div className="mt-6 rounded-lg border border-demo-border bg-demo-bg p-4">
+                    <p className="text-md font-bold text-demo-text">
                       Portfolio demo mode
                     </p>
 
-                    <ul className="mt-3 space-y-2 text-sm leading-5 text-blue-900">
+                    <ul className="mt-3 space-y-2 text-sm leading-5 text-demo-text">
                       <li>
                         • Viewing batches and reviewing messages are available.
                       </li>
@@ -393,9 +393,9 @@ async function handleClearHistory() {
                       </li>
                     </ul>
 
-                    <div className="my-4 border-t border-blue-200" />
+                    <div className="my-4 border-t border-demo-border" />
 
-                    <p className="text-sm leading-6 text-blue-800">
+                    <p className="text-sm leading-6 text-demo-text">
                       You can explore the available features without an account,
                       but some actions like sending require login. New account registration
                       is currently unavailable.
@@ -461,7 +461,7 @@ function BatchCard({
   const isFailed = batch.status === "failed";
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+    <div className="rounded-xl border border-neutral-border bg-white p-5 shadow-sm sm:p-6">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">
@@ -516,7 +516,7 @@ function BatchCard({
               title={
                 isLoggedIn === true ? undefined : "Log in to send outreach"
               }
-              className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg bg-terracotta px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-terracotta-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSending ? "Sending..." : "Send"}
             </button>
@@ -525,7 +525,7 @@ function BatchCard({
       </div>
 
       {isReviewing && isReady && (
-        <div className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4">
+        <div className="mt-5 rounded-lg border border-neutral-border bg-slate-50 p-4">
           <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
             Subject
           </p>
@@ -607,7 +607,7 @@ function EmptyState({
   description: string;
 }) {
   return (
-    <div className="grid min-h-40 place-items-center rounded-xl border border-dashed border-slate-300 bg-white px-6 text-center">
+    <div className="grid min-h-40 place-items-center rounded-xl border border-dashed border-neutral-border bg-white px-6 text-center">
       <div>
         <h3 className="font-medium text-slate-800">{title}</h3>
 

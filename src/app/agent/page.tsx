@@ -170,7 +170,7 @@ export default function AgentPage() {
     : sendMessage;
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
+    <main className="min-h-screen bg-app-bg text-slate-900">
       <div className="mx-auto flex min-h-screen max-w-[1600px]">
         <AppSidebar activePage="agent" />
 
@@ -178,7 +178,7 @@ export default function AgentPage() {
           <MobileHeader />
 
           <div className="mb-8 mt-8 sm:mt-0">
-            <p className="text-sm font-medium text-blue-600">Automation</p>
+            <p className="text-sm font-medium text-terracotta">Automation</p>
 
             <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
               Agent
@@ -191,7 +191,7 @@ export default function AgentPage() {
           </div>
 
           <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
-            <div className="min-w-0 w-full max-w-3xl justify-self-start rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="min-w-0 w-full max-w-3xl justify-self-start rounded-xl border border-neutral-border bg-white p-5 shadow-sm">
               <label
                 htmlFor="agent-task"
                 className="text-sm font-medium text-slate-700"
@@ -204,18 +204,18 @@ export default function AgentPage() {
                 value={task}
                 onChange={(event) => setTask(event.target.value)}
                 placeholder="e.g. Find 20 restaurants in Berlin and prepare personalized outreach..."
-                className="mt-3 w-full rounded-lg border border-slate-300 p-3 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="mt-3 w-full rounded-lg border border-slate-300 p-3 text-sm outline-none transition focus:border-terracotta focus:ring-1 focus:ring-terracotta"
               />
               <button
                 type="button"
                 onClick={handleRunAgent}
                 disabled={loading || !task.trim()}
-                className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="mt-4 rounded-lg bg-terracotta px-4 py-2 text-sm font-medium text-white transition hover:bg-terracotta-hover disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? "Running..." : "Run Agent"}
               </button>
               {response && (
-                <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <div className="mt-6 rounded-lg border border-neutral-border bg-slate-50 p-4">
                   <div className="whitespace-pre-line text-sm leading-6 text-slate-700">
                     {response}
                   </div>
@@ -223,7 +223,7 @@ export default function AgentPage() {
               )}
 
               {outreach && (
-                <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="mt-6 rounded-xl border border-neutral-border bg-white p-5 shadow-sm">
                   <div className="flex items-center justify-between gap-4">
                     <div>
                       <p className="text-sm font-semibold text-slate-800">
@@ -243,16 +243,16 @@ export default function AgentPage() {
                         outreach.restaurants.length === 0
                       }
                       onClick={handleSendOutreach}
-                      className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="shrink-0 rounded-lg bg-terracotta px-4 py-2 text-sm font-medium text-white transition hover:bg-terracotta-hover disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {sendingOutreach ? "Sending..." : "Send outreach"}
                     </button>
                   </div>
 
                   {isLoggedIn === false && (
-                    <div className="mt-4 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
+                    <div className="mt-4 rounded-lg border border-demo-border bg-demo-bg px-4 py-3 text-sm leading-6 text-demo-text">
                       <p>
-                        <span className="text-md font-bold text-blue-900">
+                        <span className="text-md font-bold text-demo-text">
                           Portfolio demo mode:
                         </span>{" "}
                         You can explore the available features without an
@@ -309,9 +309,9 @@ export default function AgentPage() {
             </div>
 
             {/* Demo mode information */}
-            <aside className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm xl:sticky xl:top-8">
+            <aside className="rounded-xl border border-neutral-border bg-white p-5 shadow-sm xl:sticky xl:top-8">
               <div className="flex items-center gap-2">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-sm font-semibold text-blue-600">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-demo-bg text-sm font-semibold text-terracotta">
                   <AgentIcon />
                 </span>
                 <div>
@@ -356,12 +356,12 @@ export default function AgentPage() {
               </div>
 
               {isLoggedIn === false && (
-                <div className="mt-6 rounded-lg border border-blue-100 bg-blue-50 p-4">
-                  <p className="text-md font-bold text-blue-900">
+                <div className="mt-6 rounded-lg border border-demo-border bg-demo-bg p-4">
+                  <p className="text-md font-bold text-demo-text">
                     Portfolio demo mode
                   </p>
 
-                  <ul className="mt-3 space-y-2 text-sm leading-5 text-blue-900">
+                  <ul className="mt-3 space-y-2 text-sm leading-5 text-demo-text">
                     <li>
                       • Restaurant and email searches are limited to 5 results
                       per request.
@@ -370,9 +370,9 @@ export default function AgentPage() {
                     <li>• Sending emails is disabled.</li>
                   </ul>
 
-                  <div className="my-4 border-t border-blue-200" />
+                  <div className="my-4 border-t border-demo-border" />
 
-                  <p className="text-sm leading-6 text-blue-800">
+                  <p className="text-sm leading-6 text-demo-text">
                     You can explore the available features without an account,
                     but some actions require login. New account registration is
                     currently unavailable.
@@ -380,7 +380,7 @@ export default function AgentPage() {
                 </div>
               )}
               {isLoggedIn === true && (
-                <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <div className="mt-6 rounded-lg border border-neutral-border bg-slate-50 p-4">
                   <p className="text-sm font-medium text-slate-800">
                     You&apos;re logged in
                   </p>

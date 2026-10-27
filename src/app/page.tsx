@@ -16,7 +16,7 @@ export default async function DashboardPage() {
       : 0;
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
+    <main className="min-h-screen bg-app-bg text-slate-900">
       <div className="mx-auto flex min-h-screen max-w-[1600px]">
         <AppSidebar activePage="dashboard" />
 
@@ -24,7 +24,7 @@ export default async function DashboardPage() {
           <MobileHeader />
 
           <div className="mb-8 mt-8 sm:mt-0">
-            <p className="text-sm font-medium text-blue-600">Lead research</p>
+            <p className="text-sm font-medium text-terracotta">Lead research</p>
 
             <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
               Dashboard
@@ -56,7 +56,7 @@ export default async function DashboardPage() {
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-xl border border-neutral-border bg-white p-5 shadow-sm">
       <p className="text-sm font-medium text-slate-500">{label}</p>
 
       <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">

@@ -1,8 +1,39 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
+  /* Muted Terracotta Brand System */
+  --primary-accent: #8A5438;
+  --primary-accent-hover: #73452E;
+  --primary-accent-light: #F5EAE3;
+  --primary-accent-muted: #C49B85;
+
+  /* Portfolio Demo Mode Panel */
+  --demo-panel-bg: #F5EAE3;
+  --demo-panel-border: #E3C9B9;
+  --demo-panel-text: #573A2C;
+
+  /* Surfaces & Structural Neutrals */
+  --app-bg: #FAF9F6;
+  --neutral-borders: #E5E0DA;
+  --white-surface: #FFFFFF;
+
+  --background: var(--app-bg);
   --foreground: #0f172a;
+}
+
+@theme {
+  --color-terracotta: var(--primary-accent);
+  --color-terracotta-hover: var(--primary-accent-hover);
+  --color-terracotta-light: var(--primary-accent-light);
+  --color-terracotta-muted: var(--primary-accent-muted);
+
+  --color-demo-bg: var(--demo-panel-bg);
+  --color-demo-border: var(--demo-panel-border);
+  --color-demo-text: var(--demo-panel-text);
+
+  --color-app-bg: var(--app-bg);
+  --color-neutral-border: var(--neutral-borders);
+  --color-white-surface: var(--white-surface);
 }
 
 * {
@@ -22,7 +53,7 @@ body {
 .input {
   height: 2.5rem;
   width: 100%;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--neutral-borders, #e5e0da);
   border-radius: 0.5rem;
   background: #fff;
   padding: 0 0.75rem;
@@ -38,6 +69,6 @@ body {
 }
 
 .input:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.12);
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 3px rgb(138 84 56 / 0.15);
 }

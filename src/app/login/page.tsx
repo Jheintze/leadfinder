@@ -54,7 +54,7 @@ export default function LoginPage() {
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             required
-            className="w-full rounded-lg border px-3 py-2"
+            className="w-full rounded-lg border border-neutral-border px-3 py-2 outline-none transition focus:border-terracotta focus:ring-1 focus:ring-terracotta"
           />
 
           <input
@@ -63,7 +63,7 @@ export default function LoginPage() {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             required
-            className="w-full rounded-lg border px-3 py-2"
+            className="w-full rounded-lg border border-neutral-border px-3 py-2 outline-none transition focus:border-terracotta focus:ring-1 focus:ring-terracotta"
           />
         </div>
 
@@ -72,7 +72,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-black px-4 py-2 text-white disabled:opacity-50"
+          className="w-full rounded-lg bg-terracotta px-4 py-2 text-white transition hover:bg-terracotta-hover disabled:opacity-50"
         >
           {loading ? "Signing in..." : "Sign in"}
         </button>

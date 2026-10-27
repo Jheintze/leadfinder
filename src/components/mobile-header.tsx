@@ -9,9 +9,9 @@ export function MobileHeader() {
 
   return (
     <div className="relative md:hidden">
-      <header className="flex items-center justify-between border-b border-slate-200 pb-5">
+      <header className="flex items-center justify-between border-b border-neutral-border pb-5">
         <div className="flex items-center gap-2">
-          <div className="grid h-8 w-8 place-items-center rounded-lg bg-blue-600 text-xs font-bold text-white">
+          <div className="grid h-8 w-8 place-items-center rounded-lg bg-terracotta text-xs font-bold text-white">
             L
           </div>
 
@@ -30,7 +30,7 @@ export function MobileHeader() {
       </header>
 
       <nav
-        className={`absolute left-0 right-0 top-full z-50 mt-3 rounded-xl border border-slate-200 bg-white p-2 shadow-lg transition-all duration-150 ${
+        className={`absolute left-0 right-0 top-full z-50 mt-3 rounded-xl border border-neutral-border bg-white p-2 shadow-lg transition-all duration-150 ${
           menuOpen
             ? "visible translate-y-0 opacity-100"
             : "invisible -translate-y-1 opacity-0"

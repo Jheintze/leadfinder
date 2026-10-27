@@ -69,9 +69,9 @@ export function AppSidebar({ activePage }: AppSidebarProps) {
   }, []);
 
   return (
-    <aside className="hidden w-60 shrink-0 border-r border-slate-200 bg-white px-5 py-6 md:flex md:flex-col">
+    <aside className="hidden w-60 shrink-0 border-r border-neutral-border bg-white px-5 py-6 md:flex md:flex-col">
       <div className="flex items-center gap-3 px-2">
-        <div className="grid h-9 w-9 place-items-center rounded-lg bg-blue-600 text-sm font-bold text-white">
+        <div className="grid h-9 w-9 place-items-center rounded-lg bg-terracotta text-sm font-bold text-white">
           L
         </div>
         <span className="text-lg font-semibold tracking-tight">LeadFinder</span>
@@ -83,7 +83,7 @@ export function AppSidebar({ activePage }: AppSidebarProps) {
             key={href}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium ${
               activePage === page
-                ? "bg-blue-50 text-blue-700"
+                ? "bg-demo-bg text-terracotta font-semibold"
                 : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
             }`}
             href={href}
