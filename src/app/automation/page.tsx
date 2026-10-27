@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AppSidebar } from "../../components/app-sidebar";
+import { AutomationIcon } from "../../components/app-sidebar";
 import { MobileHeader } from "../../components/mobile-header";
 import { useAuthStatus } from "@/hooks/use-auth-status";
 import {
@@ -202,11 +203,7 @@ async function handleClearHistory() {
   const completedBatches = batches.filter(
     (batch) => batch.status === "sent" || batch.status === "failed",
   );
-  console.log({
-    isLoggedIn,
-    batches: batches.map((batch) => batch.status),
-    completedCount: completedBatches.length,
-  });
+ 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto flex min-h-screen max-w-[1600px]">
@@ -238,116 +235,190 @@ async function handleClearHistory() {
               {error}
             </p>
           ) : (
-            <div className="max-w-4xl space-y-8">
-              {isLoggedIn !== true && (
-                <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-                  <p className="font-medium">Demo mode</p>
-                  <p className="mt-1">
-                    You can review automation batches, but sending emails
-                    requires an existing account and{" "}
-                    <a
-                      href="/login"
-                      className="font-medium underline underline-offset-2 hover:text-blue-900"
-                    >
-                      login
-                    </a>
-                    . New registrations are currently unavailable.
-                  </p>
-                </div>
-              )}
-
-              <section>
-                <div className="mb-4">
-                  <h2 className="text-lg font-semibold tracking-tight">
-                    Pending outreach
-                  </h2>
-
-                  <p className="mt-1 text-sm text-slate-500">
-                    Batches waiting to be reviewed and sent.
-                  </p>
-                </div>
-
-                {pendingBatches.length === 0 ? (
-                  <EmptyState
-                    title="No pending outreach"
-                    description="There are currently no automated outreach batches waiting to be sent."
-                  />
-                ) : (
-                  <div className="space-y-4">
-                    {pendingBatches.map((batch) => (
-                      <BatchCard
-                        key={batch.id}
-                        batch={batch}
-                        isLoggedIn={isLoggedIn}
-                        isReviewing={reviewingBatchId === batch.id}
-                        onRemove={() => handleRemoveBatch(batch.id)}
-                        onToggleReview={() =>
-                          setReviewingBatchId((current) =>
-                            current === batch.id ? null : batch.id,
-                          )
-                        }
-                        onSendAll={() => handleSendAll(batch.id)}
-                        isSending={sendingBatchId === batch.id}
-                      />
-                    ))}
-                  </div>
-                )}
-              </section>
-              <section>
-                <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
+            <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
+              <div className="min-w-0 w-full max-w-3xl justify-self-start space-y-8">
+                <section>
+                  <div className="mb-4">
                     <h2 className="text-lg font-semibold tracking-tight">
-                      Batch history
+                      Pending outreach
                     </h2>
 
                     <p className="mt-1 text-sm text-slate-500">
-                      Previously processed automated outreach batches.
+                      Batches waiting to be reviewed and sent.
                     </p>
                   </div>
 
-                  {completedBatches.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={handleClearHistory}
-                      disabled={isLoggedIn !== true}
-                      title={
-                        isLoggedIn === true
-                          ? undefined
-                          : "Log in to clear history"
-                      }
-                      className="self-start rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
-                    >
-                      Clear history
-                    </button>
+                  {pendingBatches.length === 0 ? (
+                    <EmptyState
+                      title="No pending outreach"
+                      description="There are currently no automated outreach batches waiting to be sent."
+                    />
+                  ) : (
+                    <div className="space-y-4">
+                      {pendingBatches.map((batch) => (
+                        <BatchCard
+                          key={batch.id}
+                          batch={batch}
+                          isLoggedIn={isLoggedIn}
+                          isReviewing={reviewingBatchId === batch.id}
+                          onRemove={() => handleRemoveBatch(batch.id)}
+                          onToggleReview={() =>
+                            setReviewingBatchId((current) =>
+                              current === batch.id ? null : batch.id,
+                            )
+                          }
+                          onSendAll={() => handleSendAll(batch.id)}
+                          isSending={sendingBatchId === batch.id}
+                        />
+                      ))}
+                    </div>
                   )}
+                </section>
+                <section>
+                  <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <h2 className="text-lg font-semibold tracking-tight">
+                        Batch history
+                      </h2>
+
+                      <p className="mt-1 text-sm text-slate-500">
+                        Previously processed automated outreach batches.
+                      </p>
+                    </div>
+
+                    {completedBatches.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleClearHistory}
+                        disabled={isLoggedIn !== true}
+                        title={
+                          isLoggedIn === true
+                            ? undefined
+                            : "Log in to clear history"
+                        }
+                        className="self-start rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
+                      >
+                        Clear history
+                      </button>
+                    )}
+                  </div>
+
+                  {completedBatches.length === 0 ? (
+                    <EmptyState
+                      title="No batch history yet"
+                      description="Completed and failed batches will appear here."
+                    />
+                  ) : (
+                    <div className="space-y-3">
+                      {completedBatches.map((batch) => (
+                        <BatchCard
+                          key={batch.id}
+                          batch={batch}
+                          isLoggedIn={isLoggedIn}
+                          isReviewing={reviewingBatchId === batch.id}
+                          onRemove={() => handleRemoveBatch(batch.id)}
+                          onToggleReview={() =>
+                            setReviewingBatchId((current) =>
+                              current === batch.id ? null : batch.id,
+                            )
+                          }
+                          onSendAll={() => handleSendAll(batch.id)}
+                          isSending={sendingBatchId === batch.id}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </section>
+              </div>
+
+              <aside className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm xl:sticky xl:top-8">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-sm font-semibold text-blue-600">
+                    <AutomationIcon />
+                  </span>
+                  <div>
+                    <h2 className="text-base font-semibold text-slate-900">
+                      Daily outreach automation
+                    </h2>
+                    <p className="text-xs text-slate-500">
+                      Scheduled lead generation and outreach preparation
+                    </p>
+                  </div>
                 </div>
 
-                {completedBatches.length === 0 ? (
-                  <EmptyState
-                    title="No batch history yet"
-                    description="Completed and failed batches will appear here."
-                  />
-                ) : (
-                  <div className="space-y-3">
-                    {completedBatches.map((batch) => (
-                      <BatchCard
-                        key={batch.id}
-                        batch={batch}
-                        isLoggedIn={isLoggedIn}
-                        isReviewing={reviewingBatchId === batch.id}
-                        onRemove={() => handleRemoveBatch(batch.id)}
-                        onToggleReview={() =>
-                          setReviewingBatchId((current) =>
-                            current === batch.id ? null : batch.id,
-                          )
-                        }
-                        onSendAll={() => handleSendAll(batch.id)}
-                        isSending={sendingBatchId === batch.id}
-                      />
-                    ))}
+                <div className="mt-5 space-y-5">
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-800">
+                      1. Automated daily runs
+                    </h3>
+                    <p className="mt-1 text-sm leading-6 text-slate-600">
+                      A scheduled Vercel Cron Job runs once a day to find
+                      restaurants and prepare an outreach batch of up to 5
+                      restaurants.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-800">
+                      2. Review prepared batches
+                    </h3>
+                    <p className="mt-1 text-sm leading-6 text-slate-600">
+                      Review the restaurants and prepared outreach messages
+                      before deciding whether to send them.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-800">
+                      3. Track batch history
+                    </h3>
+                    <p className="mt-1 text-sm leading-6 text-slate-600">
+                      View previously processed batches and check their status.
+                    </p>
+                  </div>
+                </div>
+
+                {isLoggedIn === false && (
+                  <div className="mt-6 rounded-lg border border-blue-100 bg-blue-50 p-4">
+                    <p className="text-sm font-semibold text-blue-900">
+                      Demo mode
+                    </p>
+
+                    <ul className="mt-3 space-y-2 text-sm leading-5 text-blue-900">
+                      <li>
+                        • Viewing batches and reviewing messages are available.
+                      </li>
+                      <li>
+                        • Sending emails and deleting batches require login.
+                      </li>
+                    </ul>
+
+                    <div className="my-4 border-t border-blue-200" />
+
+                    <p className="text-sm leading-6 text-blue-800">
+                      Existing users can{" "}
+                      <a
+                        href="/login"
+                        className="font-semibold underline underline-offset-2"
+                      >
+                        log in
+                      </a>
+                      . New account registration is currently unavailable.
+                    </p>
                   </div>
                 )}
-              </section>
+
+                {isLoggedIn === true && (
+                  <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-sm font-medium text-slate-800">
+                      You&apos;re logged in
+                    </p>
+                    <p className="mt-1 text-sm leading-5 text-slate-600">
+                      You can send outreach batches and manage batch history.
+                    </p>
+                  </div>
+                )}
+              </aside>
             </div>
           )}
         </section>

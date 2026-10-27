@@ -191,7 +191,7 @@ export default function AgentPage() {
           </div>
 
           <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
-            <div className="min-w-0 w-full max-w-2xl justify-self-start rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="min-w-0 w-full max-w-3xl justify-self-start rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
               <label
                 htmlFor="agent-task"
                 className="text-sm font-medium text-slate-700"

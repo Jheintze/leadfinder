@@ -204,7 +204,7 @@ export function AgentIcon() {
   );
 }
 
-function AutomationIcon() {
+export function AutomationIcon() {
   return (
     <svg
       aria-hidden="true"
