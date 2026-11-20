@@ -111,11 +111,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Project Status
 
-LeadFinder is a completed portfolio project with its core functionality implemented, including restaurant discovery, email enrichment, AI-assisted outreach, Gmail integration, and AI agent workflows.
+LeadFinder is a fully functional portfolio project, currently focused on restaurant lead generation and outreach.
 
-The application includes a public demo mode that allows visitors to explore its main functionality without registering.
+The core features are implemented, including restaurant discovery, email enrichment, AI-assisted outreach, Gmail integration, AI agent workflows, and scheduled lead discovery through Vercel Cron.
 
-Scheduled automation is configured through Vercel Cron.
+Future development may include support for additional business types and further improvements to the platform.
 
 ## Purpose
 
