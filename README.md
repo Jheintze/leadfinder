@@ -6,6 +6,8 @@ LeadFinder is a full-stack web application designed to streamline restaurant pro
 
 The project combines external data sources, automated email discovery, AI-assisted workflows, and Gmail integration to reduce the manual work involved in finding and contacting potential business customers.
 
+<img width="987" height="681" alt="leadfinder2" src="https://github.com/user-attachments/assets/15836422-2a0c-405b-a737-c058a730f739" />
+
 ## Features
 
 ### Restaurant Discovery
@@ -109,11 +111,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Project Status
 
-LeadFinder is an actively developed portfolio project. Its core restaurant discovery, email enrichment, AI-assisted outreach, Gmail integration, and agent workflows have been implemented.
+LeadFinder is a completed portfolio project with its core functionality implemented, including restaurant discovery, email enrichment, AI-assisted outreach, Gmail integration, and AI agent workflows.
 
-The application also includes a public demo mode so visitors can explore its main functionality without registering.
+The application includes a public demo mode that allows visitors to explore its main functionality without registering.
 
-Scheduled automation is configured for Vercel Cron and requires deployment configuration before its production behaviour can be verified.
+Scheduled automation is configured through Vercel Cron.
 
 ## Purpose
 
