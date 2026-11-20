@@ -6,7 +6,7 @@ LeadFinder is a full-stack web application designed to streamline restaurant pro
 
 The project combines external data sources, automated email discovery, AI-assisted workflows, and Gmail integration to reduce the manual work involved in finding and contacting potential business customers.
 
-<img width="987" height="681" alt="leadfinder2" src="https://github.com/user-attachments/assets/15836422-2a0c-405b-a737-c058a730f739" />
+<img width="1108" height="750" alt="leadfinder" src="https://github.com/user-attachments/assets/08a5e1d9-8fda-4d52-8d3a-bf71960de3f8" />
 
 ## Features
 
